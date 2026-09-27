@@ -8,11 +8,11 @@
  */
 
 window.VENDO_CONFIG = {
-  // Your Supabase Project URL (e.g. https://xyzcompany.supabase.co)
-  SUPABASE_URL: window.__ENV?.SUPABASE_URL || "https://your-project-ref.supabase.co",
+  // Your Supabase Project URL
+  SUPABASE_URL: window.__ENV?.SUPABASE_URL || "https://oidamfhjfcgyisrcacgc.supabase.co",
   
   // Your Supabase Public Anon Key (safe for client-side browser usage)
-  SUPABASE_ANON_KEY: window.__ENV?.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-anon-key",
+  SUPABASE_ANON_KEY: window.__ENV?.SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9pZGFtZmhqZmNneWlzcmNhY2djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1MjU0MTEsImV4cCI6MjEwNjEwMTQxMX0.LQ_65ACYbrkpT1dsc7r1BIWKQi4yHbPoXzp65CDvNAc",
 };
 
 // Initialize Supabase JS Client if loaded via CDN
