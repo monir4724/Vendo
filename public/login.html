@@ -5,13 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign In & Register · Vendo</title>
-  <script src="../../src/js/theme.js"></script>
+  <script src="../src/js/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
     href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Sora:wght@400;500;600;700&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="../../src/css/styles.css">
+  <link rel="stylesheet" href="../src/css/styles.css">
   <style>
     .auth-split {
       display: flex;
@@ -200,7 +200,7 @@
   <main class="auth-split">
     <!-- LEFT SIDE: Live Shopping Hero Image -->
     <section class="auth-visual" aria-label="Vendo Live Commerce showcase">
-      <img src="../assets/login-hero.jpg" alt="Vendo Live Stream Commerce showcase with artisan creators and live shoppers">
+      <img src="assets/login-hero.jpg" alt="Vendo Live Stream Commerce showcase with artisan creators and live shoppers">
       <div class="auth-visual-overlay">
         <div class="flex gap-2" style="align-items:center;margin-bottom:8px">
           <span class="badge badge-live" style="background:#ef4444;color:#fff;font-weight:700;padding:2px 8px;border-radius:12px;font-size:11px">
@@ -222,7 +222,7 @@
       <div class="auth-card">
         <!-- Brand Header -->
         <div class="auth-header">
-          <a href="../index.html" class="flex gap-2" style="align-items:center;margin-bottom:16px;text-decoration:none">
+          <a href="index.html" class="flex gap-2" style="align-items:center;margin-bottom:16px;text-decoration:none">
             <span class="brand-mark" style="width:36px;height:36px;font-size:18px">V</span>
             <div>
               <strong style="font-family:var(--font-display);font-size:20px;letter-spacing:-0.02em;color:var(--color-text-primary)">Vendo</strong>
@@ -373,7 +373,7 @@
   </main>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="../../src/js/ui.js"></script>
+  <script src="../src/js/ui.js"></script>
   <script>
     if (window.lucide) lucide.createIcons();
 
@@ -460,7 +460,7 @@
             sessionStorage.setItem("vendo_role", "admin");
             sessionStorage.setItem("vendo_user", identifier);
             if (window.VendoUI) VendoUI.toast({ title: "Admin Authenticated", desc: "Redirecting to Admin Control...", type: "success" });
-            window.location.href = "../admin/dashboard.html";
+            window.location.href = "admin/dashboard.html";
             return;
           } else {
             errorBox.textContent = "Invalid Admin credentials. Please verify your password.";
@@ -476,7 +476,7 @@
           sessionStorage.setItem("vendo_role", "vendor");
           sessionStorage.setItem("vendo_user", identifier);
           if (window.VendoUI) VendoUI.toast({ title: "Vendor Studio", desc: "Welcome back to your studio!", type: "success" });
-          window.location.href = "../vendor/dashboard.html";
+          window.location.href = "vendor/dashboard.html";
           return;
         }
 
@@ -484,7 +484,7 @@
         sessionStorage.setItem("vendo_role", "customer");
         sessionStorage.setItem("vendo_user", identifier);
         if (window.VendoUI) VendoUI.toast({ title: "Welcome to Vendo", desc: "Happy live shopping!", type: "success" });
-        window.location.href = "home.html";
+        window.location.href = "customer/home.html";
       }, 500);
     });
 
@@ -505,9 +505,9 @@
         sessionStorage.setItem("vendo_name", name);
 
         if (role === "vendor") {
-          window.location.href = "../vendor/onboarding.html";
+          window.location.href = "vendor/onboarding.html";
         } else {
-          window.location.href = "home.html";
+          window.location.href = "customer/home.html";
         }
       }, 500);
     });
@@ -520,7 +520,7 @@
       setTimeout(() => {
         sessionStorage.setItem("vendo_role", "customer");
         sessionStorage.setItem("vendo_user", "google.user@gmail.com");
-        window.location.href = "home.html";
+        window.location.href = "customer/home.html";
       }, 700);
     });
   </script>
