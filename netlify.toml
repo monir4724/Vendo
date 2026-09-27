@@ -15,8 +15,8 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(self), microphone=(self), geolocation=()"
 
-# Default redirect to landing page
+# Default redirect to login page
 [[redirects]]
   from = "/"
-  to = "/public/index.html"
+  to = "/public/login.html"
   status = 302
