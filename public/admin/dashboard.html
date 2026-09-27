@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin dashboard · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search vendors, orders" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+      <div class="content" id="main">
+        <h1 class="h1 mb-4">Platform overview</h1>
+        <div class="bento">
+          <section class="card span-6 row-2">
+            <h2 class="h4">GMV trend</h2>
+            <div class="chart"><span style="height:30%"></span><span style="height:45%"></span><span style="height:50%"></span><span style="height:40%"></span><span style="height:72%"></span><span style="height:80%"></span><span style="height:68%"></span><span style="height:90%"></span></div>
+          </section>
+          <section class="card span-3">
+            <p class="caption">Live streams now</p>
+            <p class="kpi h1">3</p>
+            <span class="badge badge-live"><span class="pulse-dot"></span> Live</span>
+          </section>
+          <section class="card span-3">
+            <p class="caption">Pending disputes</p>
+            <p class="kpi h1">2</p>
+            <a class="caption" href="disputes.html">Open queue</a>
+          </section>
+          <div class="card span-4"><p class="caption">Total sales</p><p class="kpi h2">$82.4k</p></div>
+          <div class="card span-4"><p class="caption">Active vendors</p><p class="kpi h2">146</p></div>
+          <div class="card span-4"><p class="caption">New orders today</p><p class="kpi h2">91</p></div>
+          <section class="card span-12">
+            <h2 class="h4 mb-4">Activity</h2>
+            <p class="caption">KYC submitted · Kiln & Co · 12m ago</p>
+            <p class="caption">Reel flagged · Verdant Lab · 1h ago</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>VendoLayout.mountDashboard("admin");</script>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marketplace Taxonomy Tree · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    .cat-tree-node {
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-card);
+      margin-bottom: var(--space-2);
+      overflow: hidden;
+      background: var(--color-bg-surface);
+    }
+    .cat-node-header {
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background var(--duration-fast);
+    }
+    .cat-node-header:hover {
+      background: var(--color-bg-subtle);
+    }
+    .cat-sub-list {
+      padding: var(--space-2) var(--space-4) var(--space-3) var(--space-6);
+      border-top: 1px dashed var(--color-border-default);
+      background: var(--color-bg-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+    .cat-sub-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .cat-sub-item:hover, .cat-sub-item.is-selected {
+      background: var(--color-bg-surface);
+      box-shadow: var(--shadow-elev-1);
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search taxonomy, slugs, SKUs…" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Marketplace Taxonomy Tree</h1>
+            <p class="secondary mt-1">Hierarchical catalog categories, filter facets, and live stream discovery tags.</p>
+          </div>
+          <button class="btn btn-primary" type="button" id="btn-add-root">
+            <i data-lucide="folder-plus"></i> Add Root Category
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start;">
+          <!-- Left: Category Tree -->
+          <section class="card" style="padding: var(--space-4);">
+            <div class="flex-between mb-3">
+              <strong style="font-size: 15px;">Active Taxonomy Branches</strong>
+              <span class="caption secondary">4 Branches · 11 Subcategories</span>
+            </div>
+            <div id="tree-container"></div>
+          </section>
+
+          <!-- Right: Edit / Metadata Panel -->
+          <section class="card stack gap-4" id="cat-editor-card">
+            <div class="flex-between">
+              <h2 class="h3" id="edit-header">Category Properties</h2>
+              <span class="badge badge-success" id="edit-status">Active</span>
+            </div>
+
+            <form id="cat-edit-form" class="stack gap-3">
+              <div>
+                <label class="label" for="cat-name">Category Title</label>
+                <input class="field" id="cat-name" required value="Apparel">
+              </div>
+
+              <div>
+                <label class="label" for="cat-slug">URL Slug</label>
+                <input class="field mono" id="cat-slug" required value="apparel">
+              </div>
+
+              <div>
+                <label class="label" for="cat-desc">Marketplace Meta Description</label>
+                <textarea class="field" id="cat-desc" rows="3">Curated European flax linen shirts, breathable summer resort wear, and handmade artisan garments.</textarea>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label class="label">Total Products (SKUs)</label>
+                  <strong class="mono h4" id="cat-skus">142 SKUs</strong>
+                </div>
+                <div>
+                  <label class="label">Live Broadcasts Tagged</label>
+                  <strong class="mono h4" id="cat-streams">18 Streams</strong>
+                </div>
+              </div>
+
+              <div class="flex gap-2 pt-3">
+                <button class="btn btn-primary flex-1" type="submit">
+                  <i data-lucide="check"></i> Save Category Changes
+                </button>
+                <button class="btn btn-outline" type="button" id="btn-add-sub" title="Add Subcategory under this branch">
+                  <i data-lucide="plus"></i> Add Sub
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    var taxonomy = [
+      {
+        id: "cat-1",
+        name: "Apparel",
+        slug: "apparel",
+        skus: 142,
+        streams: 18,
+        desc: "Curated European flax linen shirts, breathable summer resort wear, and handmade artisan garments.",
+        children: [
+          { id: "sub-1-1", name: "Resort Shirts", slug: "resort-shirts", skus: 64 },
+          { id: "sub-1-2", name: "Linen Trousers", slug: "linen-trousers", skus: 42 },
+          { id: "sub-1-3", name: "Silk Scarves & Wraps", slug: "silk-scarves", skus: 36 }
+        ]
+      },
+      {
+        id: "cat-2",
+        name: "Home & Living",
+        slug: "home",
+        skus: 198,
+        streams: 24,
+        desc: "Wheel-thrown speckled ceramics, specialty pour-over drippers, and hand-loomed textiles.",
+        children: [
+          { id: "sub-2-1", name: "Ceramics & Drinkware", slug: "ceramics-drinkware", skus: 92 },
+          { id: "sub-2-2", name: "Coffee & Tea Accessories", slug: "coffee-accessories", skus: 68 },
+          { id: "sub-2-3", name: "Handwoven Throws", slug: "handwoven-throws", skus: 38 }
+        ]
+      },
+      {
+        id: "cat-3",
+        name: "Leather Goods",
+        slug: "leather",
+        skus: 76,
+        streams: 12,
+        desc: "Full-grain vegetable-tanned leather totes, hand-stitched bifold wallets, and EDC accessories.",
+        children: [
+          { id: "sub-3-1", name: "Studio Totes & Bags", slug: "studio-totes", skus: 44 },
+          { id: "sub-3-2", name: "Wallets & Cardholders", slug: "wallets-cardholders", skus: 32 }
+        ]
+      },
+      {
+        id: "cat-4",
+        name: "Clean Beauty",
+        slug: "beauty",
+        skus: 88,
+        streams: 15,
+        desc: "Small-batch botanical face elixirs, organic cold-pressed serums, and mulberry silk pillowcases.",
+        children: [
+          { id: "sub-4-1", name: "Botanical Face Oils", slug: "botanical-face-oils", skus: 52 },
+          { id: "sub-4-2", name: "Silk Sleep Essentials", slug: "silk-essentials", skus: 36 }
+        ]
+      }
+    ];
+
+    function renderTree() {
+      var container = document.getElementById("tree-container");
+      container.innerHTML = taxonomy.map(function(branch) {
+        var subHtml = branch.children.map(function(sub) {
+          return '<div class="cat-sub-item" onclick="selectSub(\'' + branch.id + '\', \'' + sub.id + '\')">' +
+            '<span><i data-lucide="corner-down-right" style="width: 12px; height: 12px; display: inline; color: var(--color-brand);"></i> ' + sub.name + '</span>' +
+            '<span class="caption mono secondary">' + sub.skus + ' SKUs</span>' +
+          '</div>';
+        }).join("");
+
+        return '<div class="cat-tree-node">' +
+          '<div class="cat-node-header" onclick="selectBranch(\'' + branch.id + '\')">' +
+            '<div class="flex gap-2" style="align-items: center;">' +
+              '<i data-lucide="folder" style="width: 16px; height: 16px; color: var(--color-brand);"></i>' +
+              '<span>' + branch.name + '</span>' +
+            '</div>' +
+            '<div class="flex gap-2" style="align-items: center;">' +
+              '<span class="badge" style="background: var(--color-bg-canvas); font-size: 11px;">' + branch.skus + ' SKUs</span>' +
+              '<i data-lucide="chevron-down" style="width: 14px; height: 14px;"></i>' +
+            '</div>' +
+          '</div>' +
+          '<div class="cat-sub-list">' + subHtml + '</div>' +
+        '</div>';
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    var selectedBranchId = "cat-1";
+
+    window.selectBranch = function(id) {
+      selectedBranchId = id;
+      var branch = taxonomy.find(function(b) { return b.id === id; });
+      if (!branch) return;
+
+      document.getElementById("edit-header").textContent = "Branch: " + branch.name;
+      document.getElementById("cat-name").value = branch.name;
+      document.getElementById("cat-slug").value = branch.slug;
+      document.getElementById("cat-desc").value = branch.desc;
+      document.getElementById("cat-skus").textContent = branch.skus + " SKUs";
+      document.getElementById("cat-streams").textContent = branch.streams + " Streams";
+    };
+
+    window.selectSub = function(branchId, subId) {
+      selectedBranchId = branchId;
+      var branch = taxonomy.find(function(b) { return b.id === branchId; });
+      if (!branch) return;
+      var sub = branch.children.find(function(s) { return s.id === subId; });
+      if (!sub) return;
+
+      document.getElementById("edit-header").textContent = "Subcategory: " + sub.name;
+      document.getElementById("cat-name").value = sub.name;
+      document.getElementById("cat-slug").value = sub.slug;
+      document.getElementById("cat-desc").value = "Subcategory under parent taxonomy branch " + branch.name + ".";
+      document.getElementById("cat-skus").textContent = sub.skus + " SKUs";
+      document.getElementById("cat-streams").textContent = "Facet Filter Tag";
+    };
+
+    // Save Form
+    document.getElementById("cat-edit-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var newName = document.getElementById("cat-name").value.trim();
+      var branch = taxonomy.find(function(b) { return b.id === selectedBranchId; });
+      if (branch) {
+        branch.name = newName;
+        branch.slug = document.getElementById("cat-slug").value.trim();
+        branch.desc = document.getElementById("cat-desc").value.trim();
+        renderTree();
+        VendoUI.toast("Taxonomy Updated", "Category '" + newName + "' saved and published to catalog filters.", "success");
+      }
+    });
+
+    // Add Root Category Modal
+    document.getElementById("btn-add-root").addEventListener("click", function() {
+      VendoUI.modal({
+        title: "Create Root Category",
+        body: '<div class="stack gap-3" style="text-align: left;">' +
+          '<div><label class="label">Category Title</label><input class="field" id="new-root-title" placeholder="e.g. Footwear & Shoes"></div>' +
+          '<div><label class="label">URL Slug</label><input class="field mono" id="new-root-slug" placeholder="e.g. footwear"></div>' +
+        '</div>',
+        ok: "Create Branch",
+        onOk: function() {
+          var title = document.getElementById("new-root-title").value.trim() || "New Branch";
+          var slug = document.getElementById("new-root-slug").value.trim() || "new-branch";
+          taxonomy.push({
+            id: "cat-" + Date.now(),
+            name: title,
+            slug: slug,
+            skus: 0,
+            streams: 0,
+            desc: "Newly added marketplace branch.",
+            children: []
+          });
+          renderTree();
+          VendoUI.toast("Category Added", "Root category '" + title + "' added to catalog taxonomy.", "success");
+        }
+      });
+    });
+
+    // Add Subcategory Modal
+    document.getElementById("btn-add-sub").addEventListener("click", function() {
+      var branch = taxonomy.find(function(b) { return b.id === selectedBranchId; });
+      var branchName = branch ? branch.name : "Category";
+
+      VendoUI.modal({
+        title: "Add Subcategory to " + branchName,
+        body: '<div class="stack gap-3" style="text-align: left;">' +
+          '<div><label class="label">Subcategory Name</label><input class="field" id="new-sub-title" placeholder="e.g. Vintage Loafers"></div>' +
+          '<div><label class="label">Slug</label><input class="field mono" id="new-sub-slug" placeholder="e.g. vintage-loafers"></div>' +
+        '</div>',
+        ok: "Add Subcategory",
+        onOk: function() {
+          var title = document.getElementById("new-sub-title").value.trim() || "New Sub";
+          var slug = document.getElementById("new-sub-slug").value.trim() || "new-sub";
+          if (branch) {
+            branch.children.push({
+              id: "sub-" + Date.now(),
+              name: title,
+              slug: slug,
+              skus: 0
+            });
+            renderTree();
+            VendoUI.toast("Subcategory Created", "'" + title + "' added under " + branchName + ".", "success");
+          }
+        }
+      });
+    });
+
+    renderTree();
+  </script>
+</body>
+</html>

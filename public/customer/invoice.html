@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tax Invoice · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #fff !important; color: #1e293b !important; }
+      .invoice-card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+    }
+  </style>
+</head>
+<body style="background:var(--color-bg-canvas)">
+  <main class="container" style="padding:32px 0 80px;max-width:800px">
+    <!-- Top Actions (Hidden on Print) -->
+    <div class="flex-between no-print mb-6">
+      <a class="btn btn-outline" href="orders.html"><i data-lucide="arrow-left"></i> Return to Orders</a>
+      <div class="flex gap-2">
+        <button class="btn btn-cta" type="button" onclick="window.print()">
+          <i data-lucide="printer"></i> Print / Save as PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Legal Tax Invoice Card -->
+    <article class="card invoice invoice-card" style="padding:48px;background:var(--color-bg-surface);border:1px solid var(--color-border-default)">
+      <!-- Header -->
+      <div class="flex-between" style="align-items:flex-start;border-bottom:2px solid var(--color-border-default);padding-bottom:24px;margin-bottom:28px">
+        <div>
+          <div class="flex gap-2" style="align-items:center;margin-bottom:8px">
+            <span class="brand-mark" style="width:36px;height:36px;font-size:18px">V</span>
+            <strong style="font-size:22px;letter-spacing:-0.02em">Vendo</strong>
+          </div>
+          <div class="caption secondary">
+            Vendo Marketplace Technologies Ltd.<br>
+            VAT / BIN Registration: <span class="mono">004291042-0102</span><br>
+            74 Gulshan Avenue, Dhaka 1212
+          </div>
+        </div>
+
+        <div style="text-align:right">
+          <h1 class="h2" style="letter-spacing:0.04em;text-transform:uppercase;color:var(--color-brand)">Tax Invoice</h1>
+          <div class="mono" style="font-size:16px;font-weight:600;margin-top:4px" id="inv-id">VD-10421</div>
+          <div class="caption secondary mt-1">Issue Date: <span class="mono" id="inv-date">2026-09-27</span></div>
+          <div class="caption secondary">Payment Status: <strong style="color:var(--color-success)">PAID</strong></div>
+        </div>
+      </div>
+
+      <!-- Bill To & Ship To -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:28px">
+        <div>
+          <div class="caption" style="text-transform:uppercase;letter-spacing:0.04em;font-weight:600;margin-bottom:6px">Billed & Shipped To:</div>
+          <strong id="inv-customer" style="font-size:15px;display:block">Amina Rahman</strong>
+          <div class="secondary" id="inv-address" style="font-size:13px;line-height:20px">House 42, Road 11, Banani, Dhaka</div>
+          <div class="caption mono secondary" id="inv-phone">+880 1712 345678</div>
+        </div>
+        <div style="text-align:right">
+          <div class="caption" style="text-transform:uppercase;letter-spacing:0.04em;font-weight:600;margin-bottom:6px">Shipping & Order Source:</div>
+          <div class="caption">Dispatch Method: <strong id="inv-carrier">Pathao Express / DHL</strong></div>
+          <div class="caption">Tracking Number: <span class="mono" id="inv-trk">TRK-982142</span></div>
+          <div class="caption">Purchased Via: <span class="badge badge-live" id="inv-source">Live Stream</span></div>
+        </div>
+      </div>
+
+      <!-- Line Items Table -->
+      <table class="data" style="margin-bottom:24px">
+        <thead>
+          <tr>
+            <th style="width:48%">Item Description</th>
+            <th style="width:12%;text-align:center">Qty</th>
+            <th style="width:20%;text-align:right">Unit Price</th>
+            <th style="width:20%;text-align:right">Total</th>
+          </tr>
+        </thead>
+        <tbody id="inv-items-table"></tbody>
+      </table>
+
+      <!-- Calculations & Taxes -->
+      <div style="display:flex;justify-content:flex-end">
+        <div class="stack gap-2" style="width:280px;font-size:13px">
+          <div class="flex-between">
+            <span class="secondary">Subtotal</span>
+            <span class="mono" id="inv-subtotal">$0.00</span>
+          </div>
+          <div class="flex-between">
+            <span class="secondary">VAT / Sales Tax (7.5%)</span>
+            <span class="mono" id="inv-tax">$0.00</span>
+          </div>
+          <div class="flex-between">
+            <span class="secondary">Delivery Fee</span>
+            <span class="mono" id="inv-shipping">FREE</span>
+          </div>
+          <div class="flex-between pt-2" style="border-top:2px solid var(--color-border-default)">
+            <strong style="font-size:16px">Grand Total</strong>
+            <strong class="mono h3 price" id="inv-total" style="font-size:20px">$0.00</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legal Footer -->
+      <div style="margin-top:40px;padding-top:20px;border-top:1px solid var(--color-border-default);display:flex;justify-content:space-between;align-items:center" class="caption secondary">
+        <div>
+          This is an electronically generated and digitally signed tax invoice valid under digital commerce regulations.
+        </div>
+        <div class="mono">
+          Page 1 of 1
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script>
+    var params = new URLSearchParams(location.search);
+    var orderId = params.get("id");
+    var order = (orderId && VendoOrders.get(orderId)) || VendoOrders.all()[0];
+
+    if (order) {
+      document.title = "Tax Invoice " + order.id + " · Vendo";
+      document.getElementById("inv-id").textContent = order.id;
+      document.getElementById("inv-date").textContent = order.date;
+      document.getElementById("inv-customer").textContent = order.customer;
+      document.getElementById("inv-address").textContent = order.address;
+      document.getElementById("inv-phone").textContent = order.phone || "";
+      document.getElementById("inv-carrier").textContent = order.carrier || "Express Courier";
+      document.getElementById("inv-trk").textContent = order.trackingNumber || "N/A";
+      document.getElementById("inv-source").textContent = (order.source || "web").toUpperCase();
+
+      var items = order.items || [
+        { name: "Linen Resort Shirt", qty: 1, price: 48 }
+      ];
+
+      var sub = order.subtotal || items.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+      var tax = order.tax !== undefined ? order.tax : Math.round(sub * 0.075 * 100) / 100;
+      var ship = order.shipping !== undefined ? order.shipping : 0;
+      var tot = order.total || (sub + tax + ship);
+
+      document.getElementById("inv-items-table").innerHTML = items.map(function (i) {
+        return (
+          '<tr>' +
+            '<td><strong>' + i.name + '</strong></td>' +
+            '<td class="mono" style="text-align:center">' + i.qty + '</td>' +
+            '<td class="mono" style="text-align:right">$' + Number(i.price).toFixed(2) + '</td>' +
+            '<td class="mono" style="text-align:right">$' + (i.price * i.qty).toFixed(2) + '</td>' +
+          '</tr>'
+        );
+      }).join("");
+
+      document.getElementById("inv-subtotal").textContent = "$" + Number(sub).toFixed(2);
+      document.getElementById("inv-tax").textContent = "$" + Number(tax).toFixed(2);
+      document.getElementById("inv-shipping").textContent = ship === 0 ? "FREE" : "$" + Number(ship).toFixed(2);
+      document.getElementById("inv-total").textContent = "$" + Number(tot).toFixed(2);
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

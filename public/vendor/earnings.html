@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendor Earnings & Settlements · Vendor Studio · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search transactions, payouts…" aria-label="Search"></div>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4 flex-wrap gap-2">
+          <div>
+            <h1 class="h1">Earnings & Treasury Settlements</h1>
+            <p class="secondary mt-1">Real-time escrow reconciliation, transparent marketplace fees, and direct withdrawals.</p>
+          </div>
+          <button class="btn btn-cta" type="button" id="btn-request-payout">
+            <i data-lucide="wallet"></i> Request Payout Withdrawal
+          </button>
+        </div>
+
+        <!-- 3 KPI Cards -->
+        <div class="grid mb-6" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+          <!-- Available Balance -->
+          <div class="card stack gap-1">
+            <span class="caption secondary">Available for Withdrawal</span>
+            <div class="kpi h1 price" style="color: var(--color-brand); font-size: 36px;">$4,210.00</div>
+            <span class="caption" style="color: var(--color-success); font-weight: 500;">✓ Ready for immediate bank transfer</span>
+          </div>
+
+          <!-- In Escrow Buffer -->
+          <div class="card stack gap-1">
+            <span class="caption secondary">In Escrow (Pending Fulfillment)</span>
+            <div class="kpi h1 mono" style="font-size: 36px;">$1,840.00</div>
+            <span class="caption secondary">Clears upon delivery confirmation (7–14 days)</span>
+          </div>
+
+          <!-- Total Lifetime Sales -->
+          <div class="card stack gap-1">
+            <span class="caption secondary">Lifetime Gross Volume</span>
+            <div class="kpi h1 mono" style="font-size: 36px;">$38,420.00</div>
+            <span class="caption secondary">Transparent 8% platform commission applied</span>
+          </div>
+        </div>
+
+        <!-- Transparent 8% Fee Structure Banner -->
+        <div class="card mb-6" style="background: var(--color-bg-subtle); padding: var(--space-4);">
+          <div class="flex-between flex-wrap gap-2">
+            <div class="flex gap-3" style="align-items: center;">
+              <i data-lucide="percent" style="width: 24px; height: 24px; color: var(--color-brand);"></i>
+              <div>
+                <strong>Transparent Marketplace Commission (8.0%)</strong>
+                <p class="caption secondary" style="margin: 2px 0 0;">Zero hidden listing costs. Vendo charges a flat 8% fee only when your pieces sell.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 mono caption">
+              <span>Gross Sale: $100</span> &rarr;
+              <span class="secondary">Fee: -$8.00</span> &rarr;
+              <strong style="color: var(--color-success);">Net Payout: $92.00</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Settlements Table -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="flex-between" style="padding: var(--space-4); border-bottom: 1px solid var(--color-border-default);">
+            <strong style="font-size: 15px;">Settlement Ledger & Payout History</strong>
+            <span class="caption secondary">Showing last 30 days</span>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Transaction Reference</th>
+                  <th>Date & Time</th>
+                  <th>Type</th>
+                  <th>Gross Amount</th>
+                  <th>Platform Fee (8%)</th>
+                  <th>Net Disbursed</th>
+                  <th>Settlement Status</th>
+                </tr>
+              </thead>
+              <tbody id="settlements-tbody">
+                <tr>
+                  <td class="mono font-bold">TX-994120</td>
+                  <td class="mono caption secondary">2026-09-27 15:30</td>
+                  <td><span class="badge" style="background: var(--color-bg-subtle);">Payout Withdrawal</span></td>
+                  <td class="mono">$2,480.00</td>
+                  <td class="mono secondary">-$198.40</td>
+                  <td class="mono price font-bold">$2,281.60</td>
+                  <td><span class="badge badge-warning">Processing Wire</span></td>
+                </tr>
+                <tr>
+                  <td class="mono font-bold">TX-984102</td>
+                  <td class="mono caption secondary">2026-09-25 11:04</td>
+                  <td><span class="badge badge-live">Live Stream Sale</span></td>
+                  <td class="mono">$147.60</td>
+                  <td class="mono secondary">-$11.80</td>
+                  <td class="mono price font-bold">$135.80</td>
+                  <td><span class="badge badge-success">Cleared to Balance</span></td>
+                </tr>
+                <tr>
+                  <td class="mono font-bold">TX-972108</td>
+                  <td class="mono caption secondary">2026-09-22 14:00</td>
+                  <td><span class="badge" style="background: var(--color-bg-subtle);">Payout Withdrawal</span></td>
+                  <td class="mono">$1,150.00</td>
+                  <td class="mono secondary">-$92.00</td>
+                  <td class="mono price font-bold">$1,058.00</td>
+                  <td><span class="badge badge-success">Settled via bKash</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    // Request Payout Modal
+    document.getElementById("btn-request-payout").addEventListener("click", function() {
+      var modalHtml = 
+        '<div class="stack gap-3" style="text-align: left;">' +
+          '<p class="secondary" style="font-size: 13px;">Transfer funds from your available balance of <strong>$4,210.00</strong> to your registered bank account or mobile money merchant wallet.</p>' +
+          '<div>' +
+            '<label class="label">Withdrawal Amount ($)</label>' +
+            '<input class="field mono" id="payout-amount" type="number" min="50" max="4210" value="1000" placeholder="Min. $50.00">' +
+          '</div>' +
+          '<div>' +
+            '<label class="label">Payout Destination Rail</label>' +
+            '<select class="field" id="payout-method">' +
+              '<option value="wire">Bank Wire: City Bank Ltd (SEPA / IBAN ending in 9102)</option>' +
+              '<option value="bkash">bKash Merchant Wallet (+880 1711 **** 88)</option>' +
+            '</select>' +
+          '</div>' +
+          '<div class="card" style="background: var(--color-bg-subtle); padding: 10px; font-size: 12px;" class="caption secondary">' +
+            'Estimated deposit: Same-day for bKash; 1-2 business days for bank wire. 8% platform fee already cleared.' +
+          '</div>' +
+        '</div>';
+
+      VendoUI.modal({
+        title: "Request Payout Withdrawal",
+        body: modalHtml,
+        ok: "Submit Withdrawal",
+        onOk: function() {
+          var amt = document.getElementById("payout-amount").value;
+          VendoUI.toast("Payout Queued", "Withdrawal of $" + amt + " submitted to treasury queue. Ref #PO-" + Math.floor(Math.random()*900 + 100), "success");
+        }
+      });
+      lucide.createIcons();
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

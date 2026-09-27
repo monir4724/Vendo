@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Broadcast Studio (70/30) · Vendor Studio · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    .studio-chat-stream {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 4px;
+      max-height: 280px;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to studio console</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="flex gap-2" style="align-items: center;">
+          <span class="badge badge-live"><span class="pulse-dot"></span> BROADCASTING LIVE</span>
+          <span class="caption mono secondary" id="stream-timer">00:42:15</span>
+        </div>
+        <div class="flex gap-3" style="align-items: center;">
+          <span class="caption" style="display: flex; align-items: center; gap: 6px;">
+            <i data-lucide="eye" style="width: 15px; height: 15px; color: var(--color-brand);"></i>
+            <strong class="mono" id="viewer-count">1,248</strong> watching
+          </span>
+          <button class="btn btn-sm btn-danger" type="button" id="btn-end-broadcast">
+            <i data-lucide="radio" style="width: 14px; height: 14px; margin-right: 4px;"></i> End Stream
+          </button>
+        </div>
+      </header>
+
+      <div class="content cols-70-30" id="main">
+        <!-- 70% Video Stream Monitor -->
+        <div class="card" style="padding: 0; overflow: hidden; background: #0c0a09; position: relative; min-height: 540px; display: flex; flex-direction: column; justify-content: space-between;">
+          <!-- Video Backdrop -->
+          <div style="position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1280&q=80&auto=format') center/cover; opacity: 0.9;"></div>
+
+          <!-- Top Overlay Controls -->
+          <div style="position: relative; z-index: 2; padding: 16px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);">
+            <div class="flex gap-2" style="align-items: center;">
+              <span class="badge" style="background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.2);">Kiln & Co Studio</span>
+              <span class="badge badge-success">HD 1080p 60fps</span>
+            </div>
+            <!-- Media Quick Toggles -->
+            <div class="flex gap-2">
+              <button class="icon-btn" style="background: rgba(0,0,0,0.6); color: #fff;" id="toggle-mic" title="Mute/Unmute Mic" type="button">
+                <i data-lucide="mic"></i>
+              </button>
+              <button class="icon-btn" style="background: rgba(0,0,0,0.6); color: #fff;" id="toggle-cam" title="Toggle Camera" type="button">
+                <i data-lucide="video"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Pinned Product Glass Overlay -->
+          <div style="position: relative; z-index: 2; padding: 16px;">
+            <div class="product-glass glass-heavy" id="pinned-product-overlay" style="background: rgba(28,25,23,0.78); backdrop-filter: blur(24px); box-shadow: 0 0 24px rgba(249,115,22,0.35);">
+              <img id="host-pin-img" src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=160&q=80&auto=format" alt="" width="60" height="60" style="border-radius: 8px; object-fit: cover;">
+              <div style="flex: 1; min-width: 0;">
+                <div class="caption" style="color: #fdba74; font-weight: 600;">PINNED ITEM ON STREAM</div>
+                <div id="host-pin-name" style="font-weight: 600; font-size: 15px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Ceramic Pour-Over &amp; Carafe</div>
+                <div class="price" id="host-pin-price" style="font-size: 16px; color: #fff;">$32.00</div>
+              </div>
+              <span class="btn btn-cta btn-sm" style="box-shadow: 0 0 16px rgba(249,115,22,0.5);">Buy Now</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 30% Host Control Console -->
+        <aside class="card stack gap-4" style="height: fit-content;">
+          <!-- Realtime Stream Metrics -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--color-bg-subtle); padding: 12px; border-radius: 8px;">
+            <div>
+              <div class="caption secondary">Stream GMV</div>
+              <strong class="mono h3 price" id="live-sales-gmv">$1,408</strong>
+            </div>
+            <div>
+              <div class="caption secondary">Orders Placed</div>
+              <strong class="mono h3" id="live-orders-count">44 orders</strong>
+            </div>
+          </div>
+
+          <!-- Console Tabs -->
+          <div class="tabs" role="tablist">
+            <button class="tab" aria-selected="true" data-tab="chat" type="button">Live Chat</button>
+            <button class="tab" aria-selected="false" data-tab="pin" type="button">Pin Product</button>
+            <button class="tab" aria-selected="false" data-tab="sales" type="button">Live Sales</button>
+          </div>
+
+          <!-- Tab 1: Live Chat -->
+          <div id="pane-chat" class="stack gap-2">
+            <div class="studio-chat-stream" id="chat-messages">
+              <div class="caption secondary" style="text-align: center;">--- Stream broadcast connected ---</div>
+              <div class="bubble bubble-ai" style="font-size: 13px;"><strong>Maya R.:</strong> Is this speckled clay body high-fired?</div>
+              <div class="bubble" style="background: var(--role-accent-soft); font-size: 13px;"><strong>Host (You):</strong> Yes! Fired to Cone 6 vitrification. Completely waterproof.</div>
+              <div class="bubble bubble-ai" style="font-size: 13px;"><strong>Arif H.:</strong> Just ordered with the carafe! Can't wait.</div>
+            </div>
+
+            <!-- Host Chat Composer -->
+            <form id="host-chat-form" class="flex gap-2" style="margin-top: 8px;">
+              <input class="field" id="host-msg-input" placeholder="Reply to viewers as host..." style="font-size: 13px;">
+              <button class="btn btn-sm btn-primary" type="submit">
+                <i data-lucide="send"></i>
+              </button>
+            </form>
+          </div>
+
+          <!-- Tab 2: Pinned Product Switcher -->
+          <div id="pane-pin" class="hidden stack gap-3">
+            <p class="caption secondary">Switch the active pinned product. All connected viewer screens will update instantly.</p>
+            <div class="stack gap-2" id="host-skus-list"></div>
+          </div>
+
+          <!-- Tab 3: Realtime Orders -->
+          <div id="pane-sales" class="hidden stack gap-2" id="stream-sales-stream">
+            <div class="card" style="padding: 10px; background: var(--color-bg-subtle);">
+              <div class="flex-between caption"><strong>Sofia M.</strong> <span class="mono price">$32.00</span></div>
+              <div class="caption secondary">Ceramic Pour-Over · 1m ago</div>
+            </div>
+            <div class="card" style="padding: 10px; background: var(--color-bg-subtle);">
+              <div class="flex-between caption"><strong>Kenji T.</strong> <span class="mono price">$64.00</span></div>
+              <div class="caption secondary">Ceramic Pour-Over (Qty 2) · 3m ago</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    // Host Tab Switching
+    document.querySelectorAll(".tab").forEach(function(t) {
+      t.addEventListener("click", function() {
+        document.querySelectorAll(".tab").forEach(function(x) { x.setAttribute("aria-selected", "false"); });
+        t.setAttribute("aria-selected", "true");
+        var target = t.getAttribute("data-tab");
+        document.getElementById("pane-chat").classList.toggle("hidden", target !== "chat");
+        document.getElementById("pane-pin").classList.toggle("hidden", target !== "pin");
+        document.getElementById("pane-sales").classList.toggle("hidden", target !== "sales");
+      });
+    });
+
+    // Populate SKUs for Pinning
+    var prods = (VendoData && VendoData.products) || [];
+    var pinContainer = document.getElementById("host-skus-list");
+    pinContainer.innerHTML = prods.slice(0, 4).map(function(p) {
+      return '<div class="card card-hover flex gap-3" style="align-items: center; padding: 10px; cursor: pointer;" onclick="pinProduct(\'' + p.id + '\')">' +
+        '<img src="' + p.img + '" style="width: 44px; height: 44px; border-radius: 6px; object-fit: cover;">' +
+        '<div style="flex: 1; min-width: 0;">' +
+          '<div style="font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">' + p.name + '</div>' +
+          '<div class="price mono" style="font-size: 13px;">$' + p.price + '</div>' +
+        '</div>' +
+        '<button class="btn btn-sm btn-outline" type="button">Pin Now</button>' +
+      '</div>';
+    }).join("");
+
+    window.pinProduct = function(id) {
+      var p = prods.find(function(x) { return x.id === id; });
+      if (!p) return;
+      document.getElementById("host-pin-img").src = p.img;
+      document.getElementById("host-pin-name").textContent = p.name;
+      document.getElementById("host-pin-price").textContent = "$" + p.price + ".00";
+      VendoUI.toast("Product Pinned", "'" + p.name + "' is now highlighted to 1,248 live viewers.", "success");
+    };
+
+    // Host Chat Sending
+    document.getElementById("host-chat-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var input = document.getElementById("host-msg-input");
+      var text = input.value.trim();
+      if (!text) return;
+
+      var stream = document.getElementById("chat-messages");
+      var div = document.createElement("div");
+      div.className = "bubble";
+      div.style.background = "var(--role-accent-soft)";
+      div.style.fontSize = "13px";
+      div.innerHTML = "<strong>Host (You):</strong> " + text;
+      stream.appendChild(div);
+      input.value = "";
+      stream.scrollTop = stream.scrollHeight;
+    });
+
+    // End Broadcast Confirm
+    document.getElementById("btn-end-broadcast").addEventListener("click", function() {
+      VendoUI.modal({
+        title: "End Live Broadcast?",
+        body: "Are you sure you want to conclude this live stream session? Final sales summary will be calculated and viewers will be redirected to your storefront catalog.",
+        danger: true,
+        ok: "End Stream",
+        onOk: function() {
+          VendoUI.toast("Stream Concluded", "Session ended. Total GMV: $1,408 across 44 orders.", "info");
+          setTimeout(function() {
+            location.href = "dashboard.html";
+          }, 800);
+        }
+      });
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

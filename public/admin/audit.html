@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security & Compliance Audit Log · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input id="audit-search" placeholder="Search audit logs by actor, URI, action…" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4 flex-wrap gap-2">
+          <div>
+            <h1 class="h1">Security & Audit Log</h1>
+            <p class="secondary mt-1">Immutable ledger of administrative decisions, security events, and financial payouts.</p>
+          </div>
+          <div class="flex gap-2">
+            <select class="field" id="filter-actor" style="width: auto; padding: 6px 12px; font-size: 13px;">
+              <option value="all">All Actors</option>
+              <option value="admin">Admins only</option>
+              <option value="system">System / Cron only</option>
+              <option value="mod">Moderators only</option>
+            </select>
+            <button class="btn btn-sm btn-outline" type="button" id="btn-export" onclick="VendoUI.toast('Audit Export', 'Audit trail exported as cryptographically verified CSV.', 'info')">
+              <i data-lucide="download"></i> Export Log
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card" id="audit-table-card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th style="width: 22%;">Timestamp (UTC)</th>
+                  <th style="width: 20%;">Actor Identity</th>
+                  <th style="width: 20%;">Security Action</th>
+                  <th style="width: 26%;">Target Resource URI</th>
+                  <th style="width: 12%;">IP Address</th>
+                </tr>
+              </thead>
+              <tbody id="audit-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 9: Empty State -->
+        <div class="card state hidden" id="audit-empty" style="padding: 64px 24px;">
+          <i data-lucide="file-question" style="width: 56px; height: 56px; color: var(--color-text-muted); margin: 0 auto 16px;"></i>
+          <h2 class="h3 mb-2">No matching logs</h2>
+          <p class="secondary" style="max-width: 320px; margin: 0 auto 20px;">No administrative audit entries matched your active search query or actor filter criteria.</p>
+          <button class="btn btn-outline" type="button" id="btn-reset-filters">
+            <i data-lucide="rotate-ccw"></i> Reset filters
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    var logs = (VendoData.auditLogs && VendoData.auditLogs.slice()) || [
+      { time: "2026-09-27 22:15:04", actor: "admin@vendo.app", action: "vendor.kyc.review", target: "vendor_profiles/kiln-co", ip: "192.168.1.42" },
+      { time: "2026-09-27 20:30:19", actor: "system.escrow", action: "payout.create", target: "payouts/PO-891", ip: "internal.job" },
+      { time: "2026-09-27 18:44:02", actor: "mod_lead@vendo", action: "content.reel.flag", target: "reels/r4_verdant_lab", ip: "103.24.12.8" },
+      { time: "2026-09-27 16:12:45", actor: "admin@vendo.app", action: "security.2fa.verify", target: "user_auth/admin_root", ip: "192.168.1.42" },
+      { time: "2026-09-27 14:02:11", actor: "admin@vendo.app", action: "vendor.kyc.approve", target: "vendor_profiles/atelier-north", ip: "192.168.1.42" }
+    ];
+
+    function renderLogs() {
+      var tbody = document.getElementById("audit-tbody");
+      var empty = document.getElementById("audit-empty");
+      var card = document.getElementById("audit-table-card");
+      var q = document.getElementById("audit-search").value.toLowerCase().trim();
+      var actorFilter = document.getElementById("filter-actor").value;
+
+      var filtered = logs.filter(function(item) {
+        var matchQ = !q || item.time.toLowerCase().includes(q) || item.actor.toLowerCase().includes(q) || item.action.toLowerCase().includes(q) || item.target.toLowerCase().includes(q);
+        var matchActor = true;
+        if (actorFilter === "admin") matchActor = item.actor.includes("admin");
+        else if (actorFilter === "system") matchActor = item.actor.includes("system");
+        else if (actorFilter === "mod") matchActor = item.actor.includes("mod");
+        return matchQ && matchActor;
+      });
+
+      if (filtered.length === 0) {
+        card.classList.add("hidden");
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      card.classList.remove("hidden");
+      empty.classList.add("hidden");
+
+      tbody.innerHTML = filtered.map(function(item) {
+        var actionBadge = '<span class="badge" style="background: var(--color-bg-subtle);">' + item.action + '</span>';
+        if (item.action.includes("flag") || item.action.includes("remove")) {
+          actionBadge = '<span class="badge badge-danger">' + item.action + '</span>';
+        } else if (item.action.includes("approve") || item.action.includes("verify")) {
+          actionBadge = '<span class="badge badge-success">' + item.action + '</span>';
+        }
+
+        return '<tr>' +
+          '<td class="mono caption secondary">' + item.time + '</td>' +
+          '<td><strong style="font-size: 13px;">' + item.actor + '</strong></td>' +
+          '<td>' + actionBadge + '</td>' +
+          '<td class="mono caption" style="color: var(--color-brand);">' + item.target + '</td>' +
+          '<td class="mono caption secondary">' + item.ip + '</td>' +
+        '</tr>';
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    document.getElementById("audit-search").addEventListener("input", renderLogs);
+    document.getElementById("filter-actor").addEventListener("change", renderLogs);
+
+    document.getElementById("btn-reset-filters").addEventListener("click", function() {
+      document.getElementById("audit-search").value = "";
+      document.getElementById("filter-actor").value = "all";
+      renderLogs();
+    });
+
+    renderLogs();
+  </script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Profile · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
+  </header>
+
+  <main id="main" class="container page-pad" style="max-width:720px">
+    <!-- User Avatar & Header -->
+    <div class="card mb-6" style="padding:24px;display:flex;align-items:center;gap:20px">
+      <div class="avatar" style="width:68px;height:68px;font-size:24px;background:var(--color-brand-soft);color:var(--color-brand)">
+        AR
+      </div>
+      <div style="flex:1">
+        <h1 class="h2" style="margin-bottom:2px">Amina Rahman</h1>
+        <div class="caption secondary">Verified Buyer · amina.r@example.com · +880 1712 345678</div>
+        <div class="flex gap-2 mt-2">
+          <span class="badge badge-success"><i data-lucide="shield-check" style="width:12px;height:12px"></i> Buyer Protected</span>
+          <span class="badge">4 Orders Placed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Tabs -->
+    <div class="tabs mb-6" role="tablist">
+      <button class="tab" aria-selected="true" data-pane="info">Personal Info</button>
+      <button class="tab" aria-selected="false" data-pane="addr">Addresses</button>
+      <button class="tab" aria-selected="false" data-pane="pay">Payment Methods</button>
+      <button class="tab" aria-selected="false" data-pane="pref">Preferences</button>
+    </div>
+
+    <!-- Personal Info Pane -->
+    <section id="pane-info" class="card stack gap-4">
+      <h2 class="h3">Personal Information</h2>
+      <div class="form-row" style="grid-template-columns:1fr 1fr">
+        <div>
+          <label class="label" for="prof-name">Full Name</label>
+          <input class="field" id="prof-name" value="Amina Rahman">
+        </div>
+        <div>
+          <label class="label" for="prof-email">Email Address</label>
+          <input class="field" id="prof-email" value="amina.r@example.com">
+        </div>
+      </div>
+      <div>
+        <label class="label" for="prof-phone">Phone Number</label>
+        <input class="field" id="prof-phone" value="+880 1712 345678">
+      </div>
+      <div class="flex gap-3 mt-2">
+        <button class="btn btn-cta" type="button" id="btn-save-profile">Save Changes</button>
+      </div>
+    </section>
+
+    <!-- Addresses Pane -->
+    <section id="pane-addr" class="card stack gap-4 hidden">
+      <div class="flex-between">
+        <h2 class="h3">Saved Addresses</h2>
+        <button class="btn btn-sm btn-outline" type="button" id="btn-add-addr"><i data-lucide="plus"></i> Add Address</button>
+      </div>
+
+      <div class="card" style="background:var(--color-bg-subtle);padding:16px;border:1px solid var(--color-border-default)">
+        <div class="flex-between mb-2">
+          <strong>Default Home Address</strong>
+          <span class="badge badge-success">Default</span>
+        </div>
+        <div class="secondary" style="font-size:14px;line-height:20px">
+          House 42, Road 11, Banani<br>
+          Dhaka 1213, Bangladesh<br>
+          Phone: +880 1712 345678
+        </div>
+      </div>
+    </section>
+
+    <!-- Payments Pane -->
+    <section id="pane-pay" class="card stack gap-4 hidden">
+      <h2 class="h3">Saved Payment Cards</h2>
+      <div class="card flex-between" style="background:var(--color-bg-subtle);padding:16px">
+        <div class="flex gap-3" style="align-items:center">
+          <i data-lucide="credit-card" style="width:24px;height:24px;color:var(--color-brand)"></i>
+          <div>
+            <strong class="mono">Visa ending in 9912</strong>
+            <div class="caption secondary">Expires 08/2028 · Primary</div>
+          </div>
+        </div>
+        <span class="badge badge-info">Verified</span>
+      </div>
+    </section>
+
+    <!-- Preferences Pane -->
+    <section id="pane-pref" class="card stack gap-4 hidden">
+      <h2 class="h3">App Preferences</h2>
+      <div class="flex-between" style="padding:12px 0;border-bottom:1px solid var(--color-border-default)">
+        <div>
+          <strong>Color Theme</strong>
+          <div class="caption secondary">Choose light or elevated dark mode.</div>
+        </div>
+        <button class="btn btn-sm btn-outline" type="button" id="prof-theme-toggle">Toggle Theme</button>
+      </div>
+      <div class="flex-between" style="padding:12px 0">
+        <div>
+          <strong>Live Stream Broadcast Alerts</strong>
+          <div class="caption secondary">Receive immediate alerts when followed vendors go live.</div>
+        </div>
+        <input type="checkbox" checked style="width:20px;height:20px">
+      </div>
+    </section>
+
+    <!-- Quick Shortcuts List -->
+    <div class="card stack gap-2 mt-6" style="padding:16px">
+      <a class="nav-link flex-between" href="orders.html" style="padding:10px 12px;border-radius:8px">
+        <span class="flex gap-2" style="align-items:center"><i data-lucide="package"></i> Order History &amp; Tracking</span>
+        <i data-lucide="chevron-right" style="width:16px;height:16px"></i>
+      </a>
+      <a class="nav-link flex-between" href="wishlist.html" style="padding:10px 12px;border-radius:8px">
+        <span class="flex gap-2" style="align-items:center"><i data-lucide="heart"></i> Saved Wishlist Items</span>
+        <i data-lucide="chevron-right" style="width:16px;height:16px"></i>
+      </a>
+      <a class="nav-link flex-between" href="login.html" style="padding:10px 12px;border-radius:8px;color:var(--color-danger)">
+        <span class="flex gap-2" style="align-items:center"><i data-lucide="log-out"></i> Sign Out</span>
+        <i data-lucide="chevron-right" style="width:16px;height:16px"></i>
+      </a>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    document.querySelectorAll(".tabs .tab").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        document.querySelectorAll(".tabs .tab").forEach(function (t) { t.setAttribute("aria-selected", "false"); });
+        tab.setAttribute("aria-selected", "true");
+        var pane = tab.dataset.pane;
+        ["info", "addr", "pay", "pref"].forEach(function (p) {
+          document.getElementById("pane-" + p).classList.toggle("hidden", p !== pane);
+        });
+        lucide.createIcons();
+      });
+    });
+
+    document.getElementById("btn-save-profile").addEventListener("click", function () {
+      VendoUI.toast({ title: "Profile Updated", desc: "Your customer details have been saved.", type: "success" });
+    });
+
+    document.getElementById("prof-theme-toggle").addEventListener("click", function () {
+      VendoTheme.toggle();
+      VendoUI.toast({ title: "Theme Toggled", type: "info" });
+    });
+
+    document.getElementById("btn-add-addr").addEventListener("click", function () {
+      VendoUI.modal({
+        title: "Add New Address",
+        htmlBody: '<label class="label">Street Address</label><input class="field mb-3" placeholder="House, road"><label class="label">City</label><input class="field" placeholder="City">',
+        ok: "Save Address",
+        onOk: function () {
+          VendoUI.toast({ title: "Address Saved", type: "success" });
+        }
+      });
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Order Confirmed · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
+  </header>
+
+  <main id="main" class="container page-pad" style="max-width:680px">
+    <div class="card state" style="padding:48px 32px">
+      <!-- Animated Success Mark -->
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--color-success-soft);color:var(--color-success);display:grid;place-items:center;margin:0 auto 20px">
+        <i data-lucide="check-circle-2" style="width:36px;height:36px"></i>
+      </div>
+
+      <span class="badge badge-success mb-2">Payment Authorized & Confirmed</span>
+      <h1 class="h2 mb-1">Thank you for your order!</h1>
+      <p class="secondary" style="font-size:15px;margin-bottom:8px">We've sent an order confirmation and digital receipt to your email.</p>
+      <div class="mono" style="font-size:16px;font-weight:600;color:var(--color-brand)" id="conf-id">VD-10421</div>
+
+      <!-- Quick Delivery Card -->
+      <div class="card mt-6" style="background:var(--color-bg-subtle);text-align:left;padding:20px;border:1px solid var(--color-border-default)">
+        <div class="flex-between mb-3">
+          <strong>Delivery & Logistics Details</strong>
+          <span class="badge badge-info" id="conf-status">Processing</span>
+        </div>
+        <div class="stack gap-2 caption" style="font-size:13px">
+          <div class="flex-between"><span>Recipient:</span><strong id="conf-customer">Amina Rahman</strong></div>
+          <div class="flex-between"><span>Shipping Address:</span><span id="conf-address">House 42, Road 11, Banani, Dhaka</span></div>
+          <div class="flex-between"><span>Estimated Delivery:</span><strong id="conf-est">Est. in 2–3 business days</strong></div>
+          <div class="flex-between"><span>Tracking ID:</span><span class="mono" id="conf-track">TRK-982142</span></div>
+        </div>
+
+        <div class="pt-3 mt-3" style="border-top:1px solid var(--color-border-default)" id="conf-items-box"></div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-6" style="justify-content:center;flex-wrap:wrap">
+        <a class="btn btn-cta" id="link-track" href="orders.html"><i data-lucide="package"></i> Track Order Status</a>
+        <a class="btn btn-outline" id="link-invoice" href="invoice.html"><i data-lucide="file-text"></i> View Legal Tax Invoice</a>
+        <a class="btn btn-ghost" href="shop.html"><i data-lucide="shopping-bag"></i> Continue Shopping</a>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+
+    var params = new URLSearchParams(location.search);
+    var orderId = params.get("id");
+    var order = (orderId && VendoOrders.get(orderId)) || VendoOrders.all()[0];
+
+    if (order) {
+      document.getElementById("conf-id").textContent = order.id;
+      document.getElementById("conf-customer").textContent = order.customer;
+      document.getElementById("conf-address").textContent = order.address;
+      document.getElementById("conf-track").textContent = order.trackingNumber || "Pending Courier Scan";
+      document.getElementById("link-track").href = "orders.html?id=" + order.id;
+      document.getElementById("link-invoice").href = "invoice.html?id=" + order.id;
+
+      if (order.items && order.items.length) {
+        document.getElementById("conf-items-box").innerHTML =
+          '<div class="caption secondary mb-2">Purchased Items:</div>' +
+          order.items.map(function (i) {
+            return '<div class="flex-between" style="padding:3px 0"><span>' + i.qty + ' × ' + i.name + '</span><span class="mono">$' + (i.price * i.qty).toFixed(2) + '</span></div>';
+          }).join("") +
+          '<div class="flex-between pt-2 mt-2" style="border-top:1px dashed var(--color-border-default)"><strong>Total Paid:</strong><strong class="mono price">$' + order.total.toFixed(2) + '</strong></div>';
+      }
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

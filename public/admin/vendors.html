@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendors · Admin</title>
+  <script src="../../src/js/theme.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar"><button class="icon-btn" id="nav-toggle" type="button" aria-label="Menu"><i
+            data-lucide="menu"></i></button>
+        <div id="topbar-tools"></div>
+      </header>
+      <div class="content">
+        <h1 class="h1 mb-4">Vendors</h1>
+        <div class="pills mb-4" id="filters">
+          <button class="pill is-active" type="button" data-f="all">All</button>
+          <button class="pill" type="button" data-f="pending">Pending</button>
+          <button class="pill" type="button" data-f="approved">Approved</button>
+          <button class="pill" type="button" data-f="suspended">Suspended</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Vendor</th>
+                <th>KYC</th>
+                <th>Joined</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+    var map = { approved: "success", pending: "warning", suspended: "danger" };
+    var f = "all";
+    function render() {
+      var list = VendoData.vendors.filter(function (v) { return f === "all" || v.kyc === f; });
+      document.getElementById("rows").innerHTML = list.map(function (v) {
+        return "<tr><td>" + v.name + "</td><td><span class='badge badge-" + map[v.kyc] + "'>" + v.kyc + "</span></td><td>" + v.joined + "</td><td><a class='btn btn-sm' href='vendor-detail.html'>Review</a></td></tr>";
+      }).join("");
+    }
+    document.getElementById("filters").addEventListener("click", function (e) {
+      if (!e.target.dataset.f) return;
+      f = e.target.dataset.f;
+      document.querySelectorAll("#filters .pill").forEach(function (p) { p.classList.toggle("is-active", p.dataset.f === f); });
+      render();
+    });
+    render();
+  </script>
+</body>
+
+</html>

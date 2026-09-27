@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendor KYC Dossier Review · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    .doc-preview-box {
+      border: 1px solid var(--color-border-default);
+      border-radius: var(--radius-card);
+      background: var(--color-bg-subtle);
+      padding: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search vendors, TIN, dossiers…" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4">
+          <div class="flex gap-2" style="align-items: center;">
+            <a class="btn btn-sm btn-outline" href="vendors.html"><i data-lucide="arrow-left"></i> All Vendors</a>
+            <h1 class="h2" style="margin-left: 8px;">Vendor KYC Dossier: <span id="v-title">Kiln & Co</span></h1>
+          </div>
+          <span class="badge badge-warning" id="kyc-badge">KYC Review Pending</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+          <!-- Left Column: Business & Documents -->
+          <div class="stack gap-4">
+            <!-- Business Info Card -->
+            <section class="card stack gap-3">
+              <h2 class="h3">1. Business & Legal Entity</h2>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <label class="label">Trade Name</label>
+                  <strong id="v-trade-name">Kiln & Co Artisanal Studio</strong>
+                </div>
+                <div>
+                  <label class="label">Tax Identification (TIN / BIN)</label>
+                  <strong class="mono" id="v-tin">TIN-98421094-X</strong>
+                </div>
+                <div>
+                  <label class="label">Primary Category</label>
+                  <span id="v-category">Home & Living (Handmade Ceramics)</span>
+                </div>
+                <div>
+                  <label class="label">Registered Address</label>
+                  <span id="v-address">House 14, Road 7, Sector 3, Uttara, Dhaka 1230</span>
+                </div>
+                <div>
+                  <label class="label">Contact Phone</label>
+                  <span class="mono" id="v-phone">+880 1711 002233</span>
+                </div>
+                <div>
+                  <label class="label">Official Email</label>
+                  <span id="v-email">contact@kilnandco.studio</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Documents Preview Card -->
+            <section class="card stack gap-4">
+              <h2 class="h3">2. Verified Legal Documentation</h2>
+
+              <!-- Document 1: Trade License -->
+              <div class="doc-preview-box">
+                <i data-lucide="file-text" style="width: 36px; height: 36px; color: var(--color-brand); flex-shrink: 0;"></i>
+                <div style="flex: 1;">
+                  <div class="flex-between">
+                    <strong>Trade License Certificate (Certified PDF)</strong>
+                    <span class="badge badge-success">Digital Stamp Match</span>
+                  </div>
+                  <div class="caption secondary mono mt-1">License #TRD-2024-884192 · Issued by Dhaka North City Corp</div>
+                  <div class="caption secondary">Document checksum: SHA256 e8f3...a9b2 (Valid through Dec 2027)</div>
+                </div>
+                <button class="btn btn-sm btn-outline" type="button" onclick="VendoUI.toast('PDF Viewer', 'Opening high-resolution certificate seal viewer in secure sandbox.', 'info')">
+                  <i data-lucide="eye"></i> Inspect
+                </button>
+              </div>
+
+              <!-- Document 2: National ID / Biometric Match -->
+              <div class="doc-preview-box">
+                <i data-lucide="shield-check" style="width: 36px; height: 36px; color: var(--color-brand); flex-shrink: 0;"></i>
+                <div style="flex: 1;">
+                  <div class="flex-between">
+                    <strong>National ID Biometric Verification</strong>
+                    <span class="badge badge-success">98.4% Facial Match</span>
+                  </div>
+                  <div class="caption secondary mono mt-1">NID #19882691048201 · Name: Tareq Mahmud Chowdhury</div>
+                  <div class="caption secondary">Election Commission Database verified via secure Gov API gateway.</div>
+                </div>
+                <button class="btn btn-sm btn-outline" type="button" onclick="VendoUI.toast('Biometrics', 'Biometric photo match score confirmed via secure gateway.', 'info')">
+                  <i data-lucide="eye"></i> Inspect
+                </button>
+              </div>
+
+              <!-- Document 3: Bank Settlement Mandate -->
+              <div class="doc-preview-box">
+                <i data-lucide="landmark" style="width: 36px; height: 36px; color: var(--color-brand); flex-shrink: 0;"></i>
+                <div style="flex: 1;">
+                  <div class="flex-between">
+                    <strong>Bank Account Routing Void Check</strong>
+                    <span class="badge badge-success">Account Title Match</span>
+                  </div>
+                  <div class="caption secondary mono mt-1">City Bank Ltd · A/C 1102948192001 · Branch: Gulshan</div>
+                  <div class="caption secondary">Account title matches Trade License name exactly.</div>
+                </div>
+                <button class="btn btn-sm btn-outline" type="button" onclick="VendoUI.toast('Banking', 'Routing transit number and SWIFT code verified.', 'info')">
+                  <i data-lucide="eye"></i> Inspect
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <!-- Right Column: Compliance Actions & Notes -->
+          <aside class="card stack gap-4" style="position: sticky; top: 84px;">
+            <h2 class="h3">Compliance Decision</h2>
+            <p class="secondary" style="font-size: 13px;">
+              Approving unlocks the Vendor Broadcast Studio, Live Commerce streaming, and daily escrow payouts.
+            </p>
+
+            <div class="stack gap-2">
+              <label class="label" for="admin-note">Compliance Officer Notes / Reason</label>
+              <textarea class="field" id="admin-note" style="min-height: 110px; padding: 10px; font-size: 13px;" placeholder="Optional note for merchant. Required on rejection or request for additional documents..."></textarea>
+            </div>
+
+            <div class="stack gap-2 pt-2">
+              <!-- Approve Button -->
+              <button class="btn btn-primary" type="button" id="btn-approve" style="background: var(--color-success); border-color: var(--color-success); width: 100%; justify-content: center;">
+                <i data-lucide="check-circle-2"></i> Approve KYC & Unlock Store
+              </button>
+
+              <!-- Request More Documents -->
+              <button class="btn btn-outline" type="button" id="btn-request-docs" style="width: 100%; justify-content: center;">
+                <i data-lucide="refresh-cw"></i> Request Document Resubmission
+              </button>
+
+              <!-- Reject / Suspend -->
+              <button class="btn btn-danger" type="button" id="btn-reject" style="width: 100%; justify-content: center;">
+                <i data-lucide="shield-alert"></i> Suspend / Reject Application
+              </button>
+            </div>
+
+            <div class="card" style="background: var(--color-bg-subtle); padding: 12px; border: none; font-size: 12px;" class="caption secondary">
+              <i data-lucide="lock" style="width: 12px; height: 12px; display: inline;"></i> Audit logged under admin security policy. All decisions write to immutable audit log.
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    // Dynamic ID lookup
+    var params = new URLSearchParams(window.location.search);
+    var vId = params.get("id") || "v2";
+    var vendor = (VendoData.vendors && VendoData.vendors.find(function(v) { return v.id === vId; })) || {
+      name: "Kiln & Co",
+      category: "Home & Living (Handmade Ceramics)",
+      kyc: "pending",
+      location: "Dhaka, Bangladesh"
+    };
+
+    document.getElementById("v-title").textContent = vendor.name;
+    document.getElementById("v-trade-name").textContent = vendor.name + " Artisanal Studio";
+    document.getElementById("v-category").textContent = vendor.category || "Artisanal Goods";
+
+    // Approve Action
+    document.getElementById("btn-approve").addEventListener("click", function() {
+      var badge = document.getElementById("kyc-badge");
+      badge.className = "badge badge-success";
+      badge.textContent = "KYC Approved & Active";
+      VendoUI.toast("KYC Approved", "Vendor " + vendor.name + " approved. Live Studio and Payout gateways unlocked.", "success");
+    });
+
+    // Request Docs Action
+    document.getElementById("btn-request-docs").addEventListener("click", function() {
+      var note = document.getElementById("admin-note").value.trim();
+      if (!note) {
+        VendoUI.toast("Note Required", "Please enter a specific note explaining which document needs resubmission.", "warning");
+        return;
+      }
+      VendoUI.toast("Resubmission Requested", "Email sent to vendor requesting re-upload of highlighted documents.", "info");
+    });
+
+    // Reject Action
+    document.getElementById("btn-reject").addEventListener("click", function() {
+      var note = document.getElementById("admin-note").value.trim() || "Application suspended due to regulatory compliance check.";
+      VendoUI.modal({
+        title: "Suspend & Reject Vendor?",
+        body: "Are you sure you want to suspend " + vendor.name + "? Storefront will be unlisted and live broadcasting disabled. Reason: '" + note + "'",
+        danger: true,
+        ok: "Confirm Rejection",
+        onOk: function() {
+          var badge = document.getElementById("kyc-badge");
+          badge.className = "badge badge-danger";
+          badge.textContent = "KYC Suspended";
+          VendoUI.toast("Vendor Suspended", "Store suspended and rejection logged in compliance audit.", "danger");
+        }
+      });
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

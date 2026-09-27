@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendor Payout Authorizations · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search payouts by vendor, ID, bank…" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Payout Authorization Queue</h1>
+            <p class="secondary mt-1">Review vendor settlement withdrawals and authorize treasury disbursements.</p>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-sm btn-outline" type="button" id="btn-batch-approve">
+              <i data-lucide="check-check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Batch Approve All
+            </button>
+            <span class="badge badge-warning" id="pending-count-badge">2 pending</span>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="card" id="payout-table-card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Batch / ID</th>
+                  <th>Vendor</th>
+                  <th>Gross Sales</th>
+                  <th>Platform Fee (8%)</th>
+                  <th>Net Payout</th>
+                  <th>Destination Method</th>
+                  <th>Requested Date</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="payout-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 9: Empty State -->
+        <div class="card state hidden" id="payout-empty" style="padding: 64px 24px;">
+          <i data-lucide="check-circle" style="width: 56px; height: 56px; color: var(--color-success); margin: 0 auto 16px;"></i>
+          <h2 class="h3 mb-2">Queue empty</h2>
+          <p class="secondary" style="max-width: 320px; margin: 0 auto;">All merchant withdrawal requests have been verified and dispatched to treasury payment rails.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    var payouts = (VendoData.payouts && VendoData.payouts.slice()) || [
+      {
+        id: "PO-891",
+        vendor: "Atelier North",
+        amount: 2480.00,
+        fee: 198.40,
+        net: 2281.60,
+        method: "Bank Wire (SEPA / IBAN)",
+        accountNumber: "SE42 **** **** 9102",
+        status: "pending",
+        requestedAt: "2026-09-27 15:30"
+      },
+      {
+        id: "PO-890",
+        vendor: "Harbor Goods",
+        amount: 4120.00,
+        fee: 329.60,
+        net: 3790.40,
+        method: "Direct Deposit (Chase NA)",
+        accountNumber: "US91 **** **** 4419",
+        status: "pending",
+        requestedAt: "2026-09-26 09:12"
+      }
+    ];
+
+    function renderPayouts() {
+      var tbody = document.getElementById("payout-tbody");
+      var empty = document.getElementById("payout-empty");
+      var card = document.getElementById("payout-table-card");
+      var pendingList = payouts.filter(function(p) { return p.status === "pending" || p.status === "processing"; });
+
+      document.getElementById("pending-count-badge").textContent = pendingList.length + " pending";
+
+      if (pendingList.length === 0) {
+        card.classList.add("hidden");
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      card.classList.remove("hidden");
+      empty.classList.add("hidden");
+
+      tbody.innerHTML = payouts.map(function(p) {
+        var statusBadge = p.status === "paid" ?
+          '<span class="badge badge-success">Disbursed</span>' :
+          '<span class="badge badge-warning">Pending Review</span>';
+
+        var actionCol = p.status === "paid" ?
+          '<span class="caption secondary"><i data-lucide="check" style="width: 12px; height: 12px; display: inline;"></i> Completed</span>' :
+          '<button class="btn btn-sm btn-primary" type="button" onclick="confirmPayout(\'' + p.id + '\')"><i data-lucide="credit-card" style="width: 14px; height: 14px; margin-right: 4px;"></i> Authorize</button>';
+
+        return '<tr>' +
+          '<td class="mono font-bold">' + p.id + '</td>' +
+          '<td><strong>' + p.vendor + '</strong></td>' +
+          '<td class="mono">$' + Number(p.amount).toFixed(2) + '</td>' +
+          '<td class="mono secondary">-$' + Number(p.fee).toFixed(2) + '</td>' +
+          '<td class="mono price font-bold" style="font-size: 15px;">$' + Number(p.net).toFixed(2) + '</td>' +
+          '<td><div style="font-size: 13px;">' + p.method + '</div><div class="caption mono secondary">' + p.accountNumber + '</div></td>' +
+          '<td class="mono caption secondary">' + p.requestedAt + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td style="text-align: right;">' + actionCol + '</td>' +
+        '</tr>';
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    window.confirmPayout = function(id) {
+      var p = payouts.find(function(item) { return item.id === id; });
+      if (!p) return;
+
+      VendoUI.modal({
+        title: "Authorize Treasury Disbursement",
+        body: "Authorize net payout transfer of $" + Number(p.net).toFixed(2) + " to " + p.vendor + " (" + p.method + ")? Idempotent payout job will be queued immediately.",
+        ok: "Authorize & Disburse",
+        onOk: function() {
+          p.status = "paid";
+          VendoUI.toast("Disbursement Queued", "Payout " + p.id + " authorized for " + p.vendor + ". Idempotency key stored.", "success");
+          renderPayouts();
+        }
+      });
+    };
+
+    document.getElementById("btn-batch-approve").addEventListener("click", function() {
+      var pending = payouts.filter(function(p) { return p.status === "pending" || p.status === "processing"; });
+      if (pending.length === 0) {
+        VendoUI.toast("Queue Clean", "No pending payouts to authorize.", "info");
+        return;
+      }
+
+      VendoUI.modal({
+        title: "Batch Authorize All Payouts",
+        body: "Authorize all " + pending.length + " pending merchant disbursements totaling $" + pending.reduce(function(acc, x) { return acc + x.net; }, 0).toFixed(2) + "?",
+        ok: "Approve All",
+        onOk: function() {
+          pending.forEach(function(p) { p.status = "paid"; });
+          VendoUI.toast("Batch Complete", "Authorized " + pending.length + " payouts across banking and mobile money rails.", "success");
+          renderPayouts();
+        }
+      });
+    });
+
+    renderPayouts();
+  </script>
+</body>
+</html>

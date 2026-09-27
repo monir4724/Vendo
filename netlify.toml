@@ -1,0 +1,22 @@
+# ============================================================================
+# Vendo Platform — Netlify Production Deployment Config
+# ============================================================================
+
+[build]
+  publish = "."
+
+# Security headers for production hardening
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(self), microphone=(self), geolocation=()"
+
+# Default redirect to landing page
+[[redirects]]
+  from = "/"
+  to = "/public/index.html"
+  status = 302

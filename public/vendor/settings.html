@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Store Profile & Branding Settings · Vendor Studio · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to settings</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+
+      <div class="content" id="main" style="max-width: 800px;">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Store Settings & Branding</h1>
+            <p class="secondary mt-1">Configure your artisan storefront appearance, fulfillment policies, and verified bank routing.</p>
+          </div>
+          <a class="btn btn-sm btn-outline" href="../customer/storefront.html">
+            <i data-lucide="external-link"></i> View Live Storefront
+          </a>
+        </div>
+
+        <!-- Settings Tabs -->
+        <div class="tabs mb-6" role="tablist">
+          <button class="tab" aria-selected="true" data-tab="profile" type="button">Store Profile</button>
+          <button class="tab" aria-selected="false" data-tab="branding" type="button">Branding & Banner</button>
+          <button class="tab" aria-selected="false" data-tab="policies" type="button">Shipping & Return Policies</button>
+          <button class="tab" aria-selected="false" data-tab="payout" type="button">Tax & Payout Routing</button>
+        </div>
+
+        <form id="store-settings-form" class="stack gap-6">
+          <!-- Pane 1: Store Profile -->
+          <div id="pane-profile" class="card stack gap-4">
+            <h2 class="h3">Store Information</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="label" for="store-name">Artisan Store Name *</label>
+                <input class="field" id="store-name" value="Kiln & Co" required>
+              </div>
+              <div>
+                <label class="label" for="store-cat">Primary Category</label>
+                <select class="field" id="store-cat">
+                  <option selected>Home & Living (Handmade Ceramics)</option>
+                  <option>Apparel & Sustainable Fashion</option>
+                  <option>Leather Goods & Craftsmanship</option>
+                  <option>Clean Beauty & Botanical Care</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="label" for="store-bio">Storefront Bio / Story (Fraunces Display Heading)</label>
+              <textarea class="field" id="store-bio" rows="3">Wheel-thrown speckled ceramics, mindful tableware, and slow-crafted stoneware designed for deliberate living in Dhaka.</textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="label" for="store-loc">Studio Location</label>
+                <input class="field" id="store-loc" value="Dhaka, Bangladesh">
+              </div>
+              <div>
+                <label class="label" for="store-support-email">Customer Support Email</label>
+                <input class="field" id="store-support-email" value="support@kilnandco.studio">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pane 2: Branding & Banners -->
+          <div id="pane-branding" class="card stack gap-4 hidden">
+            <h2 class="h3">Visual Branding</h2>
+            <div>
+              <label class="label">Store Banner Image (1440x360 recommended)</label>
+              <div id="banner-preview" style="height: 160px; border-radius: 12px; background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1280&q=80&auto=format') center/cover; position: relative; margin-bottom: 12px; border: 1px solid var(--color-border-default);" role="img" aria-label="Banner Preview">
+                <span class="badge" style="position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.6); color: #fff;">Active Store Banner</span>
+              </div>
+              <input class="field" id="banner-url" value="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1280&q=80&auto=format" placeholder="Enter image URL or upload...">
+            </div>
+
+            <div>
+              <label class="label">Avatar & Studio Logo (1:1 aspect ratio)</label>
+              <div class="flex gap-4" style="align-items: center;">
+                <img id="avatar-preview" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80&auto=format" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border-default);" alt="Avatar">
+                <input class="field" id="avatar-url" value="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80&auto=format" style="flex: 1;" placeholder="Avatar image URL...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pane 3: Policies & Shipping SLA -->
+          <div id="pane-policies" class="card stack gap-4 hidden">
+            <h2 class="h3">Fulfillment & Return Policy</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="label">Dispatch Handling SLA</label>
+                <select class="field">
+                  <option selected>Ships within 24 hours (Fast Dispatch badge)</option>
+                  <option>Ships within 48 hours</option>
+                  <option>Made-to-order (3-5 business days)</option>
+                </select>
+              </div>
+              <div>
+                <label class="label">Customer Return Window</label>
+                <select class="field">
+                  <option selected>14-Day Free Returns Guarantee</option>
+                  <option>30-Day Extended Return Window</option>
+                  <option>Final Sale / No Returns (Exempt items)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="label">Free Shipping Minimum Threshold ($)</label>
+              <input class="field mono" type="number" value="75.00" style="max-width: 200px;">
+              <span class="caption secondary mt-1">Orders exceeding this amount automatically receive free express delivery.</span>
+            </div>
+          </div>
+
+          <!-- Pane 4: Tax & Payout -->
+          <div id="pane-payout" class="card stack gap-4 hidden">
+            <h2 class="h3">Settlement & Tax Credentials</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="label">Tax Identification Number (TIN)</label>
+                <input class="field mono" value="TIN-98421094-X" readonly style="background: var(--color-bg-subtle);">
+              </div>
+              <div>
+                <label class="label">KYC Verification Status</label>
+                <div class="mt-2"><span class="badge badge-success">✓ Verified by Vendo Compliance</span></div>
+              </div>
+            </div>
+
+            <div>
+              <label class="label">Bank Settlement IBAN / Account</label>
+              <input class="field mono" value="The City Bank Ltd · A/C 1102948192001 · Branch: Gulshan-2">
+            </div>
+
+            <div>
+              <label class="label">Registered bKash Merchant Wallet</label>
+              <input class="field mono" value="+880 1711 002233">
+            </div>
+          </div>
+
+          <div>
+            <button class="btn btn-primary" type="submit" style="width: 100%; justify-content: center;">
+              <i data-lucide="save"></i> Save Storefront Settings
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    // Tab switching
+    document.querySelectorAll(".tab").forEach(function(t) {
+      t.addEventListener("click", function() {
+        document.querySelectorAll(".tab").forEach(function(x) { x.setAttribute("aria-selected", "false"); });
+        t.setAttribute("aria-selected", "true");
+        var target = t.getAttribute("data-tab");
+        document.getElementById("pane-profile").classList.toggle("hidden", target !== "profile");
+        document.getElementById("pane-branding").classList.toggle("hidden", target !== "branding");
+        document.getElementById("pane-policies").classList.toggle("hidden", target !== "policies");
+        document.getElementById("pane-payout").classList.toggle("hidden", target !== "payout");
+      });
+    });
+
+    // Realtime banner URL preview
+    document.getElementById("banner-url").addEventListener("input", function() {
+      document.getElementById("banner-preview").style.backgroundImage = "url('" + this.value + "')";
+    });
+
+    // Realtime avatar preview
+    document.getElementById("avatar-url").addEventListener("input", function() {
+      document.getElementById("avatar-preview").src = this.value;
+    });
+
+    // Save Form
+    document.getElementById("store-settings-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var name = document.getElementById("store-name").value;
+      VendoUI.toast("Store Settings Saved", "Public storefront for '" + name + "' updated successfully.", "success");
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

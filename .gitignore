@@ -1,0 +1,47 @@
+# ============================================================================
+# Vendo Platform — Git Ignore Specification
+# Reference: Vendo Security Hardening Patch v3.1 (§ SEC-19)
+# ============================================================================
+
+# Environment Variables & Secrets (CRITICAL: Never commit secrets)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+*.env
+
+# Supabase Secrets & Local Storage
+supabase/.temp/
+.secrets.baseline
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build Outputs & Bundles
+dist/
+build/
+.output/
+
+# Logs & Temporary debug files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test & Coverage
+coverage/
+.nyc_output/

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <div style="margin-left:auto" class="caption secondary flex gap-2" style="align-items:center">
+      <i data-lucide="lock" style="width:14px;height:14px;color:var(--color-brand)"></i>
+      <span>Secure 256-bit SSL Checkout</span>
+    </div>
+  </header>
+
+  <main id="main" class="container page-pad">
+    <!-- 3-Step Checkout Stepper -->
+    <div class="stepper" id="checkout-stepper" style="max-width:680px;margin:0 auto 36px">
+      <div class="step is-current" data-step="1">
+        <div class="step-bar"></div>
+        <div class="step-label">1. Shipping Address</div>
+      </div>
+      <div class="step" data-step="2">
+        <div class="step-bar"></div>
+        <div class="step-label">2. Payment Method</div>
+      </div>
+      <div class="step" data-step="3">
+        <div class="step-bar"></div>
+        <div class="step-label">3. Review & Place</div>
+      </div>
+    </div>
+
+    <div class="cols-cart">
+      <!-- Interactive Multi-Step Form -->
+      <form id="checkout-form" class="card stack gap-5" novalidate>
+        <!-- STEP 1: Shipping -->
+        <section id="pane-step-1">
+          <div class="flex-between mb-4">
+            <h2 class="h2">Delivery Address</h2>
+            <span class="caption secondary">Step 1 of 3</span>
+          </div>
+
+          <div class="form-row" style="grid-template-columns:1fr 1fr">
+            <div>
+              <label class="label" for="ship-name">Full Name *</label>
+              <input class="field" id="ship-name" required value="Amina Rahman" placeholder="e.g. Amina Rahman">
+            </div>
+            <div>
+              <label class="label" for="ship-email">Email Address *</label>
+              <input class="field" type="email" id="ship-email" required value="amina.r@example.com" placeholder="name@domain.com">
+            </div>
+          </div>
+
+          <div class="form-row" style="grid-template-columns:1fr 1fr">
+            <div>
+              <label class="label" for="ship-phone">Phone Number *</label>
+              <input class="field" id="ship-phone" required value="+880 1712 345678" placeholder="+880 1XXX XXXXXX">
+            </div>
+            <div>
+              <label class="label" for="ship-city">City / Region *</label>
+              <input class="field" id="ship-city" required value="Dhaka" placeholder="City">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="label" for="ship-address">Street Address & Apartment *</label>
+            <input class="field" id="ship-address" required value="House 42, Road 11, Banani" placeholder="House, road, landmark">
+          </div>
+
+          <div class="mb-4">
+            <label class="label">Shipping Courier Option</label>
+            <div class="card" style="padding:14px;background:var(--color-bg-subtle);display:flex;align-items:center;gap:12px">
+              <input type="radio" name="carrier" checked id="c1">
+              <label for="c1" style="flex:1;cursor:pointer">
+                <strong>Express Courier Dispatch</strong>
+                <div class="caption secondary">Estimated 2-3 business days · Tracked door-to-door</div>
+              </label>
+              <strong id="ship-rate-label" class="mono">FREE</strong>
+            </div>
+          </div>
+
+          <div class="flex gap-3" style="justify-content:flex-end">
+            <a class="btn btn-outline" href="cart.html">Back to Cart</a>
+            <button class="btn btn-cta" type="button" id="btn-to-step-2">Continue to Payment <i data-lucide="arrow-right"></i></button>
+          </div>
+        </section>
+
+        <!-- STEP 2: Payment -->
+        <section id="pane-step-2" class="hidden">
+          <div class="flex-between mb-4">
+            <h2 class="h2">Payment Method</h2>
+            <span class="caption secondary">Step 2 of 3</span>
+          </div>
+
+          <div class="pills mb-4" id="pay-methods">
+            <button class="pill is-active" type="button" data-pay="card"><i data-lucide="credit-card" style="width:14px;height:14px;vertical-align:-2px"></i> Credit / Debit Card</button>
+            <button class="pill" type="button" data-pay="bkash"><i data-lucide="smartphone" style="width:14px;height:14px;vertical-align:-2px"></i> bKash / Nagad</button>
+            <button class="pill" type="button" data-pay="cod"><i data-lucide="banknote" style="width:14px;height:14px;vertical-align:-2px"></i> Cash on Delivery</button>
+          </div>
+
+          <!-- Card Fields -->
+          <div id="pay-card-fields" class="stack gap-3">
+            <div>
+              <label class="label" for="card-num">Card Number</label>
+              <input class="field mono" id="card-num" placeholder="4242 •••• •••• 4242" value="4242 8819 2041 9912">
+            </div>
+            <div class="form-row" style="grid-template-columns:1fr 1fr">
+              <div>
+                <label class="label" for="card-exp">Expiry (MM/YY)</label>
+                <input class="field mono" id="card-exp" placeholder="12/28" value="08/28">
+              </div>
+              <div>
+                <label class="label" for="card-cvc">CVC / CVV</label>
+                <input class="field mono" id="card-cvc" placeholder="382" value="382">
+              </div>
+            </div>
+          </div>
+
+          <!-- bKash Fields -->
+          <div id="pay-bkash-fields" class="stack gap-3 hidden">
+            <div class="card" style="background:#e2136e15;border:1px solid #e2136e40;padding:16px">
+              <strong style="color:#e2136e">bKash Instant Gateway</strong>
+              <p class="caption mt-1">Enter your personal bKash account number. A simulated verification OTP will be sent.</p>
+            </div>
+            <div>
+              <label class="label" for="bkash-num">bKash Mobile Number</label>
+              <input class="field mono" id="bkash-num" placeholder="017XXXXXXXX" value="01712345678">
+            </div>
+          </div>
+
+          <!-- COD Fields -->
+          <div id="pay-cod-fields" class="hidden">
+            <div class="card" style="background:var(--color-bg-subtle);padding:16px">
+              <strong>Cash on Delivery (COD)</strong>
+              <p class="caption mt-1">Pay with cash upon receipt. Please prepare exact change for courier verification.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-6" style="justify-content:flex-between">
+            <button class="btn btn-outline" type="button" id="btn-back-to-1"><i data-lucide="arrow-left"></i> Back</button>
+            <button class="btn btn-cta" type="button" id="btn-to-step-3">Review Order <i data-lucide="arrow-right"></i></button>
+          </div>
+        </section>
+
+        <!-- STEP 3: Review & Confirm -->
+        <section id="pane-step-3" class="hidden">
+          <div class="flex-between mb-4">
+            <h2 class="h2">Review & Place Order</h2>
+            <span class="caption secondary">Step 3 of 3</span>
+          </div>
+
+          <div class="card" style="background:var(--color-bg-subtle);padding:16px;margin-bottom:16px">
+            <div class="flex-between mb-2">
+              <strong>Shipping Destination</strong>
+              <button class="btn btn-sm btn-ghost" type="button" id="btn-edit-ship" style="font-size:12px;color:var(--color-brand)">Edit</button>
+            </div>
+            <div class="caption" id="review-ship-text">Amina Rahman · Banani, Dhaka · +880 1712 345678</div>
+          </div>
+
+          <div class="card" style="background:var(--color-bg-subtle);padding:16px;margin-bottom:16px">
+            <div class="flex-between mb-2">
+              <strong>Payment Option</strong>
+              <button class="btn btn-sm btn-ghost" type="button" id="btn-edit-pay" style="font-size:12px;color:var(--color-brand)">Edit</button>
+            </div>
+            <div class="caption" id="review-pay-text">Credit Card ending in 9912</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="flex gap-2" style="align-items:center;cursor:pointer;font-size:13px">
+              <input type="checkbox" id="terms-agree" checked>
+              <span>I agree to Vendo's Buyer Protection terms and 14-day artisan return policy.</span>
+            </label>
+          </div>
+
+          <div id="checkout-err" class="helper-error mb-3 hidden" role="alert"></div>
+
+          <div class="flex gap-3" style="justify-content:flex-between">
+            <button class="btn btn-outline" type="button" id="btn-back-to-2"><i data-lucide="arrow-left"></i> Back</button>
+            <button class="btn btn-cta" type="button" id="btn-place-order" style="min-width:180px">
+              <i data-lucide="check-circle-2"></i> Place Order Now
+            </button>
+          </div>
+        </section>
+      </form>
+
+      <!-- Sticky Order Summary -->
+      <aside class="card stack gap-4" style="position:sticky;top:84px;height:fit-content;box-shadow:var(--elev-2)">
+        <h3 class="h4">Your Items (<span id="aside-count">0</span>)</h3>
+        <div id="aside-items" class="stack gap-2" style="max-height:260px;overflow-y:auto"></div>
+
+        <div class="stack gap-2 pt-3" style="border-top:1px solid var(--color-border-default);font-size:14px">
+          <div class="flex-between">
+            <span class="secondary">Subtotal</span>
+            <span class="mono" id="aside-sub">$0.00</span>
+          </div>
+          <div class="flex-between" id="aside-discount-row" style="display:none;color:var(--color-success)">
+            <span>Discount (15%)</span>
+            <span class="mono" id="aside-disc">-$0.00</span>
+          </div>
+          <div class="flex-between">
+            <span class="secondary">Shipping</span>
+            <span class="mono" id="aside-ship">FREE</span>
+          </div>
+          <div class="flex-between">
+            <span class="secondary">VAT / Tax</span>
+            <span class="mono" id="aside-tax">$0.00</span>
+          </div>
+          <div class="flex-between pt-3" style="border-top:1px solid var(--color-border-default)">
+            <strong style="font-size:16px">Total to Pay</strong>
+            <strong class="mono h2 price" id="aside-total" style="font-size:24px">$0.00</strong>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+
+    // Ensure cart has at least 1 item for checkout demo if empty
+    var items = VendoCart.items();
+    if (items.length === 0) {
+      VendoCart.add(VendoData.products[0], 1);
+      items = VendoCart.items();
+    }
+
+    // Populate Aside Items
+    document.getElementById("aside-count").textContent = VendoCart.count();
+    document.getElementById("aside-items").innerHTML = items.map(function (i) {
+      return (
+        '<div class="flex gap-3" style="align-items:center;padding:6px 0">' +
+          '<img src="' + i.img + '" alt="" style="width:44px;height:44px;border-radius:6px;object-fit:cover">' +
+          '<div style="flex:1"><strong style="font-size:13px;display:block">' + i.name + '</strong><span class="caption secondary">Qty: ' + i.qty + '</span></div>' +
+          '<span class="mono caption" style="font-weight:600">$' + (i.price * i.qty).toFixed(2) + '</span>' +
+        '</div>'
+      );
+    }).join("");
+
+    var sub = VendoCart.subtotal();
+    var disc = VendoCart.discount();
+    var ship = VendoCart.shipping();
+    var tax = VendoCart.tax();
+    var total = VendoCart.grandTotal();
+
+    document.getElementById("aside-sub").textContent = "$" + sub.toFixed(2);
+    if (disc > 0) {
+      document.getElementById("aside-discount-row").style.display = "flex";
+      document.getElementById("aside-disc").textContent = "-$" + disc.toFixed(2);
+    }
+    document.getElementById("aside-ship").textContent = ship === 0 ? "FREE" : "$" + ship.toFixed(2);
+    document.getElementById("ship-rate-label").textContent = ship === 0 ? "FREE" : "$" + ship.toFixed(2);
+    document.getElementById("aside-tax").textContent = "$" + tax.toFixed(2);
+    document.getElementById("aside-total").textContent = "$" + total.toFixed(2);
+
+    // Stepper Navigation
+    var curStep = 1;
+    function setStep(step) {
+      curStep = step;
+      document.querySelectorAll("#checkout-stepper .step").forEach(function (s) {
+        var sNum = Number(s.dataset.step);
+        s.classList.toggle("is-done", sNum < curStep);
+        s.classList.toggle("is-current", sNum === curStep);
+      });
+      document.getElementById("pane-step-1").classList.toggle("hidden", curStep !== 1);
+      document.getElementById("pane-step-2").classList.toggle("hidden", curStep !== 2);
+      document.getElementById("pane-step-3").classList.toggle("hidden", curStep !== 3);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      lucide.createIcons();
+    }
+
+    document.getElementById("btn-to-step-2").addEventListener("click", function () {
+      var name = document.getElementById("ship-name").value.trim();
+      var email = document.getElementById("ship-email").value.trim();
+      var phone = document.getElementById("ship-phone").value.trim();
+      var addr = document.getElementById("ship-address").value.trim();
+      if (!name || !email || !phone || !addr) {
+        VendoUI.toast({ title: "Incomplete Shipping Info", desc: "Please fill in all required shipping fields.", type: "warning" });
+        return;
+      }
+      setStep(2);
+    });
+
+    document.getElementById("btn-back-to-1").addEventListener("click", function () { setStep(1); });
+    document.getElementById("btn-edit-ship").addEventListener("click", function () { setStep(1); });
+
+    var selectedPay = "card";
+    document.getElementById("pay-methods").addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-pay]");
+      if (!btn) return;
+      selectedPay = btn.dataset.pay;
+      document.querySelectorAll("#pay-methods .pill").forEach(function (p) {
+        p.classList.toggle("is-active", p.dataset.pay === selectedPay);
+      });
+      document.getElementById("pay-card-fields").classList.toggle("hidden", selectedPay !== "card");
+      document.getElementById("pay-bkash-fields").classList.toggle("hidden", selectedPay !== "bkash");
+      document.getElementById("pay-cod-fields").classList.toggle("hidden", selectedPay !== "cod");
+    });
+
+    document.getElementById("btn-to-step-3").addEventListener("click", function () {
+      var name = document.getElementById("ship-name").value;
+      var city = document.getElementById("ship-city").value;
+      var phone = document.getElementById("ship-phone").value;
+      document.getElementById("review-ship-text").textContent = name + " · " + city + " · " + phone;
+
+      var payText = "Credit Card ending in " + document.getElementById("card-num").value.slice(-4);
+      if (selectedPay === "bkash") payText = "bKash Mobile Account (" + document.getElementById("bkash-num").value + ")";
+      if (selectedPay === "cod") payText = "Cash on Delivery upon courier arrival";
+      document.getElementById("review-pay-text").textContent = payText;
+
+      setStep(3);
+    });
+
+    document.getElementById("btn-back-to-2").addEventListener("click", function () { setStep(2); });
+    document.getElementById("btn-edit-pay").addEventListener("click", function () { setStep(2); });
+
+    // Place Order Action
+    var placeBtn = document.getElementById("btn-place-order");
+    placeBtn.addEventListener("click", function () {
+      if (!document.getElementById("terms-agree").checked) {
+        VendoUI.toast({ title: "Terms Agreement", desc: "Please accept the buyer protection terms.", type: "warning" });
+        return;
+      }
+
+      VendoUI.setBusy(placeBtn, true, "Processing Payment…");
+
+      setTimeout(function () {
+        var orderPayload = {
+          customer: document.getElementById("ship-name").value,
+          email: document.getElementById("ship-email").value,
+          phone: document.getElementById("ship-phone").value,
+          address: document.getElementById("ship-address").value + ", " + document.getElementById("ship-city").value,
+          items: VendoCart.items(),
+          subtotal: VendoCart.subtotal(),
+          tax: VendoCart.tax(),
+          shipping: VendoCart.shipping(),
+          total: VendoCart.grandTotal(),
+          paymentMethod: selectedPay
+        };
+
+        var created = VendoOrders.create(orderPayload);
+        VendoCart.clear();
+
+        VendoUI.toast({
+          title: "Order Placed Successfully!",
+          desc: "Order " + created.id + " is confirmed.",
+          type: "success"
+        });
+
+        setTimeout(function () {
+          location.href = "confirmation.html?id=" + created.id;
+        }, 600);
+      }, 900);
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

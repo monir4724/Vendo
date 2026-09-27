@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Search · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <form class="search" id="header-search-form" action="search.html" style="max-width:600px">
+      <i data-lucide="search"></i>
+      <input name="q" id="search-input" placeholder="Search ceramic dripper, linen shirt, live broadcast, artisan…" aria-label="Search">
+    </form>
+    <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
+  </header>
+
+  <main id="main" class="container-wide page-pad">
+    <div class="flex-between mb-4" style="flex-wrap:wrap;gap:12px">
+      <div>
+        <h1 class="h2" id="search-title">Search Results</h1>
+        <span class="caption secondary" id="results-count">Type to search</span>
+      </div>
+
+      <!-- Entity Filter Tabs -->
+      <div class="tabs" id="entity-tabs" role="tablist">
+        <button class="tab" aria-selected="true" data-tab="all">All</button>
+        <button class="tab" aria-selected="false" data-tab="products">Products</button>
+        <button class="tab" aria-selected="false" data-tab="vendors">Artisans</button>
+        <button class="tab" aria-selected="false" data-tab="reels">Reels</button>
+      </div>
+    </div>
+
+    <!-- Empty State per Section 9 -->
+    <div id="search-empty" class="card state hidden" style="padding:64px 24px">
+      <i data-lucide="search-x" style="width:56px;height:56px;color:var(--color-text-muted);margin:0 auto 16px"></i>
+      <h2 class="h3 mb-2">No results found</h2>
+      <p class="secondary" style="max-width:360px;margin:0 auto 20px">We couldn't find matches for your search. Try these popular categories and artisan tags:</p>
+      <div class="chips" style="justify-content:center;margin-bottom:24px">
+        <button class="chip" type="button" onclick="performSearch('Ceramic')">Ceramics</button>
+        <button class="chip" type="button" onclick="performSearch('Linen')">Linen Shirts</button>
+        <button class="chip" type="button" onclick="performSearch('Leather')">Leather Tote</button>
+        <button class="chip" type="button" onclick="performSearch('Serum')">Botanical Serum</button>
+        <button class="chip" type="button" onclick="performSearch('Kiln')">Kiln &amp; Co</button>
+      </div>
+      <a class="btn btn-cta" href="shop.html">Browse All Catalog</a>
+    </div>
+
+    <!-- Results Section -->
+    <div id="search-results-area">
+      <!-- Vendors Results Row -->
+      <div id="vendor-results-section" class="mb-6 hidden">
+        <h3 class="h4 mb-3">Matching Studios &amp; Artisans</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:16px" id="vendor-grid"></div>
+      </div>
+
+      <!-- Products Grid -->
+      <div id="products-results-section">
+        <div class="product-grid" id="products-grid"></div>
+      </div>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    var params = new URLSearchParams(location.search);
+    var query = (params.get("q") || "").trim();
+    var currentTab = "all";
+
+    var searchInput = document.getElementById("search-input");
+    searchInput.value = query;
+
+    function performSearch(q) {
+      query = q;
+      searchInput.value = q;
+      executeSearch();
+    }
+
+    function executeSearch() {
+      var q = query.toLowerCase();
+      var titleEl = document.getElementById("search-title");
+      var countEl = document.getElementById("results-count");
+      var emptyEl = document.getElementById("search-empty");
+      var resultsArea = document.getElementById("search-results-area");
+
+      if (query) {
+        titleEl.textContent = 'Results for "' + query + '"';
+      } else {
+        titleEl.textContent = "Browse All Marketplace";
+      }
+
+      var products = (window.VendoData.products || []).filter(function (p) {
+        if (!q) return true;
+        return p.name.toLowerCase().indexOf(q) !== -1 ||
+               p.vendor.toLowerCase().indexOf(q) !== -1 ||
+               p.cat.toLowerCase().indexOf(q) !== -1 ||
+               (p.tags && p.tags.some(function (t) { return t.toLowerCase().indexOf(q) !== -1; }));
+      });
+
+      var vendors = (window.VendoData.vendors || []).filter(function (v) {
+        if (!q) return true;
+        return v.name.toLowerCase().indexOf(q) !== -1 ||
+               (v.category && v.category.toLowerCase().indexOf(q) !== -1) ||
+               (v.bio && v.bio.toLowerCase().indexOf(q) !== -1);
+      });
+
+      var totalFound = (currentTab === "vendors" ? 0 : products.length) + (currentTab === "products" ? 0 : vendors.length);
+      countEl.textContent = totalFound + " matches found";
+
+      if (totalFound === 0) {
+        resultsArea.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        lucide.createIcons();
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      resultsArea.classList.remove("hidden");
+
+      // Render Vendors
+      var vSec = document.getElementById("vendor-results-section");
+      var vGrid = document.getElementById("vendor-grid");
+      if (vendors.length > 0 && (currentTab === "all" || currentTab === "vendors")) {
+        vSec.classList.remove("hidden");
+        vGrid.innerHTML = vendors.map(function (v) {
+          return (
+            '<a class="card card-hover flex gap-3" href="storefront.html?vendor=' + encodeURIComponent(v.name) + '" style="text-decoration:none;color:inherit;align-items:center;padding:16px">' +
+              '<img src="' + v.avatar + '" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover">' +
+              '<div style="flex:1">' +
+                '<strong style="font-size:15px;display:block">' + v.name + '</strong>' +
+                '<span class="caption secondary">' + (v.category || "Artisan Studio") + '</span>' +
+                '<div class="caption mt-1" style="color:var(--color-brand)">★ ' + (v.rating || "4.8") + ' · ' + (v.followersCount || "10k") + ' followers</div>' +
+              '</div>' +
+            '</a>'
+          );
+        }).join("");
+      } else {
+        vSec.classList.add("hidden");
+      }
+
+      // Render Products
+      var pSec = document.getElementById("products-results-section");
+      var pGrid = document.getElementById("products-grid");
+      if (products.length > 0 && (currentTab === "all" || currentTab === "products")) {
+        pSec.classList.remove("hidden");
+        pGrid.innerHTML = products.map(VendoUI.productCard).join("");
+      } else {
+        pSec.classList.add("hidden");
+      }
+
+      lucide.createIcons();
+    }
+
+    // Tabs
+    document.querySelectorAll("#entity-tabs .tab").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        document.querySelectorAll("#entity-tabs .tab").forEach(function (t) { t.setAttribute("aria-selected", "false"); });
+        tab.setAttribute("aria-selected", "true");
+        currentTab = tab.dataset.tab;
+        executeSearch();
+      });
+    });
+
+    document.getElementById("header-search-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      query = searchInput.value.trim();
+      executeSearch();
+    });
+
+    executeSearch();
+  </script>
+</body>
+</html>

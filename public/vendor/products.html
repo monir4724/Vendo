@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Catalog · Vendor Studio</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open navigation menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search">
+          <i data-lucide="search"></i>
+          <input id="prod-search" placeholder="Search catalog by title, SKU, or tag…" aria-label="Search products">
+        </div>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-6" style="flex-wrap:wrap;gap:16px">
+          <div>
+            <h1 class="h1">Product Catalog</h1>
+            <p class="secondary mt-1">Manage SKUs, inventory counts, and shoppable products for live &amp; reels.</p>
+          </div>
+          <button class="btn btn-cta" type="button" id="btn-add-product">
+            <i data-lucide="plus"></i> Add New Product
+          </button>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="card mb-4 flex-between" style="padding:12px 16px;flex-wrap:wrap;gap:12px">
+          <div class="flex gap-2" style="align-items:center">
+            <span class="caption" style="font-weight:600">Category:</span>
+            <div class="pills" id="prod-cat-filter">
+              <button class="pill is-active" data-cat="all">All</button>
+              <button class="pill" data-cat="Apparel">Apparel</button>
+              <button class="pill" data-cat="Home & Living">Home</button>
+              <button class="pill" data-cat="Bags & Accessories">Bags</button>
+              <button class="pill" data-cat="Beauty & Wellness">Beauty</button>
+            </div>
+          </div>
+          <span class="caption secondary" id="catalog-count">8 SKUs Total</span>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-wrap">
+          <table class="data" id="products-table">
+            <thead>
+              <tr>
+                <th style="width:64px">Image</th>
+                <th>Title &amp; Category</th>
+                <th>Price</th>
+                <th>Stock Units</th>
+                <th>Inventory Status</th>
+                <th style="text-align:right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- Empty state -->
+        <div id="empty-state" class="card state hidden" style="padding:64px 24px">
+          <i data-lucide="package-search" style="width:56px;height:56px;color:var(--color-text-muted);margin:0 auto 16px"></i>
+          <h2 class="h3 mb-2">No matching products found</h2>
+          <p class="secondary" style="max-width:320px;margin:0 auto 20px">Add a new SKU to start tagging items in live streams and shoppable reels.</p>
+          <button class="btn btn-cta" type="button" onclick="document.getElementById('btn-add-product').click()">Add First Product</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    var currentCat = "all";
+    var searchQuery = "";
+
+    function renderTable() {
+      var prods = window.VendoData.products || [];
+      var filtered = prods.filter(function (p) {
+        var matchCat = currentCat === "all" || p.cat.indexOf(currentCat) !== -1;
+        var matchQ = !searchQuery || p.name.toLowerCase().indexOf(searchQuery) !== -1 || (p.cat && p.cat.toLowerCase().indexOf(searchQuery) !== -1);
+        return matchCat && matchQ;
+      });
+
+      document.getElementById("catalog-count").textContent = filtered.length + " SKUs Listed";
+      var tbody = document.getElementById("products-tbody");
+      var empty = document.getElementById("empty-state");
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        empty.classList.remove("hidden");
+        lucide.createIcons();
+        return;
+      }
+
+      empty.classList.add("hidden");
+      tbody.innerHTML = filtered.map(function (p) {
+        var stock = p.stock !== undefined ? p.stock : 25;
+        var badge = stock === 0 ? "danger" : stock < 10 ? "warning" : "success";
+        var label = stock === 0 ? "Out of Stock" : stock < 10 ? "Low Stock (" + stock + ")" : "In Stock (" + stock + ")";
+
+        return (
+          '<tr data-id="' + p.id + '">' +
+            '<td><img src="' + p.img + '" alt="" style="width:44px;height:44px;border-radius:8px;object-fit:cover"></td>' +
+            '<td>' +
+              '<a href="../customer/product.html?id=' + p.id + '" target="_blank" style="font-weight:600;color:inherit;text-decoration:none">' + p.name + '</a>' +
+              '<div class="caption secondary">' + p.cat + ' · Vendor: ' + p.vendor + '</div>' +
+            '</td>' +
+            '<td class="mono font-bold" style="font-weight:600;font-size:15px">$' + Number(p.price).toFixed(2) + '</td>' +
+            '<td>' +
+              '<div class="flex gap-2" style="align-items:center">' +
+                '<span class="mono">' + stock + '</span>' +
+                '<button class="icon-btn btn-stock-plus" data-id="' + p.id + '" title="Quick add 5 units" style="width:28px;height:28px"><i data-lucide="plus" style="width:14px;height:14px"></i></button>' +
+              '</div>' +
+            '</td>' +
+            '<td><span class="badge badge-' + badge + '">' + label + '</span></td>' +
+            '<td style="text-align:right">' +
+              '<div class="flex gap-1" style="justify-content:flex-end">' +
+                '<a class="icon-btn" href="../customer/product.html?id=' + p.id + '" target="_blank" title="View PDP" style="width:32px;height:32px"><i data-lucide="external-link" style="width:14px;height:14px"></i></a>' +
+                '<button class="icon-btn btn-delete-prod" data-id="' + p.id + '" title="Delete product" style="width:32px;height:32px;color:var(--color-danger)"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>' +
+              '</div>' +
+            '</td>' +
+          '</tr>'
+        );
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    // Category Filter clicks
+    document.getElementById("prod-cat-filter").addEventListener("click", function (e) {
+      var pill = e.target.closest(".pill");
+      if (!pill) return;
+      currentCat = pill.dataset.cat;
+      document.querySelectorAll("#prod-cat-filter .pill").forEach(function (p) {
+        p.classList.toggle("is-active", p.dataset.cat === currentCat);
+      });
+      renderTable();
+    });
+
+    // Search input
+    document.getElementById("prod-search").addEventListener("input", function (e) {
+      searchQuery = e.target.value.toLowerCase().trim();
+      renderTable();
+    });
+
+    // Quick Stock addition & delete delegation
+    document.getElementById("products-tbody").addEventListener("click", function (e) {
+      var plusBtn = e.target.closest(".btn-stock-plus");
+      if (plusBtn) {
+        var id = plusBtn.dataset.id;
+        var p = window.VendoData.products.find(function (x) { return x.id === id; });
+        if (p) {
+          p.stock = (p.stock || 0) + 5;
+          p.inStock = true;
+          VendoUI.toast({ title: "Stock Updated", desc: p.name + " inventory increased to " + p.stock + " units.", type: "success" });
+          renderTable();
+        }
+        return;
+      }
+
+      var delBtn = e.target.closest(".btn-delete-prod");
+      if (delBtn) {
+        var id = delBtn.dataset.id;
+        var p = window.VendoData.products.find(function (x) { return x.id === id; });
+        VendoUI.modal({
+          title: "Delete SKU · " + (p ? p.name : id),
+          body: "Are you sure you want to remove this product from your store catalog? It will no longer appear in shoppable reels or storefronts.",
+          danger: true,
+          ok: "Delete SKU",
+          onOk: function () {
+            window.VendoData.products = window.VendoData.products.filter(function (x) { return x.id !== id; });
+            VendoUI.toast({ title: "Product Deleted", type: "info" });
+            renderTable();
+          }
+        });
+      }
+    });
+
+    // Add Product Modal
+    document.getElementById("btn-add-product").addEventListener("click", function () {
+      VendoUI.modal({
+        title: "Add New Product SKU",
+        htmlBody:
+          '<div class="stack gap-3">' +
+            '<div><label class="label">Product Title *</label><input class="field" id="new-prod-name" placeholder="e.g. Stoneware Espresso Cup" required></div>' +
+            '<div class="form-row" style="grid-template-columns:1fr 1fr">' +
+              '<div><label class="label">Category *</label><select class="field" id="new-prod-cat"><option value="Home & Living">Home & Living</option><option value="Apparel">Apparel</option><option value="Bags & Accessories">Bags</option><option value="Beauty & Wellness">Beauty</option></select></div>' +
+              '<div><label class="label">Price ($ USD) *</label><input class="field mono" type="number" id="new-prod-price" placeholder="45.00" step="0.5" required></div>' +
+            '</div>' +
+            '<div class="form-row" style="grid-template-columns:1fr 1fr">' +
+              '<div><label class="label">Initial Stock Units *</label><input class="field mono" type="number" id="new-prod-stock" value="20" required></div>' +
+              '<div><label class="label">Image URL</label><input class="field" id="new-prod-img" value="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80&auto=format"></div>' +
+            '</div>' +
+            '<div><label class="label">Short Description</label><textarea class="field" id="new-prod-desc" rows="2" placeholder="Handcrafted with local clay, food-grade glaze…"></textarea></div>' +
+          '</div>',
+        ok: "Publish Product",
+        onOk: function (modalBox) {
+          var name = modalBox.querySelector("#new-prod-name").value.trim();
+          var cat = modalBox.querySelector("#new-prod-cat").value;
+          var price = parseFloat(modalBox.querySelector("#new-prod-price").value) || 35.00;
+          var stock = parseInt(modalBox.querySelector("#new-prod-stock").value, 10) || 20;
+          var img = modalBox.querySelector("#new-prod-img").value.trim() || "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80&auto=format";
+          var desc = modalBox.querySelector("#new-prod-desc").value.trim() || "Artisan handcrafted piece.";
+
+          if (!name) {
+            VendoUI.toast({ title: "Title required", type: "warning" });
+            return;
+          }
+
+          var newId = "p" + (window.VendoData.products.length + 1);
+          var newProd = {
+            id: newId,
+            name: name,
+            vendor: "Atelier North",
+            vendorId: "v1",
+            price: price,
+            rating: 5.0,
+            reviewsCount: 1,
+            cat: cat,
+            stock: stock,
+            inStock: true,
+            img: img,
+            gallery: [img],
+            description: desc,
+            specs: { Origin: "Artisan Studio", Care: "Gentle handle" }
+          };
+
+          window.VendoData.products.unshift(newProd);
+          VendoUI.toast({
+            title: "Product Published!",
+            desc: name + " is now live and taggable in reels and broadcasts.",
+            type: "success"
+          });
+          renderTable();
+        }
+      });
+    });
+
+    renderTable();
+  </script>
+</body>
+</html>

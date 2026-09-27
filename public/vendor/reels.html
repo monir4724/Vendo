@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reel Studio · Vendor Studio</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search your reels…" aria-label="Search"></div>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-6" style="flex-wrap:wrap;gap:16px">
+          <div>
+            <h1 class="h1">Reel Studio (9:16 Shoppable Video)</h1>
+            <p class="secondary mt-1">Upload vertical artisan video clips, tag catalog products, and convert views directly into sales.</p>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:32px;align-items:start" class="cols-70-30">
+          <!-- Upload & Tagging Controls -->
+          <div class="card stack gap-4">
+            <h2 class="h3">1. Upload Vertical Clip (9:16)</h2>
+            <div class="dropzone" id="reel-dz">
+              <i data-lucide="upload-cloud" style="width:40px;height:40px;margin-bottom:8px;color:var(--color-brand)"></i>
+              <p style="font-weight:600;margin:0 0 4px">Drag and drop vertical video (.MP4, .MOV) here</p>
+              <span class="caption secondary">Supports up to 4K 60fps · 9:16 aspect ratio recommended</span>
+            </div>
+
+            <div class="stack gap-3">
+              <div>
+                <label class="label" for="reel-title">Reel Caption &amp; Description *</label>
+                <input class="field" id="reel-title" placeholder="e.g. Hand-turning our morning pour-over batch ✨ #pottery" value="Crafting our European Flax Linen Resort Shirt in Porto #linen">
+              </div>
+
+              <div>
+                <label class="label" for="tag-product-select">Tag Shoppable Product *</label>
+                <select class="field" id="tag-product-select"></select>
+                <span class="caption secondary mt-1">This product will be pinned on the video with a direct Coral Buy Now CTA.</span>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button class="btn btn-cta" type="button" id="btn-publish-reel">
+                  <i data-lucide="sparkles"></i> Publish Shoppable Reel
+                </button>
+                <button class="btn btn-outline" type="button" id="btn-save-draft">Save Draft</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 9:16 Safe Zone Phone Frame Preview -->
+          <div class="card stack gap-3" style="background:var(--color-bg-subtle)">
+            <div class="flex-between">
+              <strong style="font-size:14px">9:16 Safe-Zone Preview</strong>
+              <span class="badge badge-info">Live Preview</span>
+            </div>
+
+            <div style="width:260px;margin:0 auto;aspect-ratio:9/16;background:#111;border-radius:24px;overflow:hidden;position:relative;box-shadow:var(--elev-3);border:4px solid var(--color-border-default)">
+              <div id="preview-bg" style="position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=640&q=80&auto=format') center/cover"></div>
+
+              <!-- Top Safe Zone Preview -->
+              <div style="position:absolute;top:12px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#fff">
+                <span class="glass-light" style="padding:2px 8px;border-radius:999px">Atelier North</span>
+                <span class="glass-light" style="padding:2px 8px;border-radius:999px">For you</span>
+              </div>
+
+              <!-- Pin Hotspot Preview -->
+              <div class="tag-pin" style="left:40%;top:45%;width:20px;height:20px">
+                <i data-lucide="map-pin" style="width:10px;height:10px"></i>
+              </div>
+
+              <!-- Right Actions Mock -->
+              <div style="position:absolute;right:8px;bottom:90px;display:flex;flex-direction:column;gap:8px;align-items:center;color:#fff">
+                <i data-lucide="heart" style="width:18px;height:18px"></i>
+                <i data-lucide="message-circle" style="width:18px;height:18px"></i>
+                <i data-lucide="bookmark" style="width:18px;height:18px"></i>
+              </div>
+
+              <!-- Bottom Overlay Preview -->
+              <div style="position:absolute;left:8px;right:36px;bottom:12px">
+                <div id="preview-caption" style="font-size:10px;color:#fff;line-height:14px;margin-bottom:6px;text-shadow:0 1px 2px #000">Crafting our European Flax Linen Resort Shirt</div>
+                <div class="product-glass glass" style="height:48px;padding:4px 8px">
+                  <img id="preview-prod-img" src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=80" style="width:36px;height:36px;border-radius:6px;object-fit:cover" alt="">
+                  <div style="flex:1;min-width:0">
+                    <div id="preview-prod-name" style="font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Linen Resort Shirt</div>
+                    <div id="preview-prod-price" class="price" style="font-size:11px">$48.00</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p class="caption secondary text-center" style="text-align:center">Buttons, captions, and hot-spots conform to 2026 mobile video safe zones.</p>
+          </div>
+        </div>
+
+        <!-- Active Store Reels Gallery & Performance Table -->
+        <section class="mt-8 pt-6" style="border-top:1px solid var(--color-border-default)">
+          <div class="flex-between mb-4">
+            <h2 class="h3">Published Reels &amp; Conversion Analytics</h2>
+            <span class="caption secondary">3 Active Reels</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));gap:20px" id="reels-performance-grid"></div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    // Populate Tag Products Dropdown
+    var select = document.getElementById("tag-product-select");
+    var prods = window.VendoData.products || [];
+    select.innerHTML = prods.map(function (p) {
+      return '<option value="' + p.id + '">' + p.name + ' ($' + p.price + ')</option>';
+    }).join("");
+
+    select.addEventListener("change", function () {
+      var selectedId = select.value;
+      var p = prods.find(function (x) { return x.id === selectedId; });
+      if (p) {
+        document.getElementById("preview-prod-name").textContent = p.name;
+        document.getElementById("preview-prod-price").textContent = "$" + p.price;
+        document.getElementById("preview-prod-img").src = p.img;
+        document.getElementById("preview-bg").style.backgroundImage = "url(" + p.img + ")";
+      }
+    });
+
+    var captionInput = document.getElementById("reel-title");
+    captionInput.addEventListener("input", function () {
+      document.getElementById("preview-caption").textContent = this.value || "Reel caption preview";
+    });
+
+    // Dropzone
+    VendoUI.dropzone(document.getElementById("reel-dz"), function (file) {
+      VendoUI.toast({
+        title: "Video File Loaded",
+        desc: file.name + " (" + (file.size / (1024 * 1024)).toFixed(1) + " MB) ready for encoding.",
+        type: "success"
+      });
+    });
+
+    // Publish Reel Button
+    document.getElementById("btn-publish-reel").addEventListener("click", function () {
+      var title = captionInput.value.trim();
+      var pid = select.value;
+      var prod = prods.find(function (x) { return x.id === pid; }) || prods[0];
+
+      if (!title) {
+        VendoUI.toast({ title: "Caption Required", type: "warning" });
+        return;
+      }
+
+      var newReel = {
+        id: "r" + (window.VendoData.reels.length + 1),
+        vendor: "Atelier North",
+        vendorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80&auto=format",
+        title: title,
+        likes: 1,
+        commentsCount: 0,
+        sharesCount: 0,
+        isLiked: false,
+        bgImg: prod.img,
+        product: { id: prod.id, name: prod.name, price: prod.price, img: prod.img }
+      };
+
+      window.VendoData.reels.unshift(newReel);
+      VendoUI.toast({
+        title: "Reel Published Successfully!",
+        desc: "Now available in customer Shoppable Reels feed with tagged Buy Now pin.",
+        type: "success"
+      });
+      renderReelsList();
+    });
+
+    // Render Performance List
+    function renderReelsList() {
+      var grid = document.getElementById("reels-performance-grid");
+      var reels = window.VendoData.reels || [];
+
+      grid.innerHTML = reels.map(function (r) {
+        return (
+          '<div class="card" style="padding:0;overflow:hidden">' +
+            '<div style="aspect-ratio:9/16;background:#1c1917 url(' + (r.bgImg || r.product.img) + ') center/cover;position:relative">' +
+              '<div style="position:absolute;top:10px;left:10px"><span class="badge badge-success"><span class="pulse-dot"></span> Live in Feed</span></div>' +
+              '<div style="position:absolute;bottom:0;left:0;right:0;padding:12px;background:linear-gradient(transparent, rgba(0,0,0,0.85));color:#fff">' +
+                '<strong style="font-size:13px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + r.title + '</strong>' +
+                '<div class="caption mt-1" style="color:#fdba74">Tagged: ' + (r.product ? r.product.name : 'Catalog SKU') + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div style="padding:14px" class="stack gap-2">' +
+              '<div class="flex-between caption">' +
+                '<span><i data-lucide="eye" style="width:12px;height:12px;display:inline-block;vertical-align:-1px"></i> ' + (r.likes * 4) + ' views</span>' +
+                '<span><i data-lucide="heart" style="width:12px;height:12px;display:inline-block;vertical-align:-1px"></i> ' + r.likes + ' likes</span>' +
+                '<strong style="color:var(--color-success)">$' + (r.likes * 2) + ' sales</strong>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    renderReelsList();
+  </script>
+</body>
+</html>

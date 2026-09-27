@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escrow Dispute Resolution · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input id="search-input" placeholder="Search disputes by order, customer, vendor…" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Escrow Dispute Resolution</h1>
+            <p class="secondary mt-1">Mediate transaction claims and authorize escrow fund settlements.</p>
+          </div>
+          <span class="badge badge-warning" id="dispute-count-badge">1 active dispute</span>
+        </div>
+
+        <!-- Disputes Table Wrap -->
+        <div class="card" id="dispute-table-card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
+          <div class="table-wrap">
+            <table class="data">
+              <thead>
+                <tr>
+                  <th>Dispute ID</th>
+                  <th>Order Reference</th>
+                  <th>Customer</th>
+                  <th>Vendor</th>
+                  <th>Escrow Amount</th>
+                  <th>Claim Reason</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="dispute-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Section 9: Empty State -->
+        <div class="card state hidden" id="dispute-empty" style="padding: 64px 24px;">
+          <i data-lucide="shield-check" style="width: 56px; height: 56px; color: var(--color-success); margin: 0 auto 16px;"></i>
+          <h2 class="h3 mb-2">No pending disputes</h2>
+          <p class="secondary" style="max-width: 340px; margin: 0 auto;">All marketplace orders are fulfilling smoothly with zero active buyer or seller contestations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    var disputes = (VendoData.disputes && VendoData.disputes.slice()) || [
+      {
+        id: "DSP-301",
+        orderId: "VD-10412",
+        customer: "Sofia Miller",
+        vendor: "Harbor Goods",
+        amount: 147.60,
+        reason: "Item not as described (Color variance)",
+        date: "2026-09-27 12:40",
+        status: "open",
+        evidence: "Customer uploaded photo showing olive tint under daylight compared to cognac catalog photo.",
+        solutionRequested: "Full refund or replacement"
+      }
+    ];
+
+    function renderDisputes() {
+      var tbody = document.getElementById("dispute-tbody");
+      var empty = document.getElementById("dispute-empty");
+      var card = document.getElementById("dispute-table-card");
+      var openList = disputes.filter(function(d) { return d.status === "open"; });
+
+      document.getElementById("dispute-count-badge").textContent = openList.length + " active dispute" + (openList.length === 1 ? "" : "s");
+
+      if (disputes.length === 0) {
+        card.classList.add("hidden");
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      card.classList.remove("hidden");
+      empty.classList.add("hidden");
+
+      tbody.innerHTML = disputes.map(function(d) {
+        var statusBadge = d.status === "open" ?
+          '<span class="badge badge-warning">Under Review</span>' :
+          '<span class="badge badge-success">Settled</span>';
+
+        var actionBtn = d.status === "open" ?
+          '<button class="btn btn-sm btn-outline" type="button" onclick="openMediationModal(\'' + d.id + '\')"><i data-lucide="scale" style="width: 14px; height: 14px; margin-right: 4px;"></i> Mediate</button>' :
+          '<span class="caption secondary"><i data-lucide="check" style="width: 13px; height: 13px; display: inline;"></i> Resolved</span>';
+
+        return '<tr>' +
+          '<td class="mono font-bold">' + d.id + '</td>' +
+          '<td><span class="mono" style="color: var(--color-brand); font-weight: 500;">' + d.orderId + '</span></td>' +
+          '<td><strong>' + d.customer + '</strong></td>' +
+          '<td>' + d.vendor + '</td>' +
+          '<td class="mono price">$' + Number(d.amount).toFixed(2) + '</td>' +
+          '<td><div style="font-size: 13px;">' + d.reason + '</div><div class="caption secondary">' + d.evidence + '</div></td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td style="text-align: right;">' + actionBtn + '</td>' +
+        '</tr>';
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    window.openMediationModal = function(id) {
+      var d = disputes.find(function(item) { return item.id === id; });
+      if (!d) return;
+
+      var bodyHtml = 
+        '<div class="stack gap-3" style="text-align: left;">' +
+          '<p class="secondary" style="font-size: 14px;">Review claim details for Order <strong>' + d.orderId + '</strong> between buyer <strong>' + d.customer + '</strong> and vendor <strong>' + d.vendor + '</strong>.</p>' +
+          '<div class="card" style="background: var(--color-bg-subtle); padding: 12px; font-size: 13px;">' +
+            '<div><strong>Claim:</strong> ' + d.reason + '</div>' +
+            '<div class="mt-1"><strong>Evidence:</strong> ' + d.evidence + '</div>' +
+            '<div class="mt-1"><strong>Escrow Held:</strong> <span class="mono price">$' + Number(d.amount).toFixed(2) + '</span></div>' +
+          '</div>' +
+          '<label class="label mt-2">Select Mediation Settlement Outcome:</label>' +
+          '<div class="stack gap-2">' +
+            '<button class="btn btn-outline" style="justify-content: flex-start; text-align: left;" type="button" onclick="settleDispute(\'' + d.id + '\', \'refund\')">' +
+              '<i data-lucide="rotate-ccw" style="color: var(--color-danger); margin-right: 8px;"></i> 1. Full Refund to Customer ($' + Number(d.amount).toFixed(2) + ')' +
+            '</button>' +
+            '<button class="btn btn-outline" style="justify-content: flex-start; text-align: left;" type="button" onclick="settleDispute(\'' + d.id + '\', \'release\')">' +
+              '<i data-lucide="check-circle" style="color: var(--color-success); margin-right: 8px;"></i> 2. Release Escrow to Vendor ($' + Number(d.amount).toFixed(2) + ')' +
+            '</button>' +
+            '<button class="btn btn-outline" style="justify-content: flex-start; text-align: left;" type="button" onclick="settleDispute(\'' + d.id + '\', \'split\')">' +
+              '<i data-lucide="pie-chart" style="color: var(--color-brand); margin-right: 8px;"></i> 3. 50/50 Compromise Split ($' + (d.amount / 2).toFixed(2) + ' each)' +
+            '</button>' +
+          '</div>' +
+        '</div>';
+
+      VendoUI.modal({
+        title: "Dispute Mediation: " + d.id,
+        body: bodyHtml,
+        ok: "Close",
+        onOk: function() {}
+      });
+      lucide.createIcons();
+    };
+
+    window.settleDispute = function(id, mode) {
+      var d = disputes.find(function(item) { return item.id === id; });
+      if (!d) return;
+
+      d.status = "resolved";
+      var msg = "";
+      if (mode === "refund") {
+        msg = "Full refund of $" + Number(d.amount).toFixed(2) + " released to " + d.customer + ".";
+      } else if (mode === "release") {
+        msg = "Escrow funds of $" + Number(d.amount).toFixed(2) + " disbursed to " + d.vendor + ".";
+      } else {
+        msg = "50/50 split settlement executed. $" + (d.amount / 2).toFixed(2) + " refunded to customer, remainder to vendor.";
+      }
+
+      // Close modal
+      var scrim = document.querySelector(".modal-scrim");
+      if (scrim) scrim.remove();
+
+      VendoUI.toast("Dispute Settled", msg, "success");
+      renderDisputes();
+    };
+
+    renderDisputes();
+  </script>
+</body>
+</html>

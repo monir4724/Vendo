@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Welcome · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <main class="container" style="padding:48px 0;max-width:560px">
+    <div class="flex-between mb-4"><span class="caption">Optional · always skippable</span><a class="btn btn-sm" href="home.html">Skip</a></div>
+    <div class="card stack" id="s1">
+      <h1 class="h-display">Welcome to Vendo</h1>
+      <p class="secondary">Pick a few interests so For You isn’t cold-start empty. Reels still fall back to trending.</p>
+      <div class="pills" id="pills"></div>
+      <button class="btn btn-cta" type="button" id="next">Continue</button>
+    </div>
+    <div class="card stack hidden" id="s2">
+      <h1 class="h2">Follow 3 vendors</h1>
+      <p class="caption">Your reel feed stays full even if you skip.</p>
+      <div id="vends" class="stack"></div>
+      <a class="btn btn-cta" href="home.html">Enter Vendo</a>
+    </div>
+  </main>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script>
+    ["Apparel", "Home", "Beauty", "Live shops", "Reels"].forEach(function (c) {
+      var b = document.createElement("button");
+      b.className = "pill";
+      b.type = "button";
+      b.textContent = c;
+      b.addEventListener("click", function () { b.classList.toggle("is-active"); });
+      document.getElementById("pills").appendChild(b);
+    });
+    document.getElementById("next").addEventListener("click", function () {
+      document.getElementById("s1").classList.add("hidden");
+      document.getElementById("s2").classList.remove("hidden");
+    });
+    document.getElementById("vends").innerHTML = VendoData.vendors.map(function (v) {
+      return '<div class="flex-between"><strong>' + v.name + '</strong><button class="btn btn-sm btn-outline" type="button" data-f>Follow</button></div>';
+    }).join("");
+    document.getElementById("vends").addEventListener("click", function (e) {
+      if (!e.target.matches("[data-f]")) return;
+      e.target.className = "btn btn-sm btn-primary";
+      e.target.textContent = "Following";
+    });
+  </script>
+</body>
+</html>

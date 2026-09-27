@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notifications · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
+  </header>
+
+  <main id="main" class="container page-pad" style="max-width:680px">
+    <div class="flex-between mb-6">
+      <div>
+        <h1 class="h1">Notification Center</h1>
+        <p class="secondary mt-1">Real-time alerts for shipments, live shows, and discounts.</p>
+      </div>
+      <button class="btn btn-sm btn-outline" id="btn-mark-all" type="button">
+        <i data-lucide="check-check"></i> Mark all read
+      </button>
+    </div>
+
+    <!-- Empty State per Section 9 -->
+    <div id="notif-empty" class="card state hidden" style="padding:64px 24px">
+      <i data-lucide="bell-off" style="width:56px;height:56px;color:var(--color-text-muted);margin:0 auto 16px"></i>
+      <h2 class="h3 mb-2">You’re caught up</h2>
+      <p class="secondary" style="max-width:320px;margin:0 auto 24px">No unread notifications right now. Check back when your favorite vendors host live sales.</p>
+      <a class="btn btn-cta" href="home.html">Explore Marketplace</a>
+    </div>
+
+    <!-- Notification Groups -->
+    <div id="notif-groups" class="stack gap-6"></div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    var notifs = window.VendoData.notifications || [];
+
+    function renderNotifications() {
+      var groupsContainer = document.getElementById("notif-groups");
+      var emptyEl = document.getElementById("notif-empty");
+
+      if (notifs.length === 0) {
+        groupsContainer.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        lucide.createIcons();
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      groupsContainer.classList.remove("hidden");
+
+      var groups = ["Today", "Yesterday", "Earlier"];
+      groupsContainer.innerHTML = groups.map(function (grp) {
+        var itemsInGroup = notifs.filter(function (n) { return n.group === grp; });
+        if (itemsInGroup.length === 0) return "";
+
+        return (
+          '<section>' +
+            '<h2 class="caption mb-3" style="text-transform:uppercase;letter-spacing:0.06em;font-weight:600">' + grp + '</h2>' +
+            '<div class="stack gap-3">' +
+              itemsInGroup.map(function (n) {
+                var icon = "bell";
+                if (n.type === "order") icon = "package";
+                if (n.type === "live") icon = "radio";
+                if (n.type === "promo") icon = "tag";
+
+                return (
+                  '<a class="card card-hover flex gap-3" href="' + (n.link || '#') + '" style="text-decoration:none;color:inherit;align-items:center;padding:16px" data-notif-id="' + n.id + '">' +
+                    '<div style="width:42px;height:42px;border-radius:50%;background:var(--color-bg-subtle);display:grid;place-items:center;flex-shrink:0;color:var(--color-brand)">' +
+                      '<i data-lucide="' + icon + '" style="width:20px;height:20px"></i>' +
+                    '</div>' +
+                    '<div style="flex:1">' +
+                      '<div class="flex-between">' +
+                        '<strong style="font-size:14px">' + n.title + '</strong>' +
+                        '<span class="caption secondary">' + n.time + '</span>' +
+                      '</div>' +
+                      '<p class="secondary caption mt-1" style="margin:2px 0 0">' + n.desc + '</p>' +
+                    '</div>' +
+                    (n.unread ? '<span class="unread-dot" title="Unread"></span>' : '') +
+                  '</a>'
+                );
+              }).join("") +
+            '</div>' +
+          '</section>'
+        );
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    document.getElementById("btn-mark-all").addEventListener("click", function () {
+      notifs.forEach(function (n) { n.unread = false; });
+      VendoUI.toast({ title: "Notifications marked as read", type: "success" });
+      renderNotifications();
+    });
+
+    renderNotifications();
+  </script>
+</body>
+</html>

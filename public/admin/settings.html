@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>System & Security Settings · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main" style="max-width: 760px;">
+        <h1 class="h1 mb-4">Platform Governance & Security Settings</h1>
+
+        <!-- Mandatory 2FA Banner -->
+        <div class="card mb-4" style="background: rgba(245, 158, 11, 0.12); border: 1px solid var(--color-warning); padding: var(--space-4);">
+          <div class="flex-between">
+            <div class="flex gap-3" style="align-items: center;">
+              <i data-lucide="shield-alert" style="width: 24px; height: 24px; color: var(--color-warning);"></i>
+              <div>
+                <strong style="color: var(--color-text-primary);">Mandatory Two-Factor Authentication (2FA)</strong>
+                <p class="secondary caption" style="margin: 2px 0 0;">Admin accounts require TOTP hardware token or authenticator app protection.</p>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-outline" type="button" id="btn-config-2fa" style="border-color: var(--color-warning); color: var(--color-text-primary);">
+              Configure 2FA
+            </button>
+          </div>
+        </div>
+
+        <form id="settings-form" class="stack gap-6">
+          <!-- Marketplace Financial Rules -->
+          <section class="card stack gap-4">
+            <h2 class="h3">Marketplace Financial Rules</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="label" for="commission-rate">Platform Commission Rate (%)</label>
+                <div class="flex gap-2" style="align-items: center;">
+                  <input class="field mono" id="commission-rate" type="number" min="0" max="30" step="0.5" value="8.0" required>
+                  <span class="secondary">%</span>
+                </div>
+                <span class="caption secondary">Deducted from gross GMV before escrow disbursement.</span>
+              </div>
+
+              <div>
+                <label class="label" for="min-payout">Minimum Payout Threshold ($)</label>
+                <div class="flex gap-2" style="align-items: center;">
+                  <span class="secondary">$</span>
+                  <input class="field mono" id="min-payout" type="number" min="10" max="1000" step="5" value="50.00" required>
+                </div>
+                <span class="caption secondary">Minimum vendor balance required to initiate payout.</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="label" for="escrow-delay">Escrow Holding Period (Days)</label>
+              <select class="field" id="escrow-delay">
+                <option value="7">7 Days (Fast track for Top Rated Artisans)</option>
+                <option value="14" selected>14 Days (Standard return window policy)</option>
+                <option value="21">21 Days (High-risk or new seller probation)</option>
+              </select>
+              <span class="caption secondary">Funds remain in escrow buffer to secure customer refunds or chargebacks.</span>
+            </div>
+          </section>
+
+          <!-- Security & Access -->
+          <section class="card stack gap-4">
+            <h2 class="h3">Security & Session Policies</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label class="label" for="admin-email">Admin Master Email</label>
+                <input class="field" id="admin-email" value="security-lead@vendo.app" required>
+              </div>
+              <div>
+                <label class="label" for="session-timeout">Idle Session Timeout</label>
+                <select class="field" id="session-timeout">
+                  <option value="15">15 Minutes</option>
+                  <option value="30" selected>30 Minutes (Recommended)</option>
+                  <option value="60">60 Minutes</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="padding-top: 8px; border-top: 1px solid var(--color-border-default);">
+              <label class="flex-between" style="cursor: pointer;">
+                <div>
+                  <strong>Live Stream Content Pre-Screening</strong>
+                  <div class="caption secondary">Automatically transcribe broadcast audio and flag high-risk claims.</div>
+                </div>
+                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--color-brand);">
+              </label>
+            </div>
+          </section>
+
+          <div>
+            <button class="btn btn-primary" type="submit" style="width: 100%; justify-content: center;">
+              <i data-lucide="save"></i> Save System & Security Settings
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    // Form Save
+    document.getElementById("settings-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var rate = document.getElementById("commission-rate").value;
+      VendoUI.toast("Settings Saved", "Marketplace parameters updated. Commission rate set to " + rate + "%.", "success");
+    });
+
+    // 2FA Modal
+    document.getElementById("btn-config-2fa").addEventListener("click", function() {
+      var modalBody = 
+        '<div class="stack gap-3" style="text-align: center;">' +
+          '<p class="secondary" style="font-size: 13px;">Scan this QR code with Google Authenticator, 1Password, or Authy:</p>' +
+          '<div style="background: #fff; padding: 16px; border-radius: 8px; display: inline-block; margin: 0 auto; border: 1px solid var(--color-border-default);">' +
+            '<img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=otpauth://totp/Vendo:admin@vendo.app?secret=JBSWY3DPEHPK3PXP&issuer=Vendo" alt="2FA QR Code" width="140" height="140">' +
+          '</div>' +
+          '<div class="caption mono secondary">Manual key: <strong style="color: var(--color-text-primary);">JBSW Y3DP EHPK 3PXP</strong></div>' +
+          '<div style="text-align: left; margin-top: 8px;">' +
+            '<label class="label">Enter 6-digit Authenticator Code</label>' +
+            '<input class="field mono" id="totp-code" placeholder="000 000" maxlength="6" style="text-align: center; font-size: 18px; letter-spacing: 0.2em;">' +
+          '</div>' +
+        '</div>';
+
+      VendoUI.modal({
+        title: "Setup Two-Factor Authentication (2FA)",
+        body: modalBody,
+        ok: "Verify & Activate",
+        onOk: function() {
+          var code = document.getElementById("totp-code") ? document.getElementById("totp-code").value.trim() : "";
+          if (code.length < 6) {
+            VendoUI.toast("Invalid Code", "Please enter a valid 6-digit verification code.", "warning");
+            return;
+          }
+          VendoUI.toast("2FA Activated", "Two-factor authentication successfully bound to admin account.", "success");
+        }
+      });
+      lucide.createIcons();
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+/* Vendo Design Tokens — 4-tier (Primitive → Semantic → Component → Product) */
+
+:root {
+  color-scheme: light;
+
+  /* ——— Tier 0 Primitive: color ——— */
+  --p-cream-50: #faf9f6;
+  --p-cream-100: #f1f0eb;
+  --p-cream-200: #e5e3dc;
+  --p-white: #ffffff;
+  --p-navy-950: #1e293b;
+  --p-navy-800: #1e3a5f;
+  --p-slate-500: #64748b;
+  --p-slate-400: #94a3b8;
+  --p-stone-950: #1c1917;
+  --p-stone-900: #24211e;
+  --p-stone-800: #2d2a26;
+  --p-stone-700: #3a362f;
+  --p-ivory-50: #f5f3ef;
+  --p-ivory-300: #b8b2a8;
+  --p-ivory-500: #8a8378;
+  --p-teal-800: #0f766e;
+  --p-teal-900: #0b5d56;
+  --p-teal-400: #2dd4bf;
+  --p-teal-300: #5eead4;
+  --p-coral-500: #f97316;
+  --p-coral-600: #ea580c;
+  --p-coral-400: #fb923c;
+  --p-coral-300: #fdba74;
+  --p-blue-300: #93c5fd;
+  --p-green-500: #10b981;
+  --p-green-400: #34d399;
+  --p-amber-500: #f59e0b;
+  --p-amber-400: #fbbf24;
+  --p-red-500: #ef4444;
+  --p-red-400: #f87171;
+  --p-sky-500: #0ea5e9;
+  --p-sky-400: #38bdf8;
+
+  /* ——— Tier 0 Primitive: space (4px) ——— */
+  --p-space-0: 0px;
+  --p-space-1: 4px;
+  --p-space-2: 8px;
+  --p-space-3: 12px;
+  --p-space-4: 16px;
+  --p-space-5: 20px;
+  --p-space-6: 24px;
+  --p-space-8: 32px;
+  --p-space-10: 40px;
+  --p-space-12: 48px;
+  --p-space-16: 64px;
+  --p-space-20: 80px;
+
+  /* ——— Tier 0 Primitive: motion ——— */
+  --p-duration-50: 100ms;
+  --p-duration-100: 150ms;
+  --p-duration-200: 220ms;
+  --p-duration-300: 320ms;
+  --p-duration-400: 450ms;
+  --p-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --p-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+  --p-ease-toggle: cubic-bezier(0.65, 0, 0.35, 1);
+  --p-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ——— Tier 1 Semantic: light ——— */
+  --color-bg-canvas: var(--p-cream-50);
+  --color-bg-surface: var(--p-white);
+  --color-bg-subtle: var(--p-cream-100);
+  --color-bg-inverse: var(--p-stone-950);
+  --color-border-default: var(--p-cream-200);
+  --color-border-strong: var(--p-slate-400);
+  --color-text-primary: var(--p-navy-950);
+  --color-text-secondary: var(--p-slate-500);
+  --color-text-muted: var(--p-slate-400);
+  --color-text-inverse: var(--p-ivory-50);
+  --color-brand: var(--p-teal-800);
+  --color-brand-hover: var(--p-teal-900);
+  --color-cta: var(--p-coral-500);
+  --color-cta-hover: var(--p-coral-600);
+  --color-success: var(--p-green-500);
+  --color-warning: var(--p-amber-500);
+  --color-danger: var(--p-red-500);
+  --color-info: var(--p-sky-500);
+  --color-focus-ring: var(--p-teal-800);
+  --color-success-soft: rgba(16, 185, 129, 0.12);
+  --color-warning-soft: rgba(245, 158, 11, 0.14);
+  --color-danger-soft: rgba(239, 68, 68, 0.12);
+  --color-info-soft: rgba(14, 165, 233, 0.12);
+  --color-brand-soft: rgba(15, 118, 110, 0.1);
+  --color-cta-soft: rgba(249, 115, 22, 0.12);
+  --shadow-tint: rgba(30, 41, 59, 0.08);
+  --shadow-tint-2: rgba(30, 41, 59, 0.12);
+  --shadow-tint-3: rgba(30, 41, 59, 0.16);
+  --shadow-tint-4: rgba(30, 41, 59, 0.2);
+
+  --skeleton-base: var(--p-cream-200);
+  --skeleton-shine: rgba(255, 255, 255, 0.55);
+
+  /* ——— Semantic space aliases ——— */
+  --space-1: var(--p-space-1);
+  --space-2: var(--p-space-2);
+  --space-3: var(--p-space-3);
+  --space-4: var(--p-space-4);
+  --space-5: var(--p-space-5);
+  --space-6: var(--p-space-6);
+  --space-8: var(--p-space-8);
+  --space-10: var(--p-space-10);
+  --space-12: var(--p-space-12);
+  --space-16: var(--p-space-16);
+
+  --motion-instant: var(--p-duration-100);
+  --motion-fast: var(--p-duration-200);
+  --motion-medium: var(--p-duration-300);
+  --motion-slow: var(--p-duration-400);
+  --ease-enter: var(--p-ease-enter);
+  --ease-exit: var(--p-ease-exit);
+  --ease-toggle: var(--p-ease-toggle);
+  --ease-standard: var(--p-ease-standard);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+
+  --elev-0: none;
+  --elev-1: 0 1px 3px var(--shadow-tint);
+  --elev-2: 0 8px 24px var(--shadow-tint-2);
+  --elev-3: 0 16px 40px var(--shadow-tint-3);
+  --elev-4: 0 24px 56px var(--shadow-tint-4);
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-live-overlay: 15;
+  --z-nav: 20;
+  --z-dropdown: 30;
+  --z-overlay: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+  --z-skip: 70;
+
+  --icon-xs: 12px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+  --icon-hero: 48px;
+
+  --layout-sidebar: 240px;
+  --layout-topbar: 64px;
+  --layout-tabbar: 56px;
+  --layout-max: 1280px;
+  --layout-max-wide: 1440px;
+  --gutter: var(--space-6);
+
+  --font-heading: "Sora", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-display: "Fraunces", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ——— Tier 3 Product defaults (overridden by data-role) ——— */
+  --role-accent: var(--p-coral-500);
+  --role-accent-hover: var(--p-coral-600);
+  --role-accent-soft: var(--color-cta-soft);
+  --role-on-accent: #ffffff;
+
+  /* ——— Tier 2 Component ——— */
+  --button-primary-bg: var(--role-accent);
+  --button-primary-fg: var(--role-on-accent);
+  --button-cta-bg: var(--color-cta);
+  --button-cta-fg: #ffffff;
+  --input-bg: var(--color-bg-surface);
+  --input-border: var(--color-border-default);
+  --input-border-focus: var(--color-brand);
+
+  --glass-bg: rgba(28, 25, 23, 0.55);
+  --glass-bg-heavy: rgba(28, 25, 23, 0.78);
+  --glass-bg-light: rgba(255, 255, 255, 0.22);
+  --glass-blur: 16px;
+  --glass-blur-heavy: 24px;
+  --glass-border: 1px solid rgba(255, 255, 255, 0.12);
+  --glass-glow-cta: 0 0 24px rgba(249, 115, 22, 0.35);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg-canvas: var(--p-stone-950);
+  --color-bg-surface: var(--p-stone-900);
+  --color-bg-subtle: var(--p-stone-800);
+  --color-bg-inverse: var(--p-ivory-50);
+  --color-border-default: var(--p-stone-700);
+  --color-border-strong: var(--p-ivory-500);
+  --color-text-primary: var(--p-ivory-50);
+  --color-text-secondary: var(--p-ivory-300);
+  --color-text-muted: var(--p-ivory-500);
+  --color-text-inverse: var(--p-stone-950);
+  --color-brand: var(--p-teal-400);
+  --color-brand-hover: var(--p-teal-300);
+  --color-cta: var(--p-coral-400);
+  --color-cta-hover: var(--p-coral-300);
+  --color-success: var(--p-green-400);
+  --color-warning: var(--p-amber-400);
+  --color-danger: var(--p-red-400);
+  --color-info: var(--p-sky-400);
+  --color-focus-ring: var(--p-teal-400);
+  --color-success-soft: rgba(52, 211, 153, 0.16);
+  --color-warning-soft: rgba(251, 191, 36, 0.16);
+  --color-danger-soft: rgba(248, 113, 113, 0.16);
+  --color-info-soft: rgba(56, 189, 248, 0.16);
+  --color-brand-soft: rgba(45, 212, 191, 0.14);
+  --color-cta-soft: rgba(251, 146, 60, 0.16);
+  --shadow-tint: rgba(0, 0, 0, 0.35);
+  --shadow-tint-2: rgba(0, 0, 0, 0.45);
+  --shadow-tint-3: rgba(0, 0, 0, 0.5);
+  --shadow-tint-4: rgba(0, 0, 0, 0.58);
+  --skeleton-base: var(--p-stone-700);
+  --skeleton-shine: rgba(255, 255, 255, 0.06);
+}
+
+[data-role="admin"] {
+  --role-accent: var(--p-navy-800);
+  --role-accent-hover: #152a45;
+  --role-accent-soft: rgba(30, 58, 95, 0.12);
+}
+[data-theme="dark"][data-role="admin"] {
+  --role-accent: var(--p-blue-300);
+  --role-accent-hover: #bfdbfe;
+  --role-accent-soft: rgba(147, 197, 253, 0.16);
+  --role-on-accent: var(--p-stone-950);
+}
+
+[data-role="vendor"] {
+  --role-accent: var(--p-teal-800);
+  --role-accent-hover: var(--p-teal-900);
+  --role-accent-soft: var(--color-brand-soft);
+}
+[data-theme="dark"][data-role="vendor"] {
+  --role-accent: var(--p-teal-400);
+  --role-accent-hover: var(--p-teal-300);
+  --role-on-accent: var(--p-stone-950);
+}
+
+[data-role="customer"] {
+  --role-accent: var(--p-coral-500);
+  --role-accent-hover: var(--p-coral-600);
+  --role-accent-soft: var(--color-cta-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-instant: 0.01ms;
+    --motion-fast: 0.01ms;
+    --motion-medium: 0.01ms;
+    --motion-slow: 0.01ms;
+  }
+}

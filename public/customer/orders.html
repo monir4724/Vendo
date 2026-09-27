@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Orders · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <form class="search" action="search.html">
+      <i data-lucide="search"></i>
+      <input name="q" placeholder="Search orders, products, artisans…" aria-label="Search">
+    </form>
+    <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
+  </header>
+
+  <main id="main" class="container page-pad">
+    <div class="flex-between mb-4">
+      <div>
+        <h1 class="h1">Order History</h1>
+        <p class="secondary mt-1">Track orders from live events, reel purchases, and catalog orders.</p>
+      </div>
+      <div class="pills" id="order-tabs">
+        <button class="pill is-active" data-filter="all">All Orders</button>
+        <button class="pill" data-filter="in-progress">In Transit</button>
+        <button class="pill" data-filter="delivered">Delivered</button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="card state hidden" id="orders-empty" style="padding:64px 24px">
+      <i data-lucide="package-open" style="width:56px;height:56px;color:var(--color-text-muted);margin:0 auto 16px"></i>
+      <h2 class="h3 mb-2">No orders yet</h2>
+      <p class="secondary" style="max-width:320px;margin:0 auto 24px">When you buy from a live broadcast, artisan reel, or storefront, tracking updates will appear here.</p>
+      <a class="btn btn-cta" href="shop.html"><i data-lucide="shopping-bag"></i> Continue shopping</a>
+    </div>
+
+    <!-- Orders List -->
+    <div class="stack gap-4" id="orders-list"></div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    var currentFilter = "all";
+    var listEl = document.getElementById("orders-list");
+    var emptyEl = document.getElementById("orders-empty");
+
+    function renderOrders() {
+      var allOrders = VendoOrders.all();
+      var filtered = allOrders.filter(function (o) {
+        if (currentFilter === "in-progress") return o.status !== "delivered";
+        if (currentFilter === "delivered") return o.status === "delivered";
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        listEl.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        lucide.createIcons();
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      listEl.classList.remove("hidden");
+
+      listEl.innerHTML = filtered.map(function (o) {
+        var statusBadge = "info";
+        if (o.status === "delivered") statusBadge = "success";
+        if (o.status === "pending") statusBadge = "warning";
+
+        var sourceBadge = "";
+        if (o.source === "live") sourceBadge = '<span class="badge badge-live"><span class="pulse-dot"></span> Live Stream Purchase</span>';
+        else if (o.source === "reel") sourceBadge = '<span class="badge" style="background:#ea580c20;color:var(--color-cta)">Reel Purchase</span>';
+        else sourceBadge = '<span class="badge">Storefront</span>';
+
+        var itemsSummary = (o.items || []).map(function (item) {
+          return '<span class="caption">' + item.qty + ' × ' + item.name + '</span>';
+        }).join(" · ") || "Artisan handcrafted product";
+
+        // Stepper logic
+        var step1Done = true;
+        var step2Done = o.status !== "pending";
+        var step3Done = o.status === "shipped" || o.status === "delivered";
+        var step4Done = o.status === "delivered";
+
+        return (
+          '<article class="card stack gap-4" data-order-id="' + o.id + '">' +
+            '<div class="flex-between" style="flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--color-border-default);padding-bottom:12px">' +
+              '<div>' +
+                '<div class="flex gap-2" style="align-items:center">' +
+                  '<strong class="mono" style="font-size:16px">' + o.id + '</strong>' +
+                  '<span class="badge badge-' + statusBadge + '" style="text-transform:capitalize">' + o.status + '</span>' +
+                  sourceBadge +
+                '</div>' +
+                '<div class="caption secondary mt-1">Placed on ' + o.date + ' · Recipient: ' + o.customer + '</div>' +
+              '</div>' +
+              '<div style="text-align:right">' +
+                '<div class="price mono" style="font-size:20px">$' + Number(o.total).toFixed(2) + '</div>' +
+                '<div class="caption secondary">Carrier: ' + (o.carrier || "Courier Express") + '</div>' +
+              '</div>' +
+            '</div>' +
+
+            '<div>' +
+              '<div class="caption" style="font-weight:600;margin-bottom:4px">Package Items:</div>' +
+              '<div class="secondary" style="font-size:14px">' + itemsSummary + '</div>' +
+            '</div>' +
+
+            '<!-- Tracking Stepper -->' +
+            '<div class="stepper mt-2 mb-2">' +
+              '<div class="step ' + (step1Done ? 'is-done' : '') + '"><div class="step-bar"></div><div class="step-label">Ordered</div></div>' +
+              '<div class="step ' + (step2Done ? (step3Done ? 'is-done' : 'is-current') : '') + '"><div class="step-bar"></div><div class="step-label">Paid</div></div>' +
+              '<div class="step ' + (step3Done ? (step4Done ? 'is-done' : 'is-current') : '') + '"><div class="step-bar"></div><div class="step-label">Shipped</div></div>' +
+              '<div class="step ' + (step4Done ? 'is-current' : '') + '"><div class="step-bar"></div><div class="step-label">Delivered</div></div>' +
+            '</div>' +
+
+            '<div class="flex-between pt-2" style="border-top:1px solid var(--color-border-default)">' +
+              '<div class="caption">' +
+                'Tracking ID: <span class="mono">' + (o.trackingNumber || "Pending dispatch") + '</span>' +
+              '</div>' +
+              '<div class="flex gap-2">' +
+                '<button class="btn btn-sm btn-outline btn-track" data-track-id="' + o.id + '" type="button"><i data-lucide="map-pin" style="width:14px;height:14px"></i> Live Tracking</button>' +
+                '<a class="btn btn-sm btn-ghost" href="invoice.html?id="' + o.id + '"><i data-lucide="file-text" style="width:14px;height:14px"></i> Tax Invoice</a>' +
+              '</div>' +
+            '</div>' +
+          '</article>'
+        );
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    // Filter clicks
+    document.getElementById("order-tabs").addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-filter]");
+      if (!btn) return;
+      currentFilter = btn.dataset.filter;
+      document.querySelectorAll("#order-tabs .pill").forEach(function (p) {
+        p.classList.toggle("is-active", p.dataset.filter === currentFilter);
+      });
+      renderOrders();
+    });
+
+    // Track button click
+    listEl.addEventListener("click", function (e) {
+      var trackBtn = e.target.closest(".btn-track");
+      if (trackBtn) {
+        var id = trackBtn.dataset.trackId;
+        var order = VendoOrders.get(id);
+        if (order) {
+          VendoUI.modal({
+            title: "Package Tracking · " + order.id,
+            htmlBody:
+              '<div class="stack gap-3">' +
+                '<div class="flex-between"><span class="secondary">Carrier:</span><strong>' + (order.carrier || "Pathao / DHL Express") + '</strong></div>' +
+                '<div class="flex-between"><span class="secondary">Tracking Number:</span><span class="mono">' + (order.trackingNumber || "TRK-982142") + '</span></div>' +
+                '<div class="flex-between"><span class="secondary">Delivery Address:</span><span>' + order.address + '</span></div>' +
+                '<div class="card mt-2" style="background:var(--color-bg-subtle);padding:14px">' +
+                  '<div class="caption flex gap-2 mb-2" style="color:var(--color-brand)"><i data-lucide="check-circle" style="width:16px;height:16px"></i> <strong>Live Dispatch Hub Event</strong></div>' +
+                  '<div class="caption">Courier scanned package at Central Logistics Hub. On vehicle for scheduled delivery.</div>' +
+                '</div>' +
+              '</div>',
+            ok: "Close Tracking"
+          });
+        }
+      }
+    });
+
+    renderOrders();
+  </script>
+</body>
+</html>

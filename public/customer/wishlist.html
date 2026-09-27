@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Wishlist · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <form class="search" action="search.html">
+      <i data-lucide="search"></i>
+      <input name="q" placeholder="Search saved items, shops…" aria-label="Search">
+    </form>
+    <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
+  </header>
+
+  <main id="main" class="container page-pad">
+    <div class="flex-between mb-6">
+      <div>
+        <h1 class="h1">Saved Wishlist</h1>
+        <p class="secondary mt-1">Artisan creations and live broadcast items saved for later.</p>
+      </div>
+      <span class="caption" id="wish-count-header">0 items saved</span>
+    </div>
+
+    <!-- Empty State per Section 9 -->
+    <div id="wish-empty" class="card state hidden" style="padding:64px 24px">
+      <i data-lucide="heart" style="width:56px;height:56px;color:var(--color-text-muted);margin:0 auto 16px"></i>
+      <h2 class="h3 mb-2">Nothing saved yet</h2>
+      <p class="secondary" style="max-width:320px;margin:0 auto 24px">Tap the heart on any product, live stream, or reel to save pieces you love.</p>
+      <a class="btn btn-cta" href="shop.html"><i data-lucide="compass"></i> Start Exploring</a>
+    </div>
+
+    <!-- Wishlist Grid -->
+    <div class="product-grid" id="wish-grid"></div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    function renderWishlist() {
+      var savedProducts = VendoWish.items();
+      var emptyEl = document.getElementById("wish-empty");
+      var gridEl = document.getElementById("wish-grid");
+      var headerCount = document.getElementById("wish-count-header");
+
+      headerCount.textContent = savedProducts.length + " " + (savedProducts.length === 1 ? "item" : "items") + " saved";
+
+      if (savedProducts.length === 0) {
+        emptyEl.classList.remove("hidden");
+        gridEl.classList.add("hidden");
+        lucide.createIcons();
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      gridEl.classList.remove("hidden");
+
+      gridEl.innerHTML = savedProducts.map(function (p) {
+        return (
+          '<div class="card card-hover product-card" data-product-id="' + p.id + '">' +
+            '<div class="thumb" style="position:relative">' +
+              '<a href="product.html?id=' + p.id + '" style="display:block;width:100%;height:100%">' +
+                '<img src="' + p.img + '" alt="' + p.name + '" width="640" height="640" loading="lazy">' +
+              '</a>' +
+              '<button class="icon-btn remove-wish-btn" type="button" aria-label="Remove from wishlist" data-del-id="' + p.id + '" style="position:absolute;top:10px;right:10px;background:var(--glass-bg-heavy);backdrop-filter:blur(12px);border-radius:50%;width:36px;height:36px;color:#fff;border:1px solid rgba(255,255,255,0.15)" title="Remove">' +
+                '<i data-lucide="x" style="width:16px;height:16px"></i>' +
+              '</button>' +
+            '</div>' +
+            '<div class="meta stack gap-2">' +
+              '<div class="caption">' + p.vendor + '</div>' +
+              '<a href="product.html?id=' + p.id + '" style="color:inherit;text-decoration:none"><strong style="font-size:15px;display:block">' + p.name + '</strong></a>' +
+              '<div class="price" style="font-size:18px">$' + p.price + '</div>' +
+              '<div class="flex gap-2 mt-2">' +
+                '<button class="btn btn-sm btn-cta flex-1 btn-move-cart" data-cart-id="' + p.id + '" type="button">' +
+                  '<i data-lucide="shopping-bag"></i> Move to Cart' +
+                '</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    document.getElementById("wish-grid").addEventListener("click", function (e) {
+      var delBtn = e.target.closest("[data-del-id]");
+      if (delBtn) {
+        var id = delBtn.dataset.delId;
+        VendoWish.toggle(id);
+        VendoUI.toast({ title: "Removed from wishlist", type: "info" });
+        renderWishlist();
+        return;
+      }
+
+      var moveBtn = e.target.closest("[data-cart-id]");
+      if (moveBtn) {
+        var pid = moveBtn.dataset.cartId;
+        var prod = VendoData.products.find(function (p) { return p.id === pid; });
+        if (prod) {
+          VendoCart.add(prod, 1);
+          VendoWish.toggle(pid);
+          VendoUI.toast({ title: "Moved to Bag!", desc: prod.name + " moved to your cart.", type: "success" });
+          renderWishlist();
+        }
+      }
+    });
+
+    renderWishlist();
+  </script>
+</body>
+</html>

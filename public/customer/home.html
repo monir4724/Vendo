@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit"><span class="brand-mark">V</span><strong>Vendo</strong></a>
+    <form class="search" action="search.html"><i data-lucide="search"></i><input name="q" placeholder="Search products, reels, live…" aria-label="Search"></form>
+    <div id="store-nav-actions" class="flex gap-1"></div>
+  </header>
+  <main id="main" class="container-wide" style="padding-top:24px;padding-bottom:80px">
+    <section class="card" style="padding:0;overflow:hidden;margin-bottom:32px">
+      <div class="hero-split" style="display:grid;grid-template-columns:1.2fr 1fr;min-height:320px">
+        <div style="padding:48px">
+          <p class="caption">Live now · Kiln & Co</p>
+          <h1 class="h-display">Pour-over hour.</h1>
+          <p class="secondary" style="max-width:28rem">Pin a product on stream, buy without leaving the room. Warm canvas, coral CTA — always the Buy button.</p>
+          <div class="flex gap-3 mt-4">
+            <a class="btn btn-cta" href="live.html">Join live</a>
+            <a class="btn btn-outline" href="shop.html">Browse products</a>
+          </div>
+        </div>
+        <div style="background:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=960&q=80&auto=format') center/cover" role="img" aria-label="Coffee shop hero"></div>
+      </div>
+    </section>
+    <h2 class="h2 mb-4">For you</h2>
+    <div class="product-grid" id="for-you"></div>
+    <div class="flex-between mt-6 mb-4">
+      <h2 class="h2">Trending reels</h2>
+      <a href="reels.html">Open feed</a>
+    </div>
+    <div class="h-scroll" id="reels-row"></div>
+    <div class="flex-between mt-6 mb-4">
+      <h2 class="h2">Live now</h2>
+      <span class="badge badge-live"><span class="pulse-dot"></span> 1 live</span>
+    </div>
+    <a class="card card-hover flex gap-4" href="live.html" style="align-items:center;text-decoration:none;color:inherit;margin-bottom:32px">
+      <div class="skel-thumb" style="width:120px;aspect-ratio:16/10;border-radius:12px;background:#1c1917"></div>
+      <div>
+        <strong>Kiln & Co</strong>
+        <p class="caption">Ceramic Pour-Over pinned · 1.2k watching</p>
+      </div>
+    </a>
+    <h2 class="h2 mb-4">Shop</h2>
+    <div class="product-grid" id="grid"></div>
+  </main>
+  <nav class="tabbar" id="tabbar"></nav>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+    document.getElementById("for-you").innerHTML = VendoData.products.slice(0, 4).map(VendoUI.productCard).join("");
+    document.getElementById("grid").innerHTML = VendoData.products.map(VendoUI.productCard).join("");
+    document.getElementById("reels-row").innerHTML = VendoData.products.slice(0, 5).map(function (p) {
+      return '<a href="reels.html" class="card" style="width:160px;padding:0;overflow:hidden"><div style="aspect-ratio:9/16;background:#1c1917 url(' + JSON.stringify(p.img) + ') center/cover"></div></a>';
+    }).join("");
+    lucide.createIcons();
+  </script>
+</body>
+</html>

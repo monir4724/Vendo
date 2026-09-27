@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Inquiry Inbox · Vendor Studio · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    .msg-thread-item {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-card);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background var(--duration-fast), border-color var(--duration-fast);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .msg-thread-item:hover {
+      background: var(--color-bg-subtle);
+    }
+    .msg-thread-item.is-active {
+      background: var(--color-bg-subtle);
+      border-color: var(--color-border-default);
+      box-shadow: var(--shadow-elev-1);
+    }
+    .msg-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--role-accent-soft);
+      color: var(--color-brand);
+      font-weight: 600;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to inbox</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input id="inbox-search" placeholder="Search conversations by customer, message…" aria-label="Search"></div>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Customer Inquiries</h1>
+            <p class="secondary mt-1">Direct inquiries from live broadcasts, shoppable reels, and order messages.</p>
+          </div>
+          <span class="badge" id="unread-total-badge" style="background: rgba(249, 115, 22, 0.15); color: var(--color-cta); font-weight: 600;">1 Unread</span>
+        </div>
+
+        <!-- Two-Pane Layout -->
+        <div style="display: grid; grid-template-columns: 340px 1fr; gap: 24px; min-height: 600px; align-items: start;">
+          <!-- Left Pane: Conversations List -->
+          <div class="card stack gap-2" style="padding: var(--space-3); max-height: 640px; overflow-y: auto;">
+            <div class="caption secondary px-2 py-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">Conversations</div>
+            <div id="threads-container" class="stack gap-1"></div>
+          </div>
+
+          <!-- Right Pane: Active Thread Chat View -->
+          <div class="card stack gap-3" style="min-height: 600px; display: flex; flex-direction: column; justify-content: space-between; padding: var(--space-5);">
+            <!-- Thread Header -->
+            <div class="flex-between" style="border-bottom: 1px solid var(--color-border-default); padding-bottom: 16px;">
+              <div class="flex gap-3" style="align-items: center;">
+                <div class="msg-avatar" id="active-chat-avatar">AR</div>
+                <div>
+                  <h2 class="h3" id="active-chat-name" style="font-size: 16px;">Amina Rahman</h2>
+                  <span class="caption secondary" id="active-chat-meta">Customer since Aug 2025 · Verified Buyer</span>
+                </div>
+              </div>
+              <a class="btn btn-sm btn-outline" href="orders.html" id="active-chat-order-link">
+                <i data-lucide="package"></i> View Linked Order
+              </a>
+            </div>
+
+            <!-- Chat Message Bubbles -->
+            <div id="chat-stream-box" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px 0;"></div>
+
+            <!-- Quick Reply Chips -->
+            <div style="display: flex; gap: 8px; overflow-x: auto; padding: 4px 0;">
+              <button class="pill" type="button" onclick="sendQuickReply('Yes! All our pieces include embossed gift packaging.')">Gift Packaging</button>
+              <button class="pill" type="button" onclick="sendQuickReply('We offer free 14-day sizing exchanges on all apparel.')">Size Exchange</button>
+              <button class="pill" type="button" onclick="sendQuickReply('Your package is scheduled for express courier pickup today!')">Dispatch Status</button>
+            </div>
+
+            <!-- Reply Composer -->
+            <form id="reply-form" class="flex gap-2" style="border-top: 1px solid var(--color-border-default); padding-top: 16px;">
+              <input class="field" id="reply-input" placeholder="Type message to customer..." style="flex: 1;" required>
+              <button class="btn btn-primary" type="submit">
+                <i data-lucide="send"></i> Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    var threads = (VendoData && VendoData.vendorMessages && VendoData.vendorMessages.slice()) || [
+      {
+        id: "msg-1",
+        customer: "Amina Rahman",
+        avatar: "AR",
+        lastMessage: "Thank you! Excited for the pour-over carafe.",
+        time: "14:22",
+        unread: 1,
+        thread: [
+          { sender: "customer", text: "Hi, I just ordered from your live stream. Is it shipped with gift box packaging?", time: "14:15" },
+          { sender: "vendor", text: "Hello Amina! Yes, every Kiln & Co piece arrives in our embossed gift kraft box with organic cotton padding.", time: "14:18" },
+          { sender: "customer", text: "Thank you! Excited for the pour-over carafe.", time: "14:22" }
+        ]
+      },
+      {
+        id: "msg-2",
+        customer: "Kenji Tanaka",
+        avatar: "KT",
+        lastMessage: "Size exchange inquiry for linen shirt",
+        time: "Yesterday",
+        unread: 0,
+        thread: [
+          { sender: "customer", text: "Hello, if the Medium is slightly tight, can I exchange for Large without extra shipping?", time: "Yesterday 11:30" },
+          { sender: "vendor", text: "Certainly Kenji! We offer free 14-day sizing exchanges on all apparel items.", time: "Yesterday 11:45" }
+        ]
+      }
+    ];
+
+    var activeThreadId = "msg-1";
+
+    function renderThreads() {
+      var container = document.getElementById("threads-container");
+      var q = document.getElementById("inbox-search").value.toLowerCase().trim();
+
+      var filtered = threads.filter(function(t) {
+        return !q || t.customer.toLowerCase().includes(q) || t.lastMessage.toLowerCase().includes(q);
+      });
+
+      var totalUnread = threads.reduce(function(acc, t) { return acc + (t.unread || 0); }, 0);
+      document.getElementById("unread-total-badge").textContent = totalUnread + " Unread";
+
+      container.innerHTML = filtered.map(function(t) {
+        var isActive = t.id === activeThreadId ? " is-active" : "";
+        var unreadDot = t.unread ? '<span class="pulse-dot" style="background: var(--color-cta); width: 8px; height: 8px; flex-shrink: 0;"></span>' : '';
+
+        return '<div class="msg-thread-item' + isActive + '" onclick="switchThread(\'' + t.id + '\')">' +
+          '<div class="msg-avatar">' + t.avatar + '</div>' +
+          '<div style="flex: 1; min-width: 0;">' +
+            '<div class="flex-between">' +
+              '<strong style="font-size: 14px;">' + t.customer + '</strong>' +
+              '<span class="caption mono secondary">' + t.time + '</span>' +
+            '</div>' +
+            '<div class="caption secondary" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">' + t.lastMessage + '</div>' +
+          '</div>' +
+          unreadDot +
+        '</div>';
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    function renderActiveChat() {
+      var t = threads.find(function(item) { return item.id === activeThreadId; });
+      if (!t) return;
+
+      document.getElementById("active-chat-avatar").textContent = t.avatar;
+      document.getElementById("active-chat-name").textContent = t.customer;
+
+      var stream = document.getElementById("chat-stream-box");
+      stream.innerHTML = t.thread.map(function(msg) {
+        if (msg.sender === "vendor") {
+          return '<div class="bubble" style="background: var(--role-accent-soft); align-self: flex-end; max-width: 80%;">' +
+            '<div>' + msg.text + '</div>' +
+            '<div class="caption mono secondary" style="text-align: right; margin-top: 4px; font-size: 10px;">' + msg.time + '</div>' +
+          '</div>';
+        } else {
+          return '<div class="bubble bubble-ai" style="align-self: flex-start; max-width: 80%;">' +
+            '<div>' + msg.text + '</div>' +
+            '<div class="caption mono secondary" style="margin-top: 4px; font-size: 10px;">' + msg.time + '</div>' +
+          '</div>';
+        }
+      }).join("");
+
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    window.switchThread = function(id) {
+      activeThreadId = id;
+      var t = threads.find(function(item) { return item.id === id; });
+      if (t) t.unread = 0;
+      renderThreads();
+      renderActiveChat();
+    };
+
+    window.sendQuickReply = function(text) {
+      document.getElementById("reply-input").value = text;
+      document.getElementById("reply-form").dispatchEvent(new Event("submit"));
+    };
+
+    document.getElementById("reply-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var input = document.getElementById("reply-input");
+      var text = input.value.trim();
+      if (!text) return;
+
+      var t = threads.find(function(item) { return item.id === activeThreadId; });
+      if (!t) return;
+
+      var now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      t.thread.push({ sender: "vendor", text: text, time: now });
+      t.lastMessage = text;
+      t.time = "Just now";
+
+      input.value = "";
+      renderThreads();
+      renderActiveChat();
+    });
+
+    document.getElementById("inbox-search").addEventListener("input", renderThreads);
+
+    renderThreads();
+    renderActiveChat();
+  </script>
+</body>
+</html>

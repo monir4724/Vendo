@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendo — Live commerce</title>
+  <script src="../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../src/css/styles.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <main id="main" class="split">
+    <section class="split-art">
+      <p class="caption" style="color:#fff;opacity:.8">Aesthetic · Modern · Classic</p>
+      <h1 class="h-display">Shop the live moment.</h1>
+      <p style="max-width:28rem;opacity:.9">Reels, live streams, and a calm storefront — one token system, first-class
+        dark mode, WCAG 2.1 AA.</p>
+    </section>
+    <section class="stack" style="padding:48px;justify-content:center;max-width:480px;margin:auto;width:100%">
+      <div class="flex gap-3" style="align-items:center">
+        <span class="brand-mark">V</span>
+        <strong class="h3">Vendo</strong>
+      </div>
+      <p class="secondary">Choose a surface to preview the generated UI. Data is mocked; Supabase wiring comes next.</p>
+      <a class="btn btn-cta" href="customer/home.html">Customer storefront</a>
+      <a class="btn btn-primary" href="vendor/dashboard.html" data-role-preview="vendor">Vendor studio</a>
+      <a class="btn" href="admin/dashboard.html">Admin control</a>
+      <div class="flex gap-2">
+        <a class="btn btn-sm btn-outline" href="customer/login.html">Sign in</a>
+        <button class="btn btn-sm" type="button" id="theme-toggle">Toggle theme</button>
+      </div>
+      <p class="caption">Design system v2.0 · 4-tier tokens · Lucide icons</p>
+    </section>
+  </main>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../src/js/ui.js"></script>
+  <script>
+    lucide.createIcons();
+    document.getElementById("theme-toggle").addEventListener("click", function () {
+      VendoTheme.toggle();
+    });
+  </script>
+</body>
+
+</html>

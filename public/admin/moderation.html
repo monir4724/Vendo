@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-role="admin">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Content Moderation · Admin · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input id="mod-search" placeholder="Search flagged items, creators, reports…" aria-label="Search"></div>
+        <div id="topbar-tools"></div>
+      </header>
+
+      <div class="content" id="main">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Content Moderation</h1>
+            <p class="secondary mt-1">Review flagged reels, live streams, and community comments.</p>
+          </div>
+          <span class="badge badge-danger" id="queue-badge">4 items pending review</span>
+        </div>
+
+        <!-- Moderation Tabs -->
+        <div class="tabs mb-6" role="tablist">
+          <button class="tab" aria-selected="true" data-type="reels" type="button">Flagged Reels (<span id="count-reels">2</span>)</button>
+          <button class="tab" aria-selected="false" data-type="live" type="button">Live Broadcasts (<span id="count-live">1</span>)</button>
+          <button class="tab" aria-selected="false" data-type="comments" type="button">Comments (<span id="count-comments">1</span>)</button>
+        </div>
+
+        <!-- Items Container -->
+        <div id="mod-container" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px;"></div>
+
+        <!-- Empty State -->
+        <div id="mod-empty" class="card state hidden" style="padding: 64px 24px;">
+          <i data-lucide="shield-check" style="width: 56px; height: 56px; color: var(--color-success); margin: 0 auto 16px;"></i>
+          <h2 class="h3 mb-2">Queue is clean!</h2>
+          <p class="secondary" style="max-width: 320px; margin: 0 auto;">No pending moderation reports for this section. All flagged content has been resolved.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("admin");
+
+    var modItems = [
+      {
+        id: "mod-r1",
+        type: "reels",
+        title: "Cold-Pressed Silk Elixir - 100% Wrinkle Cure in 24h",
+        creator: "Verdant Lab",
+        reason: "Misleading Claims",
+        severity: "danger",
+        reportsCount: 14,
+        timestamp: "2026-09-27 18:44",
+        img: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80&auto=format",
+        details: "Tagged product claims medical cure for skin aging without FDA/BSTI clearance. Customer flagged for deceptive clinical statements."
+      },
+      {
+        id: "mod-r2",
+        type: "reels",
+        title: "Exclusive Sneaker Drop - 90% Off Flash Sale",
+        creator: "Metro Kicks",
+        reason: "Spam Product Tag",
+        severity: "warning",
+        reportsCount: 8,
+        timestamp: "2026-09-27 16:20",
+        img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800&q=80&auto=format",
+        details: "Product tag links to an unrelated low-cost keychain rather than genuine branded footwear."
+      },
+      {
+        id: "mod-l1",
+        type: "live",
+        title: "Late Night Vinyl & Acoustic Session",
+        creator: "Vinyl Haven",
+        reason: "Audio Copyright",
+        severity: "warning",
+        reportsCount: 3,
+        timestamp: "2026-09-27 21:10",
+        img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=800&q=80&auto=format",
+        details: "Automated fingerprint match detected unlicensed commercial background master recordings during broadcast."
+      },
+      {
+        id: "mod-c1",
+        type: "comments",
+        title: "Comment on Kiln & Co Studio Reel #r1",
+        creator: "User: fast_crypto_rich",
+        reason: "Spam / Phishing Link",
+        severity: "danger",
+        reportsCount: 22,
+        timestamp: "2026-09-27 22:05",
+        img: "",
+        details: "Comment text: 'DM me on WhatsApp +1800... for guaranteed 500% profit while watching this stream!'"
+      }
+    ];
+
+    var currentTab = "reels";
+
+    function updateCounts() {
+      var rCount = modItems.filter(function(i) { return i.type === "reels"; }).length;
+      var lCount = modItems.filter(function(i) { return i.type === "live"; }).length;
+      var cCount = modItems.filter(function(i) { return i.type === "comments"; }).length;
+
+      document.getElementById("count-reels").textContent = rCount;
+      document.getElementById("count-live").textContent = lCount;
+      document.getElementById("count-comments").textContent = cCount;
+      document.getElementById("queue-badge").textContent = (rCount + lCount + cCount) + " items pending review";
+    }
+
+    function renderItems() {
+      var container = document.getElementById("mod-container");
+      var empty = document.getElementById("mod-empty");
+      var filtered = modItems.filter(function(item) {
+        return item.type === currentTab;
+      });
+
+      updateCounts();
+
+      if (filtered.length === 0) {
+        container.innerHTML = "";
+        empty.classList.remove("hidden");
+        return;
+      }
+
+      empty.classList.add("hidden");
+      container.innerHTML = filtered.map(function(item) {
+        var mediaPreview = item.img ?
+          '<div style="aspect-ratio: 16/9; background: url(' + JSON.stringify(item.img) + ') center/cover; position: relative;">' +
+            '<span class="badge badge-' + item.severity + '" style="position: absolute; top: 12px; left: 12px;">' + item.reason + '</span>' +
+          '</div>' :
+          '<div style="padding: 16px; background: var(--color-bg-subtle); border-bottom: 1px solid var(--color-border-default);">' +
+            '<span class="badge badge-' + item.severity + '">' + item.reason + '</span>' +
+          '</div>';
+
+        return '<article class="card" id="card-' + item.id + '" style="padding: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">' +
+          '<div>' +
+            mediaPreview +
+            '<div style="padding: 20px;">' +
+              '<div class="flex-between caption secondary mb-1">' +
+                '<span class="mono">' + item.timestamp + '</span>' +
+                '<span style="color: var(--color-danger); font-weight: 600;"><i data-lucide="flag" style="width: 12px; height: 12px; display: inline;"></i> ' + item.reportsCount + ' reports</span>' +
+              '</div>' +
+              '<h3 class="h4" style="font-size: 16px; line-height: 22px; margin-bottom: 6px;">' + item.title + '</h3>' +
+              '<p class="caption" style="color: var(--color-brand); font-weight: 600; margin-bottom: 10px;">By ' + item.creator + '</p>' +
+              '<p class="secondary" style="font-size: 13px; line-height: 19px;">' + item.details + '</p>' +
+            '</div>' +
+          '</div>' +
+          '<div style="padding: 16px 20px; background: var(--color-bg-subtle); border-top: 1px solid var(--color-border-default); display: flex; gap: 8px;">' +
+            '<button class="btn btn-sm btn-outline flex-1" type="button" onclick="resolveItem(\'' + item.id + '\', \'approve\')">' +
+              '<i data-lucide="check" style="width: 14px; height: 14px; margin-right: 4px;"></i> Clear Flag' +
+            '</button>' +
+            '<button class="btn btn-sm btn-danger flex-1" type="button" onclick="resolveItem(\'' + item.id + '\', \'remove\')">' +
+              '<i data-lucide="trash-2" style="width: 14px; height: 14px; margin-right: 4px;"></i> Remove' +
+            '</button>' +
+          '</div>' +
+        '</article>';
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    window.resolveItem = function(id, action) {
+      var item = modItems.find(function(i) { return i.id === id; });
+      if (!item) return;
+
+      if (action === "approve") {
+        VendoUI.toast("Flag Cleared", "Approved '" + item.title + "' as compliant with community guidelines.", "success");
+      } else {
+        VendoUI.toast("Content Removed", "Takedown completed for '" + item.title + "'. Creator notified.", "warning");
+      }
+
+      modItems = modItems.filter(function(i) { return i.id !== id; });
+      renderItems();
+    };
+
+    // Tab switcher
+    document.querySelectorAll(".tab").forEach(function(t) {
+      t.addEventListener("click", function() {
+        document.querySelectorAll(".tab").forEach(function(x) { x.setAttribute("aria-selected", "false"); });
+        t.setAttribute("aria-selected", "true");
+        currentTab = t.getAttribute("data-type");
+        renderItems();
+      });
+    });
+
+    renderItems();
+  </script>
+</body>
+</html>

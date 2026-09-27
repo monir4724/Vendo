@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendor dashboard · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="topbar-search"><i data-lucide="search"></i><input placeholder="Search orders, products" aria-label="Search"></div>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+      <div class="content" id="main">
+        <h1 class="h1 mb-4">Today at Atelier North</h1>
+        <div class="bento">
+          <section class="card span-8 row-2">
+            <h2 class="h4">Sales</h2>
+            <div class="chart" aria-hidden="true">
+              <span style="height:40%"></span><span style="height:55%"></span><span style="height:48%"></span>
+              <span style="height:70%"></span><span style="height:62%"></span><span style="height:88%"></span>
+              <span style="height:76%"></span>
+            </div>
+          </section>
+          <section class="card span-4 row-2 stack">
+            <h2 class="h4">Quick actions</h2>
+            <a class="btn btn-outline" href="products.html"><i data-lucide="plus"></i> Add product</a>
+            <a class="btn btn-outline" href="reels.html"><i data-lucide="upload"></i> Upload reel</a>
+            <a class="btn btn-cta" href="go-live.html"><span class="pulse-dot"></span> Go live</a>
+          </section>
+          <div class="card span-3"><p class="caption">Sales</p><p class="kpi h2">$1,284</p></div>
+          <div class="card span-3"><p class="caption">Orders</p><p class="kpi h2">18</p></div>
+          <div class="card span-3"><p class="caption">Live viewers</p><p class="kpi h2">0</p></div>
+          <div class="card span-3"><p class="caption">Followers</p><p class="kpi h2">12.4k</p></div>
+          <section class="card span-12">
+            <h2 class="h4 mb-4">Recent orders</h2>
+            <div class="table-wrap">
+              <table class="data" id="orders"></table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+    document.getElementById("orders").innerHTML = "<thead><tr><th>ID</th><th>Customer</th><th>Total</th><th>Status</th><th>Source</th></tr></thead><tbody>" +
+      VendoData.orders.map(function (o) {
+        var b = o.status === "delivered" ? "success" : o.status === "pending" ? "warning" : "info";
+        return "<tr><td class='mono'>" + o.id + "</td><td>" + o.customer + "</td><td>$" + o.total + "</td><td><span class='badge badge-" + b + "'>" + o.status + "</span></td><td>" + o.source + "</td></tr>";
+      }).join("") + "</tbody>";
+  </script>
+</body>
+</html>

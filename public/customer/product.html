@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Details · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <form class="search" action="search.html" method="get">
+      <i data-lucide="search"></i>
+      <input name="q" placeholder="Search products, artisans, reels, live…" aria-label="Search">
+    </form>
+    <div id="store-nav-actions" class="flex gap-1"></div>
+  </header>
+
+  <main id="main" class="container page-pad">
+    <!-- Breadcrumb -->
+    <nav class="caption mb-4" aria-label="Breadcrumb">
+      <a href="home.html" class="secondary">Home</a> &nbsp;/&nbsp;
+      <a href="shop.html" class="secondary">Shop</a> &nbsp;/&nbsp;
+      <span id="crumb-cat" class="secondary">Apparel</span> &nbsp;/&nbsp;
+      <strong id="crumb-title">Product</strong>
+    </nav>
+
+    <!-- Main PDP Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start" class="cols-pdp">
+      <!-- Media Gallery -->
+      <div>
+        <div class="card" style="padding:0;overflow:hidden;border-radius:16px;background:var(--color-bg-subtle)">
+          <img id="main-img" src="" alt="" width="800" height="800" fetchpriority="high" style="width:100%;aspect-ratio:1;object-fit:cover;transition:opacity 0.2s ease">
+        </div>
+        <div class="gallery-thumbs" id="gallery-thumbs"></div>
+      </div>
+
+      <!-- Product Meta & Purchasing -->
+      <div class="stack gap-5">
+        <div>
+          <div class="flex-between mb-2">
+            <a id="vendor-link" href="storefront.html" class="caption" style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--color-brand)">
+              <i data-lucide="store" style="width:14px;height:14px"></i>
+              <span id="vendor-name">Atelier North</span>
+            </a>
+            <div id="rating-wrap" class="caption flex gap-1" style="align-items:center">
+              <i data-lucide="star" style="width:14px;height:14px;fill:currentColor;color:var(--p-amber-500)"></i>
+              <strong id="prod-rating">4.8</strong>
+              <span class="secondary" id="prod-reviews">(124 reviews)</span>
+            </div>
+          </div>
+          <h1 class="h1" id="prod-title" style="letter-spacing:-0.02em"></h1>
+          <div class="flex gap-3 mt-3" style="align-items:baseline">
+            <span class="price h2" id="prod-price" style="font-size:32px"></span>
+            <span class="caption" id="prod-orig-price" style="text-decoration:line-through;font-size:16px;color:var(--color-text-muted)"></span>
+            <span class="badge badge-success" id="stock-badge">In Stock</span>
+          </div>
+        </div>
+
+        <p class="secondary" id="prod-desc" style="font-size:15px;line-height:24px"></p>
+
+        <!-- Variants: Color -->
+        <div id="color-options-wrap">
+          <label class="label" style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em">Color: <span id="selected-color-label" class="secondary" style="font-weight:normal">Default</span></label>
+          <div class="pills mt-2" id="color-pills"></div>
+        </div>
+
+        <!-- Variants: Size -->
+        <div id="size-options-wrap">
+          <div class="flex-between">
+            <label class="label" style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em">Select Size: <span id="selected-size-label" class="secondary" style="font-weight:normal">M</span></label>
+            <span class="caption" style="color:var(--color-brand);cursor:pointer">Size Guide</span>
+          </div>
+          <div class="pills mt-2" id="size-pills"></div>
+        </div>
+
+        <!-- Quantity & CTAs -->
+        <div class="stack gap-3 pt-2">
+          <div class="flex gap-3" style="align-items:center">
+            <div class="qty-stepper">
+              <button type="button" id="qty-minus" aria-label="Decrease quantity"><i data-lucide="minus" style="width:14px;height:14px"></i></button>
+              <span id="qty-val">1</span>
+              <button type="button" id="qty-plus" aria-label="Increase quantity"><i data-lucide="plus" style="width:14px;height:14px"></i></button>
+            </div>
+            <span class="caption secondary">Order ships within 24 hours</span>
+          </div>
+
+          <div class="flex gap-3" style="margin-top:8px">
+            <!-- Add to Cart (Teal Outline) -->
+            <button class="btn btn-outline flex-1" type="button" id="btn-add-cart">
+              <i data-lucide="shopping-bag"></i> Add to Cart
+            </button>
+            <!-- Buy Now (Coral Filled) -->
+            <button class="btn btn-cta flex-1" type="button" id="btn-buy-now">
+              <i data-lucide="zap"></i> Buy Now
+            </button>
+            <!-- Wishlist Button -->
+            <button class="icon-btn" type="button" id="btn-wish" aria-label="Save to Wishlist" style="border:1px solid var(--color-border-default)">
+              <i data-lucide="heart"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Value Props -->
+        <div class="card mt-4" style="background:var(--color-bg-subtle);border:none;padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="flex gap-3" style="align-items:center">
+            <i data-lucide="truck" style="color:var(--color-brand)"></i>
+            <div><strong>Free Shipping</strong><div class="caption">On orders over $75</div></div>
+          </div>
+          <div class="flex gap-3" style="align-items:center">
+            <i data-lucide="refresh-cw" style="color:var(--color-brand)"></i>
+            <div><strong>14-Day Guarantee</strong><div class="caption">Free returns & exchanges</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Tabs: Specifications & Reviews -->
+    <section class="mt-8 pt-6" style="border-top:1px solid var(--color-border-default)">
+      <div class="tabs" role="tablist">
+        <button class="tab" aria-selected="true" data-tab="specs">Specifications & Craft</button>
+        <button class="tab" aria-selected="false" data-tab="reviews">Customer Reviews</button>
+        <button class="tab" aria-selected="false" data-tab="shipping">Shipping & Returns</button>
+      </div>
+
+      <div id="tab-specs" class="pt-6">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+          <div>
+            <h3 class="h4 mb-3">Artisan Craft Details</h3>
+            <p class="secondary" id="craft-desc"></p>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <table class="data" id="specs-table">
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-reviews" class="pt-6 hidden">
+        <div class="flex-between mb-4">
+          <h3 class="h4">Verified Customer Reviews</h3>
+          <button class="btn btn-sm btn-outline" type="button" id="write-review-btn">Write a Review</button>
+        </div>
+        <div class="stack gap-3" id="reviews-list">
+          <div class="card">
+            <div class="flex-between mb-1">
+              <strong>Tanya M. · Verified Buyer</strong>
+              <div class="caption flex gap-1" style="color:var(--p-amber-500)">
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+              </div>
+            </div>
+            <p class="secondary" style="font-size:14px">Exceptional craftsmanship! The texture and cut are absolutely top grade. Arrived in beautiful eco-friendly packaging.</p>
+          </div>
+          <div class="card">
+            <div class="flex-between mb-1">
+              <strong>Kenji S. · Verified Buyer</strong>
+              <div class="caption flex gap-1" style="color:var(--p-amber-500)">
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+                <i data-lucide="star" style="width:12px;height:12px;fill:currentColor"></i>
+              </div>
+            </div>
+            <p class="secondary" style="font-size:14px">Saw this featured on a live stream and ordered immediately. True to size and super comfortable for warm days.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-shipping" class="pt-6 hidden">
+        <div class="card stack gap-2" style="max-width:640px">
+          <strong>Shipping Timeframes:</strong>
+          <p class="secondary">Orders are prepared and handed to our courier within 24 hours. Domestic express delivery arrives in 2-3 business days. International delivery takes 5-7 business days via DHL Express.</p>
+          <strong class="mt-2">14-Day Return Policy:</strong>
+          <p class="secondary">If you are not 100% delighted with your piece, return it in original packaging for a full refund or exchange. Buyer protection applies to all live and reel purchases.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recommended Products -->
+    <section class="mt-8 pt-6" style="border-top:1px solid var(--color-border-default)">
+      <div class="flex-between mb-4">
+        <h2 class="h3">You may also like</h2>
+        <a href="shop.html" class="caption">Explore all</a>
+      </div>
+      <div class="product-grid" id="related-grid"></div>
+    </section>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    var params = new URLSearchParams(location.search);
+    var id = params.get("id") || "p1";
+    var product = (window.VendoData.products || []).find(function (p) { return p.id === id; }) || window.VendoData.products[0];
+
+    // Populate Titles & Breadcrumb
+    document.title = product.name + " · Vendo";
+    document.getElementById("crumb-cat").textContent = product.cat;
+    document.getElementById("crumb-title").textContent = product.name;
+    document.getElementById("vendor-name").textContent = product.vendor;
+    document.getElementById("vendor-link").href = "storefront.html?vendor=" + encodeURIComponent(product.vendor);
+    document.getElementById("prod-title").textContent = product.name;
+    document.getElementById("prod-price").textContent = "$" + product.price;
+    if (product.originalPrice) {
+      document.getElementById("prod-orig-price").textContent = "$" + product.originalPrice;
+    }
+    document.getElementById("prod-rating").textContent = product.rating || "4.8";
+    document.getElementById("prod-reviews").textContent = "(" + (product.reviewsCount || 124) + " reviews)";
+    document.getElementById("prod-desc").textContent = product.description;
+    document.getElementById("craft-desc").textContent = product.description;
+
+    // Gallery
+    var gallery = product.gallery && product.gallery.length ? product.gallery : [product.img];
+    var mainImg = document.getElementById("main-img");
+    mainImg.src = gallery[0];
+    mainImg.alt = product.name;
+
+    var thumbsEl = document.getElementById("gallery-thumbs");
+    thumbsEl.innerHTML = gallery.map(function (url, idx) {
+      return '<div class="gallery-thumb' + (idx === 0 ? ' is-active' : '') + '" data-src="' + url + '"><img src="' + url + '" alt=""></div>';
+    }).join("");
+
+    thumbsEl.addEventListener("click", function (e) {
+      var thumb = e.target.closest(".gallery-thumb");
+      if (!thumb) return;
+      thumbsEl.querySelectorAll(".gallery-thumb").forEach(function (t) { t.classList.remove("is-active"); });
+      thumb.classList.add("is-active");
+      mainImg.style.opacity = "0.4";
+      setTimeout(function () {
+        mainImg.src = thumb.dataset.src;
+        mainImg.style.opacity = "1";
+      }, 100);
+    });
+
+    // Options: Colors
+    var colorWrap = document.getElementById("color-options-wrap");
+    var colorPills = document.getElementById("color-pills");
+    var selectedColor = "";
+    if (product.options && product.options.colors && product.options.colors.length) {
+      selectedColor = product.options.colors[0];
+      document.getElementById("selected-color-label").textContent = selectedColor;
+      colorPills.innerHTML = product.options.colors.map(function (c, idx) {
+        return '<button class="pill' + (idx === 0 ? ' is-active' : '') + '" type="button" data-color="' + c + '">' + c + '</button>';
+      }).join("");
+      colorPills.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-color]");
+        if (!btn) return;
+        selectedColor = btn.dataset.color;
+        document.getElementById("selected-color-label").textContent = selectedColor;
+        colorPills.querySelectorAll(".pill").forEach(function (p) { p.classList.toggle("is-active", p.dataset.color === selectedColor); });
+      });
+    } else {
+      colorWrap.style.display = "none";
+    }
+
+    // Options: Sizes
+    var sizeWrap = document.getElementById("size-options-wrap");
+    var sizePills = document.getElementById("size-pills");
+    var selectedSize = "";
+    if (product.options && product.options.sizes && product.options.sizes.length) {
+      selectedSize = product.options.sizes[0];
+      document.getElementById("selected-size-label").textContent = selectedSize;
+      sizePills.innerHTML = product.options.sizes.map(function (s, idx) {
+        return '<button class="pill' + (idx === 0 ? ' is-active' : '') + '" type="button" data-size="' + s + '">' + s + '</button>';
+      }).join("");
+      sizePills.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-size]");
+        if (!btn) return;
+        selectedSize = btn.dataset.size;
+        document.getElementById("selected-size-label").textContent = selectedSize;
+        sizePills.querySelectorAll(".pill").forEach(function (p) { p.classList.toggle("is-active", p.dataset.size === selectedSize); });
+      });
+    } else {
+      sizeWrap.style.display = "none";
+    }
+
+    // Quantity Stepper
+    var qty = 1;
+    var qtyVal = document.getElementById("qty-val");
+    document.getElementById("qty-minus").addEventListener("click", function () {
+      if (qty > 1) {
+        qty--;
+        qtyVal.textContent = qty;
+      }
+    });
+    document.getElementById("qty-plus").addEventListener("click", function () {
+      if (qty < (product.stock || 20)) {
+        qty++;
+        qtyVal.textContent = qty;
+      }
+    });
+
+    // Wishlist Toggle
+    var wishBtn = document.getElementById("btn-wish");
+    function updateWishUI() {
+      var isWished = window.VendoWish.has(product.id);
+      var icon = wishBtn.querySelector("i, svg");
+      if (icon) {
+        icon.style.fill = isWished ? "#f97316" : "none";
+        icon.style.color = isWished ? "#f97316" : "currentColor";
+      }
+    }
+    updateWishUI();
+    wishBtn.addEventListener("click", function () {
+      var added = window.VendoWish.toggle(product.id);
+      updateWishUI();
+      VendoUI.toast({
+        title: added ? "Added to wishlist" : "Removed from wishlist",
+        desc: product.name,
+        type: added ? "success" : "info"
+      });
+    });
+
+    // Add to Cart
+    document.getElementById("btn-add-cart").addEventListener("click", function () {
+      var options = {};
+      if (selectedColor) options.color = selectedColor;
+      if (selectedSize) options.size = selectedSize;
+      window.VendoCart.add(product, qty, options);
+      VendoUI.toast({
+        title: "Added to Cart!",
+        desc: qty + " × " + product.name + (selectedSize ? " (" + selectedSize + ")" : "") + " added.",
+        type: "success"
+      });
+    });
+
+    // Buy Now
+    document.getElementById("btn-buy-now").addEventListener("click", function () {
+      var options = {};
+      if (selectedColor) options.color = selectedColor;
+      if (selectedSize) options.size = selectedSize;
+      window.VendoCart.add(product, qty, options);
+      location.href = "checkout.html";
+    });
+
+    // Specs Table
+    var tbody = document.querySelector("#specs-table tbody");
+    var specs = product.specs || {
+      Material: "Handcrafted natural materials",
+      Origin: "Independent artisan studio",
+      Care: "Handle with gentle care"
+    };
+    tbody.innerHTML = Object.keys(specs).map(function (k) {
+      return '<tr><th style="width:38%">' + k + '</th><td>' + specs[k] + '</td></tr>';
+    }).join("");
+
+    // Tabs Switcher
+    document.querySelectorAll(".tabs .tab").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        document.querySelectorAll(".tabs .tab").forEach(function (t) { t.setAttribute("aria-selected", "false"); });
+        tab.setAttribute("aria-selected", "true");
+        var tabId = tab.dataset.tab;
+        document.getElementById("tab-specs").classList.toggle("hidden", tabId !== "specs");
+        document.getElementById("tab-reviews").classList.toggle("hidden", tabId !== "reviews");
+        document.getElementById("tab-shipping").classList.toggle("hidden", tabId !== "shipping");
+      });
+    });
+
+    // Related Products
+    var related = (window.VendoData.products || []).filter(function (p) { return p.id !== product.id; }).slice(0, 4);
+    document.getElementById("related-grid").innerHTML = related.map(VendoUI.productCard).join("");
+
+    document.getElementById("write-review-btn").addEventListener("click", function () {
+      VendoUI.modal({
+        title: "Review " + product.name,
+        htmlBody: '<label class="label">Your Rating</label><select class="field mb-3"><option>5 Stars - Outstanding</option><option>4 Stars - Great</option></select><label class="label">Your Review</label><textarea class="field" rows="3" placeholder="Share your experience with this handcrafted piece…"></textarea>',
+        ok: "Submit Review",
+        onOk: function () {
+          VendoUI.toast({ title: "Review submitted!", desc: "Thank you for supporting artisan makers.", type: "success" });
+        }
+      });
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

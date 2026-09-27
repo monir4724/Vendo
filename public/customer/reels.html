@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shoppable Reels · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    .comment-item { display: flex; gap: 10px; margin-bottom: 12px; }
+    .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-bg-subtle); display: grid; place-items: center; font-size: 11px; font-weight: 600; flex-shrink: 0; color: #fff; }
+  </style>
+</head>
+<body style="background:#0a0908;overflow:hidden">
+  <a class="skip-link" href="#stage">Skip to reel</a>
+
+  <div class="reel-stage" id="stage" tabindex="0" style="outline:none">
+    <!-- Reel Video / Backdrop -->
+    <div class="reel-video" id="bg" role="img" aria-label="Reel video stream"></div>
+
+    <!-- Tagged Product Pin on Video (Interactive Pulsing) -->
+    <button class="tag-pin" id="pin" type="button" aria-label="Tagged product hot-spot" style="left:42%;top:45%" title="View Tagged Product">
+      <i data-lucide="map-pin" style="width:12px;height:12px"></i>
+    </button>
+
+    <!-- Safe Top Zone -->
+    <div class="reel-safe-top">
+      <div class="flex gap-2" style="align-items:center">
+        <a href="home.html" class="glass-light icon-btn" style="width:36px;height:36px;color:#fff" aria-label="Return home">
+          <i data-lucide="chevron-left"></i>
+        </a>
+        <div class="glass-light flex gap-2" style="padding:4px 12px 4px 6px;border-radius:999px;align-items:center">
+          <img id="vendor-avatar" src="" style="width:26px;height:26px;border-radius:50%;object-fit:cover" alt="">
+          <strong id="vendor-title" style="font-size:13px;color:#fff">Kiln & Co</strong>
+          <button id="btn-follow" class="btn btn-sm btn-cta" type="button" style="padding:0 8px;min-height:24px;font-size:11px">Follow</button>
+        </div>
+      </div>
+
+      <div class="flex gap-2">
+        <span class="badge glass-light" style="color:#fff;border:1px solid rgba(255,255,255,0.15)">
+          <i data-lucide="clapperboard" style="width:12px;height:12px"></i> Reels
+        </span>
+      </div>
+    </div>
+
+    <!-- Right Side Actions Column -->
+    <div class="reel-actions">
+      <div style="text-align:center">
+        <button type="button" id="like" aria-label="Like reel" title="Like">
+          <i data-lucide="heart" id="like-icon" style="width:28px;height:28px"></i>
+        </button>
+        <span class="caption mono" id="like-count" style="color:#fff;font-size:11px;text-shadow:0 1px 3px rgba(0,0,0,0.8)">2.4k</span>
+      </div>
+
+      <div style="text-align:center">
+        <button type="button" id="comments" aria-label="View comments" title="Comments">
+          <i data-lucide="message-circle" style="width:28px;height:28px"></i>
+        </button>
+        <span class="caption mono" id="comment-count" style="color:#fff;font-size:11px;text-shadow:0 1px 3px rgba(0,0,0,0.8)">96</span>
+      </div>
+
+      <button type="button" id="save" aria-label="Bookmark to wishlist" title="Save">
+        <i data-lucide="bookmark" id="save-icon" style="width:28px;height:28px"></i>
+      </button>
+
+      <button type="button" id="share" aria-label="Share reel" title="Share">
+        <i data-lucide="share-2" style="width:28px;height:28px"></i>
+      </button>
+    </div>
+
+    <!-- Bottom Overlay: Caption + Pinned Product -->
+    <div class="reel-bottom">
+      <p id="cap" style="text-shadow:0 1px 3px rgba(0,0,0,0.9);margin:0 0 10px;font-size:14px;line-height:20px;color:#fff"></p>
+
+      <button class="product-glass glass" type="button" id="open-sheet" style="width:100%;text-align:left;cursor:pointer;background:rgba(28,25,23,0.7);backdrop-filter:blur(16px)">
+        <img id="thumb" alt="" width="56" height="56">
+        <div style="flex:1;min-width:0">
+          <div id="pname" style="font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+          <div class="price" id="pprice" style="font-size:15px"></div>
+        </div>
+        <span class="btn btn-cta btn-sm" style="flex-shrink:0;box-shadow:0 0 16px rgba(249,115,22,0.4)">Buy Now</span>
+      </button>
+    </div>
+
+    <!-- Shop Drawer Bottom Sheet -->
+    <div class="sheet glass-heavy" id="sheet" hidden style="background:rgba(28,25,23,0.88);backdrop-filter:blur(24px)">
+      <div class="flex-between mb-4">
+        <div>
+          <strong style="font-size:16px">Shop This Reel</strong>
+          <div class="caption secondary" style="color:rgba(255,255,255,0.7)">Exclusive direct-to-consumer piece</div>
+        </div>
+        <button class="icon-btn" type="button" id="close-sheet" aria-label="Close sheet" style="color:#fff">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="flex gap-3" style="align-items:center;background:rgba(255,255,255,0.06);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.1)">
+        <img id="sheet-img" alt="" width="72" height="72" style="border-radius:8px;object-fit:cover">
+        <div style="flex:1">
+          <div id="sheet-name" style="font-weight:600;font-size:15px"></div>
+          <div class="price" id="sheet-price" style="font-size:18px"></div>
+          <span class="caption" style="color:#34d399">✓ In stock · Ships in 24h</span>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-4">
+        <a class="btn btn-outline flex-1" id="pdp" href="#" style="border-color:#fff;color:#fff">Full Details</a>
+        <button class="btn btn-cta flex-1" type="button" id="buy-sheet">
+          <i data-lucide="zap"></i> Buy Now
+        </button>
+      </div>
+    </div>
+
+    <!-- Comments Drawer Bottom Sheet -->
+    <div class="sheet glass-heavy" id="comments-sheet" hidden style="background:rgba(28,25,23,0.92);backdrop-filter:blur(24px);height:65vh">
+      <div class="flex-between mb-3" style="border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px">
+        <strong style="font-size:15px">Comments (<span id="sheet-comment-count">0</span>)</strong>
+        <button class="icon-btn" type="button" id="close-comments" aria-label="Close comments" style="color:#fff">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div id="comments-list" style="overflow-y:auto;height:calc(100% - 100px);padding-right:4px"></div>
+
+      <form id="comment-form" style="display:flex;gap:8px;position:absolute;bottom:16px;left:24px;right:24px">
+        <input class="field" id="new-comment" placeholder="Add a comment to artisan…" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff" required>
+        <button class="btn btn-cta btn-sm" type="submit" style="padding:0 16px">Post</button>
+      </form>
+    </div>
+  </div>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+
+    var reels = window.VendoData.reels || [];
+    var currentIndex = 0;
+
+    function renderReel(n) {
+      currentIndex = (n + reels.length) % reels.length;
+      var reel = reels[currentIndex];
+      var prod = reel.product || window.VendoData.products[0];
+
+      var bg = document.getElementById("bg");
+      bg.style.backgroundImage = "url(" + (reel.bgImg || prod.img) + ")";
+      bg.style.backgroundSize = "cover";
+      bg.style.backgroundPosition = "center";
+
+      document.getElementById("vendor-title").textContent = reel.vendor;
+      document.getElementById("vendor-avatar").src = reel.vendorAvatar || prod.img;
+      document.getElementById("cap").innerHTML = "<strong>" + reel.vendor + "</strong> " + reel.title;
+
+      document.getElementById("like-count").textContent = reel.likes;
+      document.getElementById("comment-count").textContent = reel.commentsCount;
+      document.getElementById("sheet-comment-count").textContent = (reel.comments || []).length;
+
+      var likeIcon = document.getElementById("like-icon");
+      likeIcon.style.fill = reel.isLiked ? "#f97316" : "none";
+      likeIcon.style.color = reel.isLiked ? "#f97316" : "#fff";
+
+      var isSaved = window.VendoWish.has(prod.id);
+      var saveIcon = document.getElementById("save-icon");
+      saveIcon.style.fill = isSaved ? "#f97316" : "none";
+      saveIcon.style.color = isSaved ? "#f97316" : "#fff";
+
+      // Pinned product details
+      document.getElementById("thumb").src = prod.img;
+      document.getElementById("pname").textContent = prod.name;
+      document.getElementById("pprice").textContent = "$" + prod.price;
+
+      document.getElementById("sheet-img").src = prod.img;
+      document.getElementById("sheet-name").textContent = prod.name;
+      document.getElementById("sheet-price").textContent = "$" + prod.price;
+      document.getElementById("pdp").href = "product.html?id=" + prod.id;
+
+      // Render Comments in drawer
+      var commentsList = document.getElementById("comments-list");
+      commentsList.innerHTML = (reel.comments || []).map(function (c) {
+        var isVendor = c.isVendor ? '<span class="badge badge-info" style="font-size:10px;padding:1px 6px">Vendor</span>' : '';
+        return (
+          '<div class="comment-item">' +
+            '<div class="comment-avatar">' + (c.avatar || "U") + '</div>' +
+            '<div style="flex:1">' +
+              '<div class="flex gap-2" style="align-items:center"><strong style="font-size:13px">' + c.user + '</strong>' + isVendor + '</div>' +
+              '<div style="font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px">' + c.text + '</div>' +
+            '</div>' +
+          '</div>'
+        );
+      }).join("");
+
+      lucide.createIcons();
+    }
+
+    renderReel(0);
+
+    // Follow Toggle
+    var followBtn = document.getElementById("btn-follow");
+    followBtn.addEventListener("click", function () {
+      var isFollowing = followBtn.textContent === "Following";
+      followBtn.textContent = isFollowing ? "Follow" : "Following";
+      followBtn.classList.toggle("btn-cta", isFollowing);
+      followBtn.classList.toggle("btn-outline", !isFollowing);
+      VendoUI.toast({
+        title: isFollowing ? "Unfollowed" : "Following " + reels[currentIndex].vendor,
+        type: "success"
+      });
+    });
+
+    // Like Toggle
+    document.getElementById("like").addEventListener("click", function () {
+      var reel = reels[currentIndex];
+      reel.isLiked = !reel.isLiked;
+      reel.likes += reel.isLiked ? 1 : -1;
+      this.style.transform = "scale(1.35)";
+      var that = this;
+      setTimeout(function () { that.style.transform = ""; }, 150);
+      renderReel(currentIndex);
+    });
+
+    // Save Wishlist
+    document.getElementById("save").addEventListener("click", function () {
+      var prod = reels[currentIndex].product;
+      var added = VendoWish.toggle(prod.id);
+      renderReel(currentIndex);
+      VendoUI.toast({
+        title: added ? "Saved to Wishlist" : "Removed from Wishlist",
+        desc: prod.name,
+        type: added ? "success" : "info"
+      });
+    });
+
+    // Share Button
+    document.getElementById("share").addEventListener("click", function () {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(location.href);
+      }
+      VendoUI.toast({
+        title: "Reel Link Copied",
+        desc: "Share with friends to discover artisan crafts.",
+        type: "success"
+      });
+    });
+
+    // Drawers
+    var sheet = document.getElementById("sheet");
+    var commentsSheet = document.getElementById("comments-sheet");
+
+    function openShop() {
+      sheet.hidden = false;
+      commentsSheet.hidden = true;
+    }
+    document.getElementById("open-sheet").addEventListener("click", openShop);
+    document.getElementById("pin").addEventListener("click", openShop);
+    document.getElementById("close-sheet").addEventListener("click", function () { sheet.hidden = true; });
+
+    document.getElementById("comments").addEventListener("click", function () {
+      commentsSheet.hidden = false;
+      sheet.hidden = true;
+    });
+    document.getElementById("close-comments").addEventListener("click", function () { commentsSheet.hidden = true; });
+
+    // Comment Form Submit
+    document.getElementById("comment-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var input = document.getElementById("new-comment");
+      var text = input.value.trim();
+      if (!text) return;
+      var reel = reels[currentIndex];
+      if (!reel.comments) reel.comments = [];
+      reel.comments.push({ user: "You", avatar: "ME", text: text });
+      reel.commentsCount++;
+      input.value = "";
+      renderReel(currentIndex);
+      document.getElementById("comments-list").scrollTop = document.getElementById("comments-list").scrollHeight;
+    });
+
+    // Buy Action
+    function doBuy() {
+      var prod = reels[currentIndex].product;
+      var fullProd = VendoData.products.find(function (p) { return p.id === prod.id; }) || prod;
+      VendoCart.add(fullProd, 1);
+      VendoUI.toast({ title: "Opening Checkout", desc: prod.name, type: "success" });
+      setTimeout(function () { location.href = "checkout.html"; }, 300);
+    }
+    document.getElementById("buy-sheet").addEventListener("click", doBuy);
+
+    // Keyboard navigation (WCAG AA & Video gestures per §11)
+    document.getElementById("stage").addEventListener("keydown", function (e) {
+      if (e.key === "ArrowUp") renderReel(currentIndex - 1);
+      if (e.key === "ArrowDown") renderReel(currentIndex + 1);
+      if (e.key === "l" || e.key === "L") document.getElementById("like").click();
+      if (e.key === "c" || e.key === "C") document.getElementById("comments").click();
+      if (e.key === "Escape") { sheet.hidden = true; commentsSheet.hidden = true; }
+    });
+
+    // Swipe navigation
+    var startY = 0;
+    document.getElementById("stage").addEventListener("touchstart", function (e) {
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.getElementById("stage").addEventListener("touchend", function (e) {
+      var dy = e.changedTouches[0].clientY - startY;
+      if (dy < -45) renderReel(currentIndex + 1);
+      if (dy > 45) renderReel(currentIndex - 1);
+    });
+
+    document.getElementById("stage").addEventListener("wheel", function (e) {
+      if (Math.abs(e.deltaY) > 30) {
+        if (e.deltaY > 0) renderReel(currentIndex + 1);
+        else renderReel(currentIndex - 1);
+      }
+    }, { passive: true });
+
+    document.getElementById("stage").focus();
+  </script>
+</body>
+</html>

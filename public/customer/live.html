@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Stream Shopping · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+  <style>
+    .live-chat-wrap {
+      max-height: 180px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      mask-image: linear-gradient(180deg, transparent 0%, #000 24%, #000 100%);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 24%, #000 100%);
+      padding: 12px 10px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .live-chat-msg {
+      background: rgba(28,25,23,0.55);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      line-height: 18px;
+      width: fit-content;
+      color: #fff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      animation: toast-in 0.2s ease-out;
+    }
+    .live-chat-msg strong {
+      color: #fdba74;
+      margin-right: 6px;
+    }
+    .live-chat-msg.is-host {
+      background: rgba(15,118,110,0.85);
+      border: 1px solid rgba(45,212,191,0.5);
+    }
+    .live-chat-msg.is-host strong {
+      color: #5eead4;
+    }
+  </style>
+</head>
+<body style="background:#0a0908;overflow:hidden">
+  <a class="skip-link" href="#live-main">Skip to live stream</a>
+
+  <div class="reel-stage" id="live-main">
+    <!-- Stream Video Backdrop -->
+    <div class="reel-video" id="live-bg" style="background:linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%), url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1280&q=80&auto=format') center/cover" role="img" aria-label="Live Stream Camera Feed"></div>
+
+    <!-- Safe Top Zone -->
+    <div class="reel-safe-top">
+      <div class="flex gap-2" style="align-items:center">
+        <a href="home.html" class="glass-light icon-btn" style="width:36px;height:36px;color:#fff" aria-label="Exit live stream">
+          <i data-lucide="chevron-left"></i>
+        </a>
+        <div class="glass-light flex gap-2" style="padding:6px 14px 6px 8px;border-radius:999px;align-items:center">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80&auto=format" style="width:28px;height:28px;border-radius:50%;object-fit:cover" alt="">
+          <div>
+            <strong style="font-size:13px;display:block;line-height:16px;color:#fff">Kiln &amp; Co</strong>
+            <span class="caption" style="color:rgba(255,255,255,0.7);font-size:11px">Wheel-thrown pottery demo</span>
+          </div>
+          <button class="btn btn-sm btn-cta" type="button" id="live-follow" style="padding:0 10px;min-height:26px;font-size:11px;margin-left:4px">Follow</button>
+        </div>
+      </div>
+
+      <div class="flex gap-2" style="align-items:center">
+        <span class="badge badge-live" style="font-size:12px;padding:4px 10px">
+          <span class="pulse-dot"></span> LIVE · <span id="live-counter">1.2k</span>
+        </span>
+        <button class="icon-btn glass-light" id="btn-toggle-status" title="Simulate stream end" style="width:36px;height:36px;color:#fff">
+          <i data-lucide="power"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Bottom Left Chat Stream + Pinned Product -->
+    <div style="position:absolute;left:16px;right:16px;bottom:calc(76px + env(safe-area-inset-bottom));z-index:var(--z-live-overlay);max-width:540px">
+      <!-- Live Chat Stream -->
+      <div class="live-chat-wrap mb-3" id="chat-stream">
+        <div class="live-chat-msg"><strong>Maya R.</strong> Is the glaze food-grade and dishwasher safe?</div>
+        <div class="live-chat-msg is-host"><strong>Kiln &amp; Co (Host)</strong> Yes! High-fire dinnerware grade non-toxic glaze.</div>
+        <div class="live-chat-msg"><strong>Kenji T.</strong> Does the carafe come with matching dripper?</div>
+        <div class="live-chat-msg"><strong>Amina R.</strong> Watching from Dhaka 🔥 love the clay texture!</div>
+        <div class="live-chat-msg"><strong>Sofia M.</strong> Just clicked Buy Now for the Speckled Oat! ☕</div>
+      </div>
+
+      <!-- Chat Input Form -->
+      <form id="live-chat-form" style="display:flex;gap:8px;margin-bottom:12px">
+        <input class="field" id="live-input" placeholder="Say something to host & viewers…" style="background:rgba(28,25,23,0.65);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:999px;font-size:13px;padding:0 16px;height:38px" autocomplete="off">
+        <button class="btn btn-sm btn-cta" type="submit" style="border-radius:999px;padding:0 16px;height:38px"><i data-lucide="send" style="width:14px;height:14px"></i></button>
+      </form>
+
+      <!-- Pinned Shoppable Product with Coral Glow -->
+      <div class="product-glass glass" style="background:rgba(28,25,23,0.82);backdrop-filter:blur(20px);border:1.5px solid var(--color-cta);box-shadow:var(--glass-glow-cta);height:76px;padding:8px 12px">
+        <img src="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=160&q=80&auto=format" alt="Ceramic Pour-Over" style="width:58px;height:58px;border-radius:8px;object-fit:cover">
+        <div style="flex:1;min-width:0">
+          <div class="caption" style="color:var(--color-cta);font-weight:600;font-size:11px">★ PINNED BY HOST</div>
+          <strong style="font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block">Ceramic Pour-Over &amp; Carafe</strong>
+          <div class="price" style="font-size:16px">$32.00 <span class="caption secondary" style="text-decoration:line-through;color:rgba(255,255,255,0.6);margin-left:4px">$42</span></div>
+        </div>
+        <button class="btn btn-cta btn-sm" id="btn-live-buy" type="button" style="padding:0 14px;box-shadow:0 0 16px rgba(249,115,22,0.4)">
+          <i data-lucide="zap"></i> Buy Now
+        </button>
+      </div>
+    </div>
+
+    <!-- Initial Connecting Skeleton / Spinner Overlay -->
+    <div id="connect-modal" class="state" style="position:absolute;inset:0;z-index:30;background:rgba(12,10,9,0.7);backdrop-filter:blur(12px);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <span class="spin" style="width:36px;height:36px;border:3px solid var(--color-cta);border-right-color:transparent;border-radius:50%;display:inline-block;animation:spin .8s linear infinite;margin-bottom:16px"></span>
+      <h2 class="h3 mb-1">Connecting to Live Studio…</h2>
+      <p class="caption" style="color:rgba(255,255,255,0.8);max-width:280px;margin-bottom:20px">Establishing low-latency WebRTC video feed with Kiln &amp; Co studio.</p>
+      <button class="btn btn-outline" type="button" id="btn-cancel-connect" style="border-color:#fff;color:#fff">Cancel</button>
+    </div>
+
+    <!-- Stream Ended Fallback Screen per §9 -->
+    <div id="ended-modal" class="state hidden" style="position:absolute;inset:0;z-index:30;background:rgba(12,10,9,0.92);backdrop-filter:blur(24px);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,0.1);display:grid;place-items:center;margin-bottom:16px">
+        <i data-lucide="radio" style="width:32px;height:32px;color:var(--color-cta)"></i>
+      </div>
+      <h2 class="h2 mb-2">This Live Stream Has Ended</h2>
+      <p class="secondary" style="color:rgba(255,255,255,0.7);max-width:340px;margin-bottom:24px">Kiln &amp; Co just wrapped up the pottery broadcast. You can still watch their shoppable reels or browse products!</p>
+      <div class="flex gap-3">
+        <a class="btn btn-cta" href="reels.html"><i data-lucide="clapperboard"></i> Watch Reels</a>
+        <a class="btn btn-outline" href="shop.html" style="border-color:#fff;color:#fff">Browse Store</a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+
+    // Remove Connecting State after 700ms simulation
+    setTimeout(function () {
+      var connect = document.getElementById("connect-modal");
+      if (connect) {
+        connect.style.opacity = "0";
+        connect.style.transition = "opacity 0.3s ease";
+        setTimeout(function () { connect.remove(); }, 300);
+      }
+    }, 750);
+
+    document.getElementById("btn-cancel-connect").addEventListener("click", function () {
+      location.href = "home.html";
+    });
+
+    // Follow Toggle
+    var followBtn = document.getElementById("live-follow");
+    followBtn.addEventListener("click", function () {
+      var isFollowing = followBtn.textContent === "Following";
+      followBtn.textContent = isFollowing ? "Follow" : "Following";
+      followBtn.classList.toggle("btn-cta", isFollowing);
+      followBtn.classList.toggle("btn-outline", !isFollowing);
+      VendoUI.toast({
+        title: isFollowing ? "Unfollowed Kiln & Co" : "Following Kiln & Co",
+        desc: "You will be alerted next time they broadcast live.",
+        type: "success"
+      });
+    });
+
+    // Live Buy Action
+    document.getElementById("btn-live-buy").addEventListener("click", function () {
+      var prod = VendoData.products[1]; // Ceramic Pour-Over
+      VendoCart.add(prod, 1);
+      VendoUI.toast({
+        title: "Exclusive Live Deal Claimed!",
+        desc: prod.name + " pinned product added to cart. Proceeding to checkout…",
+        type: "success"
+      });
+      setTimeout(function () {
+        location.href = "checkout.html";
+      }, 400);
+    });
+
+    // Live Chat Input
+    var chatStream = document.getElementById("chat-stream");
+    document.getElementById("live-chat-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var input = document.getElementById("live-input");
+      var text = input.value.trim();
+      if (!text) return;
+
+      var msg = document.createElement("div");
+      msg.className = "live-chat-msg";
+      msg.innerHTML = "<strong>You:</strong> " + text;
+      chatStream.appendChild(msg);
+      input.value = "";
+      chatStream.scrollTop = chatStream.scrollHeight;
+    });
+
+    // Simulated Viewer Chatter Ticker
+    var autoChats = [
+      { user: "Tanya M.", msg: "Ordering the olive glaze right now!" },
+      { user: "Hassan B.", msg: "Such smooth wheel centering 🙌" },
+      { user: "Elena R.", msg: "How long does kiln firing take?" },
+      { user: "Kiln & Co (Host)", msg: "We fire at cone 10 for 14 hours!", isHost: true }
+    ];
+    var chatIdx = 0;
+    setInterval(function () {
+      if (chatIdx < autoChats.length) {
+        var item = autoChats[chatIdx++];
+        var msg = document.createElement("div");
+        msg.className = "live-chat-msg" + (item.isHost ? " is-host" : "");
+        msg.innerHTML = "<strong>" + item.user + "</strong> " + item.msg;
+        chatStream.appendChild(msg);
+        chatStream.scrollTop = chatStream.scrollHeight;
+      }
+    }, 6500);
+
+    // Toggle Stream End Simulation
+    var endedModal = document.getElementById("ended-modal");
+    document.getElementById("btn-toggle-status").addEventListener("click", function () {
+      endedModal.classList.toggle("hidden");
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

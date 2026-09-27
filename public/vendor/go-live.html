@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live Broadcast Studio Setup · Vendor Studio · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="app">
+    <aside class="sidebar" id="app-sidebar"></aside>
+
+    <div class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="nav-toggle" type="button" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div id="topbar-tools" class="flex gap-2"></div>
+      </header>
+
+      <div class="content" id="main" style="max-width: 1080px;">
+        <div class="flex-between mb-4">
+          <div>
+            <h1 class="h1">Broadcast Studio Setup</h1>
+            <p class="secondary mt-1">Configure stream metadata, pin initial catalog piece, and test audio/video before going live.</p>
+          </div>
+          <span class="badge badge-live"><span class="pulse-dot"></span> Ready to Air</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start;">
+          <!-- Camera Feed Preview -->
+          <div class="card stack gap-3" style="padding: var(--space-4);">
+            <div style="aspect-ratio: 16/9; background: #111; border-radius: 12px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=960&q=80&auto=format" alt="Studio Feed" style="width: 100%; height: 100%; object-fit: cover; opacity: 0.85;">
+              <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 8px;">
+                <span class="badge" style="background: rgba(0,0,0,0.65); color: #fff;">1080p 60fps</span>
+                <span class="badge" style="background: rgba(16, 185, 129, 0.85); color: #fff;">Low Latency WebRTC</span>
+              </div>
+              <!-- Mic VU Meter Indicator -->
+              <div style="position: absolute; bottom: 12px; left: 12px; right: 12px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); border-radius: 8px; padding: 8px 12px; display: flex; align-items: center; gap: 10px;">
+                <i data-lucide="mic" style="width: 14px; height: 14px; color: #34d399;"></i>
+                <div style="flex: 1; height: 6px; background: rgba(255,255,255,0.2); border-radius: 999px; overflow: hidden;">
+                  <div style="width: 72%; height: 100%; background: linear-gradient(90deg, #34d399, #f59e0b);"></div>
+                </div>
+                <span class="caption mono" style="color: #fff; font-size: 11px;">-6 dB OK</span>
+              </div>
+            </div>
+
+            <!-- Device Checks -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label class="label caption" style="font-size: 12px;">Camera Input</label>
+                <select class="field" style="font-size: 13px; padding: 6px 10px;">
+                  <option>FaceTime HD Camera (Built-in)</option>
+                  <option>Sony Alpha A7 IV (USB Capture)</option>
+                </select>
+              </div>
+              <div>
+                <label class="label caption" style="font-size: 12px;">Audio Input</label>
+                <select class="field" style="font-size: 13px; padding: 6px 10px;">
+                  <option>Shure MV7 USB Microphone</option>
+                  <option>Default Laptop Microphone Array</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Broadcast Parameters Form -->
+          <form class="card stack gap-4" id="live-setup-form">
+            <h2 class="h3">Broadcast Details</h2>
+
+            <div>
+              <label class="label" for="live-title">Stream Title *</label>
+              <input class="field" id="live-title" required value="Pour-over hour: Hand-turning morning carafe batch" placeholder="e.g. Autumn Knits Flash Drop & Q&A">
+            </div>
+
+            <div>
+              <label class="label" for="live-category">Primary Broadcast Category</label>
+              <select class="field" id="live-category">
+                <option>Home & Living (Handmade Ceramics)</option>
+                <option>Apparel & Sustainable Fashion</option>
+                <option>Leather Goods & Craftsmanship</option>
+                <option>Clean Beauty & Skincare</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="label" for="pin-product-select">Initial Pinned Product (Shoppable CTA)</label>
+              <select class="field" id="pin-product-select"></select>
+              <span class="caption secondary">Viewers will see this item highlighted with the Coral Buy Now button on top of your stream.</span>
+            </div>
+
+            <div style="background: var(--color-bg-subtle); padding: 12px; border-radius: 8px; font-size: 12px;" class="caption secondary">
+              <i data-lucide="shield-check" style="width: 14px; height: 14px; display: inline; color: var(--color-brand);"></i> WebRTC session token will be minted via authenticated Edge Function. Payouts and order routing will be credited automatically.
+            </div>
+
+            <button class="btn btn-cta btn-block" type="submit" id="btn-launch-live" style="width: 100%; justify-content: center; font-size: 16px; padding: 12px;">
+              <span class="pulse-dot"></span> Launch Live Studio
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script>
+    VendoLayout.mountDashboard("vendor");
+
+    // Populate products
+    var prods = (VendoData && VendoData.products) || [];
+    var sel = document.getElementById("pin-product-select");
+    sel.innerHTML = prods.map(function(p) {
+      return '<option value="' + p.id + '">' + p.name + ' — $' + p.price + '</option>';
+    }).join("");
+
+    // Submit Launch
+    document.getElementById("live-setup-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var btn = document.getElementById("btn-launch-live");
+      VendoUI.setBusy(btn, true, "Minting WebRTC Token...");
+      setTimeout(function() {
+        location.href = "live-studio.html";
+      }, 700);
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>

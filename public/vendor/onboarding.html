@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-role="vendor">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vendor onboarding · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+
+<body>
+  <main class="container" style="padding:48px 0;max-width:640px">
+    <div class="flex gap-2 mb-6" style="align-items:center"><span class="brand-mark">V</span><strong>Vendo</strong>
+    </div>
+    <div class="stepper" id="st">
+      <div class="step is-current">
+        <div class="step-bar"></div>
+        <div class="step-label">Business</div>
+      </div>
+      <div class="step">
+        <div class="step-bar"></div>
+        <div class="step-label">Documents</div>
+      </div>
+      <div class="step">
+        <div class="step-bar"></div>
+        <div class="step-label">Review</div>
+      </div>
+      <div class="step">
+        <div class="step-bar"></div>
+        <div class="step-label">Pending</div>
+      </div>
+    </div>
+    <form class="card stack" id="form">
+      <div data-p="0">
+        <h1 class="h2">Business details</h1>
+        <div><label class="label" for="bn">Business name</label><input class="field" id="bn" required></div>
+        <div><label class="label" for="reg">Registration no.</label><input class="field" id="reg"></div>
+      </div>
+      <div data-p="1" class="hidden">
+        <h1 class="h2">Upload KYC documents</h1>
+        <p class="caption">PDF or JPG, max 8MB. Draft saves on this device.</p>
+        <div class="dropzone" id="dz"><i data-lucide="upload"></i>
+          <p>Drop trade license and NID</p>
+        </div>
+      </div>
+      <div data-p="2" class="hidden">
+        <h1 class="h2">Review</h1>
+        <p class="secondary">Submit for admin review. Live and payout stay locked until approved.</p>
+      </div>
+      <div data-p="3" class="hidden">
+        <span class="badge badge-warning">Pending 24–48h</span>
+        <h1 class="h2">Application received</h1>
+        <p class="secondary">We’ll email you when KYC is approved. You can still draft products.</p>
+        <a class="btn btn-primary" href="dashboard.html">Go to dashboard</a>
+      </div>
+      <div class="flex gap-3" id="nav-btns">
+        <button class="btn" type="button" id="draft">Save draft</button>
+        <button class="btn btn-primary" type="submit" id="go">Continue</button>
+      </div>
+    </form>
+  </main>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script>
+    var step = 0;
+    function paint() {
+      document.querySelectorAll("[data-p]").forEach(function (p) {
+        p.classList.toggle("hidden", Number(p.dataset.p) !== step);
+      });
+      document.querySelectorAll("#st .step").forEach(function (s, i) {
+        s.classList.toggle("is-current", i === step);
+        s.classList.toggle("is-done", i < step);
+      });
+      document.getElementById("nav-btns").classList.toggle("hidden", step === 3);
+      document.getElementById("go").textContent = step === 2 ? "Submit" : "Continue";
+    }
+    VendoUI.dropzone(document.getElementById("dz"), function (f) {
+      VendoUI.toast({ title: "File attached", desc: f.name, type: "success" });
+    });
+    document.getElementById("draft").addEventListener("click", function () {
+      localStorage.setItem("vendo-kyc-draft", JSON.stringify({ step: step, bn: document.getElementById("bn").value }));
+      VendoUI.toast({ title: "Draft saved", type: "info" });
+    });
+    document.getElementById("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (step < 3) {
+        step += 1;
+        if (step === 3) localStorage.setItem("vendo-kyc", "pending");
+        paint();
+      }
+    });
+    lucide.createIcons();
+    paint();
+  </script>
+</body>
+
+</html>

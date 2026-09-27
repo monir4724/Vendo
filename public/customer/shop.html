@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-role="customer">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shop All Products · Vendo</title>
+  <script src="../../src/js/theme.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../src/css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="store-nav">
+    <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
+      <span class="brand-mark">V</span>
+      <strong>Vendo</strong>
+    </a>
+    <form class="search" action="search.html" method="get">
+      <i data-lucide="search"></i>
+      <input name="q" placeholder="Search products, artisans, reels, live…" aria-label="Search">
+    </form>
+    <div id="store-nav-actions" class="flex gap-1"></div>
+  </header>
+
+  <main id="main" class="container-wide" style="padding:28px 0 80px">
+    <div class="flex-between mb-6" style="flex-wrap:wrap;gap:16px">
+      <div>
+        <h1 class="h1">Curated Marketplace</h1>
+        <p class="secondary mt-1">Direct from independent studios, pottery wheels, and ethical ateliers.</p>
+      </div>
+      <div class="flex gap-3" style="align-items:center">
+        <label for="sort-select" class="caption" style="margin:0">Sort by:</label>
+        <select id="sort-select" class="field" style="width:auto;min-height:38px;padding-right:32px">
+          <option value="featured">Featured Picks</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:260px 1fr;gap:32px;align-items:start">
+      <!-- Filter Sidebar -->
+      <aside class="card stack gap-5" style="position:sticky;top:84px">
+        <div class="flex-between">
+          <h2 class="h4">Filter By</h2>
+          <button id="reset-filters" class="btn btn-ghost btn-sm" type="button" style="font-size:12px;color:var(--color-text-muted)">Reset</button>
+        </div>
+
+        <div>
+          <label class="label" style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em">Categories</label>
+          <div class="pills mt-2" id="cats"></div>
+        </div>
+
+        <div>
+          <div class="flex-between mb-1">
+            <label class="label" for="price-range" style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em;margin:0">Max Price</label>
+            <strong class="mono" id="price-val" style="color:var(--color-cta)">$200</strong>
+          </div>
+          <input id="price-range" class="field" type="range" min="20" max="200" step="5" value="200" style="padding:0">
+        </div>
+
+        <div>
+          <label class="label" style="font-size:13px;text-transform:uppercase;letter-spacing:0.04em">Availability</label>
+          <label class="flex gap-2" style="align-items:center;cursor:pointer;font-size:13px;margin-top:6px">
+            <input type="checkbox" id="instock-only" checked>
+            <span>In stock only</span>
+          </label>
+        </div>
+
+        <div class="card" style="background:var(--color-bg-subtle);padding:16px;border:none">
+          <div class="flex gap-2" style="align-items:center;color:var(--color-brand)">
+            <i data-lucide="shield-check" style="width:18px;height:18px"></i>
+            <strong>Buyer Protection</strong>
+          </div>
+          <p class="caption mt-1">14-day guaranteed returns on all handcrafted purchases.</p>
+        </div>
+      </aside>
+
+      <!-- Products Grid & Counter -->
+      <section>
+        <div class="flex-between mb-4">
+          <span class="caption" id="count">Showing 8 products</span>
+        </div>
+
+        <div class="product-grid" id="grid"></div>
+
+        <div id="empty" class="card state hidden">
+          <i data-lucide="search-x"></i>
+          <h2 class="h4">No matching products found</h2>
+          <p class="caption mt-1">Try relaxing your price filter or selecting another category.</p>
+          <button class="btn btn-cta mt-4" type="button" onclick="document.getElementById('reset-filters').click()">Clear All Filters</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/layout.js"></script>
+  <script src="../../src/js/chat.js"></script>
+  <script>
+    VendoLayout.mountCustomer();
+    VendoChat.mount();
+
+    var categories = ["All", "Apparel", "Home & Living", "Bags & Accessories", "Beauty & Wellness"];
+    var currentCat = "All";
+    var maxPrice = 200;
+    var inStockOnly = true;
+    var currentSort = "featured";
+
+    var catsEl = document.getElementById("cats");
+    catsEl.innerHTML = categories.map(function (c) {
+      var active = c === currentCat ? " is-active" : "";
+      return '<button class="pill' + active + '" type="button" data-cat="' + c + '">' + c + '</button>';
+    }).join("");
+
+    catsEl.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-cat]");
+      if (!btn) return;
+      currentCat = btn.dataset.cat;
+      catsEl.querySelectorAll(".pill").forEach(function (p) {
+        p.classList.toggle("is-active", p.dataset.cat === currentCat);
+      });
+      render();
+    });
+
+    var priceRange = document.getElementById("price-range");
+    var priceVal = document.getElementById("price-val");
+    priceRange.addEventListener("input", function () {
+      maxPrice = Number(this.value);
+      priceVal.textContent = "$" + maxPrice;
+      render();
+    });
+
+    var inStockEl = document.getElementById("instock-only");
+    inStockEl.addEventListener("change", function () {
+      inStockOnly = this.checked;
+      render();
+    });
+
+    var sortSelect = document.getElementById("sort-select");
+    sortSelect.addEventListener("change", function () {
+      currentSort = this.value;
+      render();
+    });
+
+    document.getElementById("reset-filters").addEventListener("click", function () {
+      currentCat = "All";
+      maxPrice = 200;
+      priceRange.value = 200;
+      priceVal.textContent = "$200";
+      inStockOnly = false;
+      inStockEl.checked = false;
+      currentSort = "featured";
+      sortSelect.value = "featured";
+      catsEl.querySelectorAll(".pill").forEach(function (p) {
+        p.classList.toggle("is-active", p.dataset.cat === "All");
+      });
+      render();
+    });
+
+    function render() {
+      var list = (window.VendoData.products || []).filter(function (p) {
+        var matchCat = currentCat === "All" || p.cat === currentCat;
+        var matchPrice = p.price <= maxPrice;
+        var matchStock = !inStockOnly || p.inStock !== false;
+        return matchCat && matchPrice && matchStock;
+      });
+
+      if (currentSort === "price-asc") {
+        list.sort(function (a, b) { return a.price - b.price; });
+      } else if (currentSort === "price-desc") {
+        list.sort(function (a, b) { return b.price - a.price; });
+      } else if (currentSort === "rating") {
+        list.sort(function (a, b) { return (b.rating || 0) - (a.rating || 0); });
+      }
+
+      var grid = document.getElementById("grid");
+      var empty = document.getElementById("empty");
+      var count = document.getElementById("count");
+
+      count.textContent = "Showing " + list.length + " handcrafted " + (list.length === 1 ? "item" : "items");
+      if (list.length === 0) {
+        grid.classList.add("hidden");
+        empty.classList.remove("hidden");
+      } else {
+        empty.classList.add("hidden");
+        grid.classList.remove("hidden");
+        grid.innerHTML = list.map(VendoUI.productCard).join("");
+      }
+      lucide.createIcons();
+    }
+
+    render();
+  </script>
+</body>
+</html>
