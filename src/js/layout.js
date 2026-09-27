@@ -33,9 +33,9 @@ window.VendoLayout = (function () {
     if (aside) {
       aside.innerHTML =
         '<div class="sidebar-brand">' +
-          '<a href="../index.html" style="display:flex;align-items:center;gap:12px;color:inherit;text-decoration:none">' +
-            '<span class="brand-mark">V</span>' +
-            '<div><strong style="font-size:16px;letter-spacing:-0.02em">Vendo</strong><div class="caption" style="text-transform:capitalize">' + role + ' Studio</div></div>' +
+          '<a href="../index.html" style="display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none">' +
+            '<img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:34px;height:34px;border-radius:8px">' +
+            '<div><img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:22px;width:auto;display:block"><div class="caption" style="text-transform:capitalize;font-size:10px;margin-top:2px">' + role + ' Studio</div></div>' +
           '</a>' +
         '</div>' +
         '<nav class="sidebar-nav" style="display:flex;flex-direction:column;gap:2px">' +

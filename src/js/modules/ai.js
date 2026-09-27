@@ -23,11 +23,13 @@ window.VendoAI = (function () {
       '</button>'
     );
 
+    var iconPath = (location.pathname.indexOf("/customer/") !== -1 || location.pathname.indexOf("/vendor/") !== -1 || location.pathname.indexOf("/admin/") !== -1) ? "../assets/icon.jpg" : "assets/icon.jpg";
+
     var panel = el(
       '<section class="ai-panel" id="ai-panel" hidden aria-label="Vendo AI Assistant">' +
         '<div class="flex-between" style="padding:16px 20px;border-bottom:1px solid var(--color-border-default);background:var(--color-bg-subtle)">' +
           '<div class="flex gap-2" style="align-items:center">' +
-            '<span class="brand-mark" style="width:28px;height:28px;font-size:14px">V</span>' +
+            '<img src="' + iconPath + '" class="brand-icon-img" alt="Vendo" style="width:28px;height:28px;border-radius:6px">' +
             '<div>' +
               '<strong style="font-size:15px">Vendo Assistant</strong>' +
               '<div class="caption">24/7 AI shopping & order concierge</div>' +
