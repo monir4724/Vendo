@@ -152,33 +152,6 @@
       border-color: var(--color-text-muted);
     }
 
-    .demo-credentials-box {
-      margin-top: 24px;
-      padding: 14px 16px;
-      background: var(--color-bg-subtle);
-      border: 1px dashed var(--color-border-default);
-      border-radius: var(--radius-md);
-      font-size: 12px;
-    }
-
-    .demo-pill {
-      display: inline-block;
-      padding: 4px 8px;
-      background: var(--color-bg-surface);
-      border: 1px solid var(--color-border-default);
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: var(--font-mono);
-      margin: 3px 2px;
-      transition: all 0.15s ease;
-    }
-
-    .demo-pill:hover {
-      background: var(--color-brand-soft);
-      border-color: var(--color-brand);
-      color: var(--color-brand);
-    }
-
     @media (max-width: 900px) {
       .auth-split {
         flex-direction: column;
@@ -236,9 +209,7 @@
         <!-- VIEW 1: SIGN IN (Default) -->
         <div id="view-signin">
           <div style="margin-bottom:20px">
-            <h1 class="h2" style="display:flex;align-items:center;gap:8px">
-              <span>🔐</span> Sign In
-            </h1>
+            <h1 class="h2">Sign In</h1>
             <p class="caption">Enter your registered Gmail, phone number, or Admin credentials</p>
           </div>
 
@@ -291,9 +262,7 @@
         <!-- VIEW 2: CREATE ACCOUNT / REGISTER -->
         <div id="view-register" style="display:none">
           <div style="margin-bottom:16px">
-            <h1 class="h2" style="display:flex;align-items:center;gap:8px">
-              <span>📝</span> Create Account
-            </h1>
+            <h1 class="h2">Create Account</h1>
             <p class="caption">Select your account type to join Vendo:</p>
           </div>
 
@@ -347,27 +316,6 @@
             <button type="button" id="btn-show-signin" style="background:none;border:none;color:var(--color-brand);font-weight:600;cursor:pointer;font-size:13px;margin-left:4px;padding:0">
               Sign In
             </button>
-          </div>
-        </div>
-
-        <!-- Quick Credentials Box for Testing -->
-        <div class="demo-credentials-box">
-          <div class="flex-between" style="margin-bottom:6px">
-            <strong style="color:var(--color-text-primary);font-size:11px">🔑 Test Credentials (Click to Autofill):</strong>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div>
-              <span style="font-weight:600;color:var(--color-brand)">👤 Customer:</span>
-              <span class="demo-pill" onclick="autofill('customer@vendo.app', 'Customer@123')">customer@vendo.app / Customer@123</span>
-            </div>
-            <div>
-              <span style="font-weight:600;color:#ea580c">🏪 Vendor:</span>
-              <span class="demo-pill" onclick="autofill('vendor@vendo.app', 'Vendor@123')">vendor@vendo.app / Vendor@123</span>
-            </div>
-            <div>
-              <span style="font-weight:600;color:#0f766e">🛡️ Admin:</span>
-              <span class="demo-pill" onclick="autofill('admin@vendo.app', 'Admin@Vendo2026!')">admin@vendo.app / Admin@Vendo2026!</span>
-            </div>
           </div>
         </div>
       </div>
@@ -427,19 +375,6 @@
         labelName.textContent = "Full Name";
         inputName.placeholder = "e.g. Anika Tabassum";
         txtSubmit.textContent = "Create Customer Account";
-      }
-    }
-
-    // Autofill credentials helper
-    function autofill(email, password) {
-      if (viewRegister.style.display === "block") {
-        viewRegister.style.display = "none";
-        viewSignIn.style.display = "block";
-      }
-      document.getElementById("signin-identifier").value = email;
-      document.getElementById("signin-password").value = password;
-      if (window.VendoUI) {
-        VendoUI.toast({ title: "Autofilled", desc: `Credentials loaded for ${email}`, type: "info" });
       }
     }
 
