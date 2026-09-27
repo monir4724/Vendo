@@ -141,7 +141,7 @@
       var progressPercent = document.getElementById("shipping-progress-percent");
 
       if (remaining <= 0) {
-        progressText.innerHTML = '<span style="color:var(--color-success)">🎉 You unlocked FREE Express Shipping!</span>';
+        progressText.innerHTML = '<span style="color:var(--color-success)">You unlocked FREE Express Shipping!</span>';
         progressBar.style.width = "100%";
         progressBar.style.background = "var(--color-success)";
         progressPercent.textContent = "100%";
@@ -256,13 +256,13 @@
 
     if (VendoCart.getPromo()) {
       promoInput.value = VendoCart.getPromo();
-      promoMsg.innerHTML = '<span style="color:var(--color-success)">✓ 15% discount active</span>';
+      promoMsg.innerHTML = '<span style="color:var(--color-success)">15% discount active</span>';
     }
 
     promoBtn.addEventListener("click", function () {
       var res = VendoCart.applyPromo(promoInput.value);
       if (res.success) {
-        promoMsg.innerHTML = '<span style="color:var(--color-success)">✓ 15% discount applied!</span>';
+        promoMsg.innerHTML = '<span style="color:var(--color-success)">15% discount applied!</span>';
         VendoUI.toast({ title: "Promo Applied!", desc: "15% discount added to order.", type: "success" });
         renderCart();
       } else {

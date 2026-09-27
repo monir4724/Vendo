@@ -318,7 +318,7 @@ window.VendoDefaultData = {
       id: "r1",
       vendor: "Kiln & Co",
       vendorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80&auto=format",
-      title: "Hand-turning the morning pour-over carafe batch ✨ #pottery #ceramics",
+      title: "Hand-turning the morning pour-over carafe batch #pottery #ceramics",
       likes: 2480,
       commentsCount: 96,
       sharesCount: 312,
@@ -388,7 +388,7 @@ window.VendoDefaultData = {
       id: "r4",
       vendor: "Verdant Lab",
       vendorAvatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80&auto=format",
-      title: "Morning cold-pressed botanical serum routine for glass skin glow ✨",
+      title: "Morning cold-pressed botanical serum routine for glass skin glow",
       likes: 1940,
       commentsCount: 68,
       sharesCount: 180,
@@ -428,8 +428,8 @@ window.VendoDefaultData = {
         { user: "Maya R.", msg: "Is the glaze food-safe?", time: "1m ago" },
         { user: "Kiln & Co (Host)", msg: "Yes! 100% non-toxic dinnerware grade.", isHost: true, time: "45s ago" },
         { user: "Kenji T.", msg: "Can I add to cart directly from this stream?", time: "30s ago" },
-        { user: "Amina R.", msg: "Pouring now 🔥 looks amazing!", time: "18s ago" },
-        { user: "Sofia M.", msg: "Just bought the Speckled Oat version! ☕", time: "just now" }
+        { user: "Amina R.", msg: "Pouring now, looks amazing!", time: "18s ago" },
+        { user: "Sofia M.", msg: "Just bought the Speckled Oat version!", time: "just now" }
       ]
     }
   ],

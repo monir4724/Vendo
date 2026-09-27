@@ -301,23 +301,23 @@ Per Patch 10 reconciliation, modular client features reside under `src/js/module
 
 | ID | Control | Category | Severity | Technical Implementation |
 |---|---|---|---|---|
-| **SEC-1** | Row Level Security on Every Table | Access Control | 🔴 Critical | RLS enabled on all 20 tables with granular `select`, `insert`, `update`, `delete` policies per role (Customer, Vendor, Admin). |
-| **SEC-2** | Trigger Functions under RLS | Access Control | 🔴 Critical | Defined with `security definer` and `set search_path = public` on all sync functions (`sync_product_rating`, `sync_vendor_follower_count`, `update_reel_search_vector`, `sync_reel_engagements`, `set_updated_at`). |
-| **SEC-3** | Payment Webhook Verification | Fraud Prevention | 🔴 Critical | Constant-time HMAC SHA-256 signature verification (`timingSafeEqual`) and `payment_transactions` unique constraint idempotency. |
-| **SEC-4** | KYC/Dispute Evidence Privacy | PII & Compliance | 🔴 Critical | Storage buckets `vendor-kyc` and `dispute-evidence` set to private (`public = false`). Short-lived 5-minute signed URLs. `pgcrypto` encrypted NID storage. |
-| **SEC-5** | Live Stream RTC Token Protection | Authorization | 🔴 Critical | JWT session validation and vendor ownership verification (`stream.vendor_id === user.id`) before issuing publisher tokens. |
-| **SEC-6** | Payout Double-Processing Defense | Financial Integrity | 🔴 Critical | Atomic row-level lock `select ... for update` inside `public.process_vendor_payout()` stored procedure. |
-| **SEC-7** | Realtime Channel Authorization | Authorization | 🟡 High | RLS policy on `realtime.messages` with private channel configuration (`config: { private: true }`). |
-| **SEC-8** | Reel View-Count Anti-Spam | Fraud Prevention | 🟡 Medium | 5-minute sliding-window view deduplication table `public.reel_view_dedup` and `public.record_reel_view()`. |
-| **SEC-9** | Distributed Sliding-Window Rate Limiter | Cost & Abuse Defense | 🟡 High | Database table `public.rate_limits` and `public.check_rate_limit()` RPC function enforcing request caps on LLM, payments, and reactions. |
-| **SEC-10** | AI Chat Markdown XSS Sanitization | Frontend Security | 🟡 Medium | Strict tag escaping and safe markdown rendering in `src/js/modules/ai.js` and `src/js/chat.js` preventing injection attacks. |
-| **SEC-11** | Strict CORS & Token Storage | Infrastructure | 🟡 Medium | Explicit origin allowlist in `_shared/cors.ts` (`https://vendo.app`, `https://admin.vendo.app`, localhost). |
-| **SEC-12** | SQL Injection Elimination | Application Security | 🔴 Critical | 100% parameterized queries via Supabase query builder and PL/pgSQL parameters; zero raw query string concatenation. |
-| **SEC-13** | CSRF Protection for State-Changing Requests | Application Security | 🔴 Critical | Double-submit CSRF cookie token helper in `_shared/csrf.ts` and `SameSite=Strict/Lax` headers. |
-| **SEC-14** | Malicious File Upload Defense | Application Security | 🔴 Critical | Magic-bytes content validation, 200MB size caps, quarantine-to-processed bucket lifecycle, and `X-Content-Type-Options: nosniff`. |
-| **SEC-15** | Server-Side Request Forgery (SSRF) Defense | Application Security | 🔴 Critical | Safe fetch helper `_shared/safeFetch.ts` blocking loopback, link-local, RFC 1918 private IP ranges, and cloud metadata services. |
-| **SEC-16** | Video Transcoder Command Injection Defense | Application Security | 🔴 Critical | FFmpeg execution via array argument spawn with `{ shell: false }` and server-generated UUID filenames. |
-| **SEC-17** | Checkout Price/Quantity Tamper Defense | Business Logic | 🔴 Critical | Line-item prices, active status, inventory, and totals resolved and verified exclusively against Postgres records in `initiate-payment`. |
-| **SEC-18** | Authentication Brute-Force Defense | Authentication | 🟡 High | Auth endpoint rate limiter (`login:${ip}:${email}`) max 5 attempts per 5-minute window via `_shared/authRateLimit.ts`. |
-| **SEC-19** | Secrets & Key Leakage Prevention | Infrastructure | 🟡 High | Strict `.gitignore` blocking `.env*`, client bundle isolated to `anon` key, `service_role` key restricted to Edge Functions. |
-| **SEC-20** | Dependency Supply Chain Defense | Supply Chain | 🟢 Medium | Pinned exact package versions in `package.json`, automated `npm audit --audit-level=high` script, and `npm ci` enforcement. |
+| **SEC-1** | Row Level Security on Every Table | Access Control | Critical | RLS enabled on all 20 tables with granular `select`, `insert`, `update`, `delete` policies per role (Customer, Vendor, Admin). |
+| **SEC-2** | Trigger Functions under RLS | Access Control | Critical | Defined with `security definer` and `set search_path = public` on all sync functions (`sync_product_rating`, `sync_vendor_follower_count`, `update_reel_search_vector`, `sync_reel_engagements`, `set_updated_at`). |
+| **SEC-3** | Payment Webhook Verification | Fraud Prevention | Critical | Constant-time HMAC SHA-256 signature verification (`timingSafeEqual`) and `payment_transactions` unique constraint idempotency. |
+| **SEC-4** | KYC/Dispute Evidence Privacy | PII & Compliance | Critical | Storage buckets `vendor-kyc` and `dispute-evidence` set to private (`public = false`). Short-lived 5-minute signed URLs. `pgcrypto` encrypted NID storage. |
+| **SEC-5** | Live Stream RTC Token Protection | Authorization | Critical | JWT session validation and vendor ownership verification (`stream.vendor_id === user.id`) before issuing publisher tokens. |
+| **SEC-6** | Payout Double-Processing Defense | Financial Integrity | Critical | Atomic row-level lock `select ... for update` inside `public.process_vendor_payout()` stored procedure. |
+| **SEC-7** | Realtime Channel Authorization | Authorization | High | RLS policy on `realtime.messages` with private channel configuration (`config: { private: true }`). |
+| **SEC-8** | Reel View-Count Anti-Spam | Fraud Prevention | Medium | 5-minute sliding-window view deduplication table `public.reel_view_dedup` and `public.record_reel_view()`. |
+| **SEC-9** | Distributed Sliding-Window Rate Limiter | Cost & Abuse Defense | High | Database table `public.rate_limits` and `public.check_rate_limit()` RPC function enforcing request caps on LLM, payments, and reactions. |
+| **SEC-10** | AI Chat Markdown XSS Sanitization | Frontend Security | Medium | Strict tag escaping and safe markdown rendering in `src/js/modules/ai.js` and `src/js/chat.js` preventing injection attacks. |
+| **SEC-11** | Strict CORS & Token Storage | Infrastructure | Medium | Explicit origin allowlist in `_shared/cors.ts` (`https://vendo.app`, `https://admin.vendo.app`, localhost). |
+| **SEC-12** | SQL Injection Elimination | Application Security | Critical | 100% parameterized queries via Supabase query builder and PL/pgSQL parameters; zero raw query string concatenation. |
+| **SEC-13** | CSRF Protection for State-Changing Requests | Application Security | Critical | Double-submit CSRF cookie token helper in `_shared/csrf.ts` and `SameSite=Strict/Lax` headers. |
+| **SEC-14** | Malicious File Upload Defense | Application Security | Critical | Magic-bytes content validation, 200MB size caps, quarantine-to-processed bucket lifecycle, and `X-Content-Type-Options: nosniff`. |
+| **SEC-15** | Server-Side Request Forgery (SSRF) Defense | Application Security | Critical | Safe fetch helper `_shared/safeFetch.ts` blocking loopback, link-local, RFC 1918 private IP ranges, and cloud metadata services. |
+| **SEC-16** | Video Transcoder Command Injection Defense | Application Security | Critical | FFmpeg execution via array argument spawn with `{ shell: false }` and server-generated UUID filenames. |
+| **SEC-17** | Checkout Price/Quantity Tamper Defense | Business Logic | Critical | Line-item prices, active status, inventory, and totals resolved and verified exclusively against Postgres records in `initiate-payment`. |
+| **SEC-18** | Authentication Brute-Force Defense | Authentication | High | Auth endpoint rate limiter (`login:${ip}:${email}`) max 5 attempts per 5-minute window via `_shared/authRateLimit.ts`. |
+| **SEC-19** | Secrets & Key Leakage Prevention | Infrastructure | High | Strict `.gitignore` blocking `.env*`, client bundle isolated to `anon` key, `service_role` key restricted to Edge Functions. |
+| **SEC-20** | Dependency Supply Chain Defense | Supply Chain | Medium | Pinned exact package versions in `package.json`, automated `npm audit --audit-level=high` script, and `npm ci` enforcement. |
