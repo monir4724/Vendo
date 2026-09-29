@@ -170,43 +170,65 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../../src/js/ui.js"></script>
   <script src="../../src/js/data.js"></script>
+<script src="../../src/js/store.js"></script>
   <script src="../../src/js/layout.js"></script>
-  <script>
+<script src="../../src/js/vendoLogger.js"></script>
+<script>
     VendoLayout.mountDashboard("admin");
+    try { document.querySelectorAll(".scrim").forEach(function (n) { n.remove(); }); document.querySelectorAll(".modal").forEach(function (n) { n.remove(); }); } catch (e) {}
+    try { if (window.VendoStore && VendoStore.forceReload) VendoStore.forceReload(); } catch (e) {}
 
-    // Dynamic ID lookup
+    // Dynamic ID lookup (merge base mock data + persisted store overrides)
     var params = new URLSearchParams(window.location.search);
     var vId = params.get("id") || "v2";
-    var vendor = (VendoData.vendors && VendoData.vendors.find(function(v) { return v.id === vId; })) || {
-      name: "Kiln & Co",
-      category: "Home & Living (Handmade Ceramics)",
-      kyc: "pending",
-      location: "Dhaka, Bangladesh"
-    };
+function loadVendor() {
+      // prefer the merged registry (which includes newly registered vendors)
+      var fromStore = VendoStore.getVendor(vId);
+      if (fromStore) return fromStore;
+      var base = (VendoData.vendors && VendoData.vendors.find(function(v) { return v.id === vId; })) || {
+        id: vId,
+        name: "Vendor " + vId,
+        category: "Pending setup",
+        kyc: "pending",
+        location: "Bangladesh"
+      };
+      return base;
+    }
+
+    function paintHeader() {
+      var badge = document.getElementById("kyc-badge");
+      if (!badge) return;
+      var kyc = (vendor.kyc || "pending").toLowerCase();
+      if (kyc === "approved") { badge.className = "badge badge-success"; badge.textContent = "KYC Approved & Active"; }
+      else if (kyc === "suspended" || kyc === "rejected") { badge.className = "badge badge-danger"; badge.textContent = "KYC Suspended"; }
+      else if (kyc === "docs-requested") { badge.className = "badge badge-warning"; badge.textContent = "Documents Re-Requested"; }
+      else { badge.className = "badge badge-warning"; badge.textContent = "KYC Review Pending"; }
+    }
 
     document.getElementById("v-title").textContent = vendor.name;
     document.getElementById("v-trade-name").textContent = vendor.name + " Artisanal Studio";
     document.getElementById("v-category").textContent = vendor.category || "Artisanal Goods";
+    paintHeader();
 
-    // Approve Action
     document.getElementById("btn-approve").addEventListener("click", function() {
-      var badge = document.getElementById("kyc-badge");
-      badge.className = "badge badge-success";
-      badge.textContent = "KYC Approved & Active";
+      VendoStore.updateVendor(vId, { kyc: "approved", kycApprovedAt: new Date().toISOString() });
+      vendor = loadVendor();
+      paintHeader();
       VendoUI.toast("KYC Approved", "Vendor " + vendor.name + " approved. Live Studio and Payout gateways unlocked.", "success");
     });
 
-    // Request Docs Action
     document.getElementById("btn-request-docs").addEventListener("click", function() {
       var note = document.getElementById("admin-note").value.trim();
       if (!note) {
         VendoUI.toast("Note Required", "Please enter a specific note explaining which document needs resubmission.", "warning");
         return;
       }
+      VendoStore.updateVendor(vId, { kyc: "docs-requested", adminNote: note });
+      vendor = loadVendor();
+      paintHeader();
       VendoUI.toast("Resubmission Requested", "Email sent to vendor requesting re-upload of highlighted documents.", "info");
     });
 
-    // Reject Action
     document.getElementById("btn-reject").addEventListener("click", function() {
       var note = document.getElementById("admin-note").value.trim() || "Application suspended due to regulatory compliance check.";
       VendoUI.modal({
@@ -215,15 +237,22 @@
         danger: true,
         ok: "Confirm Rejection",
         onOk: function() {
-          var badge = document.getElementById("kyc-badge");
-          badge.className = "badge badge-danger";
-          badge.textContent = "KYC Suspended";
+          VendoStore.updateVendor(vId, { kyc: "suspended", adminNote: note });
+          vendor = loadVendor();
+          paintHeader();
           VendoUI.toast("Vendor Suspended", "Store suspended and rejection logged in compliance audit.", "danger");
         }
       });
     });
 
+    VendoStore.subscribe(function (action) {
+      if (action && (action.type === "update-vendor" && action.id === vId) || action.type === "reload") {
+        vendor = loadVendor();
+        paintHeader();
+      }
+    });
+
     lucide.createIcons();
-  </script>
+</script>
 </body>
 </html>

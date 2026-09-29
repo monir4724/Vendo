@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendo · Project Audit</title>
+  <script src="../src/js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/css/styles.css">
+  <style>
+    body { padding: 24px; max-width: 1280px; margin: 0 auto; }
+    h1 { font-family: var(--font-heading); }
+    .row { padding: 10px 14px; border: 1px solid var(--color-border-default); border-radius: 8px; margin-bottom: 8px; }
+    .row.err { border-color: var(--color-danger); background: var(--color-danger-soft); }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; margin-right: 4px; background: var(--color-bg-subtle); }
+    .pill.ok { background: var(--color-success-soft); color: var(--color-success); }
+    .pill.fail { background: var(--color-danger-soft); color: var(--color-danger); }
+    .err-list { margin: 8px 0; padding: 8px; background: var(--color-bg-subtle); border-radius: 6px; font-family: var(--font-mono); font-size: 11px; }
+    .err-list li { margin: 2px 0; }
+    .progress { height: 8px; background: var(--color-bg-subtle); border-radius: 4px; overflow: hidden; margin: 8px 0; }
+    .progress > div { height: 100%; background: var(--color-brand); transition: width 0.2s; }
+    button.btn { padding: 8px 16px; border-radius: 6px; border: 1px solid var(--color-brand); background: var(--color-brand); color: #fff; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Vendo · Static Project Audit</h1>
+  <p class="secondary">Walks every page, parses HTML, cross-checks JS references vs. DOM IDs, dumps results to <code>vendo_console_log</code> for <a href="console.html">/console.html</a>.</p>
+
+  <div style="margin: 16px 0">
+    <button class="btn" id="btn-run">Run Audit</button>
+    <button class="btn" id="btn-stop" style="background: var(--color-danger); border-color: var(--color-danger); margin-left: 8px">Stop</button>
+    <span id="status" class="caption" style="margin-left: 12px"></span>
+  </div>
+
+  <div class="progress"><div id="bar" style="width: 0%"></div></div>
+
+  <div id="root"></div>
+
+  <script>
+    // Helper to push to the same log console.html reads
+    function push(level, source, message, meta) {
+      try {
+        var KEY = "vendo_console_log";
+        var entries = JSON.parse(localStorage.getItem(KEY) || "[]");
+        if (!Array.isArray(entries)) entries = [];
+        entries.push({
+          ts: new Date().toISOString(),
+          level: level,
+          source: source,
+          message: message,
+          meta: meta || null
+        });
+        if (entries.length > 500) entries = entries.slice(-500);
+        localStorage.setItem(KEY, JSON.stringify(entries));
+        try { window.dispatchEvent(new CustomEvent("vendo:log", { detail: entries[entries.length - 1] })); } catch (e) {}
+      } catch (e) {}
+    }
+
+    function log(msg) {
+      console.log(msg);
+      var el = document.getElementById("status");
+      if (el) el.textContent = msg;
+    }
+
+    var stopped = false;
+    document.getElementById("btn-stop").addEventListener("click", function () { stopped = true; });
+
+    var PAGES = [
+      "index.html", "login.html", "console.html", "_audit.html", "_e2e_report.html",
+      "admin/dashboard.html", "admin/vendors.html", "admin/vendor-detail.html",
+      "admin/moderation.html", "admin/categories.html", "admin/disputes.html",
+      "admin/payouts.html", "admin/audit.html", "admin/settings.html",
+      "vendor/onboarding.html", "vendor/dashboard.html", "vendor/products.html",
+      "vendor/reels.html", "vendor/go-live.html", "vendor/orders.html",
+      "vendor/messages.html", "vendor/earnings.html", "vendor/settings.html",
+      "vendor/live-studio.html",
+      "customer/home.html", "customer/shop.html", "customer/product.html",
+      "customer/storefront.html", "customer/cart.html", "customer/checkout.html",
+      "customer/wishlist.html", "customer/orders.html", "customer/notifications.html",
+      "customer/profile.html", "customer/search.html", "customer/reels.html",
+      "customer/live.html", "customer/confirmation.html", "customer/invoice.html"
+    ];
+
+    // Static analyser: parse HTML, find DOM ids referenced in inline <script>,
+    // find buttons/forms that have no obvious handler, find broken asset paths.
+    async function audit(url) {
+      var issues = [];
+      try {
+        var resp = await fetch(url, { cache: "no-store" });
+        if (!resp.ok) {
+          issues.push({ kind: "http", msg: "HTTP " + resp.status });
+          return { url: url, ok: false, issues: issues };
+        }
+        var text = await resp.text();
+      } catch (e) {
+        issues.push({ kind: "fetch", msg: "fetch failed: " + e.message });
+        return { url: url, ok: false, issues: issues };
+      }
+
+      // Quick HTML parse via DOMParser
+      var doc = new DOMParser().parseFromString(text, "text/html");
+
+      // 1) All declared IDs
+      var ids = {};
+      doc.querySelectorAll("[id]").forEach(function (el) {
+        var id = el.getAttribute("id");
+        if (ids[id]) issues.push({ kind: "duplicate-id", msg: "duplicate id \"" + id + "\"" });
+        ids[id] = true;
+      });
+
+      // 2) getElementById / querySelector references in inline scripts
+      var scripts = doc.querySelectorAll("script");
+      var scriptSrcs = [];
+      scripts.forEach(function (s) {
+        if (s.src) scriptSrcs.push(s.src);
+        if (s.textContent && s.textContent.length > 50) {
+          // match getElementById("foo") and getElementById('foo')
+          var re = /getElementById\(\s*["']([^"']+)["']\s*\)/g;
+          var m;
+          while ((m = re.exec(s.textContent))) {
+            var ref = m[1];
+            if (!ids[ref]) issues.push({ kind: "missing-id", msg: "JS references #" + ref + " but id is not in DOM" });
+          }
+          // match querySelector("#foo")
+          var re2 = /querySelector(?:All)?\(\s*["']([^"']+)["']\s*\)/g;
+          while ((m = re2.exec(s.textContent))) {
+            var sel = m[1];
+            if (sel.charAt(0) === "#") {
+              var ref2 = sel.slice(1).split(/[\s>~+,:[]/)[0];
+              if (ref2 && !ids[ref2]) issues.push({ kind: "missing-id-qs", msg: "JS querySelector(\"" + sel + "\") — #" + ref2 + " missing" });
+            }
+          }
+        }
+      });
+
+      // 3) Buttons with no inline onclick and no obvious form association
+      var btns = doc.querySelectorAll("button, [type='button'], [type='submit']");
+      btns.forEach(function (b) {
+        var id = b.id || "";
+        var hasOnClick = b.hasAttribute("onclick");
+        var hasForm = b.hasAttribute("form") || (b.closest("form") !== null);
+        var hasAria = b.hasAttribute("aria-controls") || b.hasAttribute("data-tab") || b.hasAttribute("data-f") || b.hasAttribute("data-status");
+        if (!id && !hasOnClick && !hasForm && !hasAria && b.textContent.trim().length < 60) {
+          issues.push({ kind: "btn-no-handler", msg: "button without id/handler: \"" + b.textContent.trim().slice(0, 40) + "\"" });
+        }
+      });
+
+      // 4) <a href> with empty hash targets that look broken
+      doc.querySelectorAll("a[href]").forEach(function (a) {
+        var href = a.getAttribute("href");
+        if (href === "#" && !a.hasAttribute("onclick") && a.textContent.trim().length > 0) {
+          // ok — many places use href="#" with onclick
+        }
+      });
+
+      // 5) Asset references — src/href to local files
+      var assetRe = /^(?:\.\.\/|assets\/|\/)(?!http)/i;
+      doc.querySelectorAll("[src], [href]").forEach(function (el) {
+        var attr = el.hasAttribute("src") ? "src" : "href";
+        var v = el.getAttribute(attr);
+        if (!v || v.indexOf("http") === 0 || v.indexOf("data:") === 0 || v.indexOf("#") === 0 || v.indexOf("mailto:") === 0 || v.indexOf("javascript:") === 0) return;
+        if (assetRe.test(v) || /^[a-z0-9_\-]+\.(png|jpg|jpeg|svg|webp|ico|css|js)$/i.test(v)) {
+          // check if asset exists in same relative path
+          var u = new URL(v, location.origin + location.pathname.replace(/[^/]*$/, "")).pathname;
+          if (u.indexOf("/assets/") >= 0 || u.indexOf(".png") >= 0 || u.indexOf(".jpg") >= 0) {
+            // we'll trust this for now — would need HEAD request for each
+          }
+        }
+      });
+
+      // 6) Inline onclick= referencing functions that don't appear in any script
+      doc.querySelectorAll("[onclick]").forEach(function (el) {
+        var oc = el.getAttribute("onclick");
+        var fnMatch = oc.match(/^([a-zA-Z_][\w]*)\s*\(/);
+        if (fnMatch) {
+          var fnName = fnMatch[1];
+          var found = false;
+          scripts.forEach(function (s) {
+            if (s.textContent && s.textContent.indexOf("function " + fnName + "(") >= 0) found = true;
+            if (s.textContent && s.textContent.indexOf("window." + fnName + "=") >= 0) found = true;
+            if (s.textContent && s.textContent.indexOf(fnName + "=function") >= 0) found = true;
+            if (s.textContent && s.textContent.indexOf("const " + fnName + "=") >= 0) found = true;
+          });
+          if (!found) {
+            // Also check global scope (rough)
+            if (typeof window[fnName] === "undefined") {
+              issues.push({ kind: "missing-fn", msg: "onclick calls " + fnName + "(...) — function not defined in any inline script" });
+            }
+          }
+        }
+      });
+
+      // 7) Forms without action or submit handler
+      doc.querySelectorAll("form").forEach(function (f) {
+        if (!f.id && !f.hasAttribute("onsubmit") && f.querySelectorAll("[type='submit']").length === 0) {
+          issues.push({ kind: "form-no-submit", msg: "<form> without id, onsubmit, or submit button" });
+        }
+      });
+
+      return { url: url, ok: true, issues: issues, ids: Object.keys(ids).length, btns: btns.length, scripts: scriptSrcs.length };
+    }
+
+    document.getElementById("btn-run").addEventListener("click", async function () {
+      stopped = false;
+      var root = document.getElementById("root");
+      root.innerHTML = "";
+      var summary = { ok: 0, bad: 0, totalIssues: 0 };
+      var allIssues = [];
+
+      push("info", "/_audit.html", "Audit started, " + PAGES.length + " pages");
+      for (var i = 0; i < PAGES.length; i++) {
+        if (stopped) break;
+        var page = PAGES[i];
+        document.getElementById("bar").style.width = ((i / PAGES.length) * 100) + "%";
+        log("(" + (i + 1) + "/" + PAGES.length + ") " + page);
+        var r = await audit(page);
+        var div = document.createElement("div");
+        div.className = "row" + (r.issues.length ? " err" : "");
+        var html = "<div class=\"flex-between\"><strong>" + page + "</strong>";
+        html += r.issues.length
+          ? "<span class=\"pill fail\">" + r.issues.length + " issue(s)</span>"
+          : "<span class=\"pill ok\">clean</span>";
+        html += "</div>";
+        html += "<div class=\"caption\">ids: " + (r.ids || 0) + " · buttons: " + (r.btns || 0) + " · scripts: " + (r.scripts || 0) + "</div>";
+        if (r.issues.length) {
+          html += "<ul class=\"err-list\">";
+          r.issues.forEach(function (it) {
+            html += "<li><strong>" + it.kind + "</strong>: " + escapeHtml(it.msg) + "</li>";
+            allIssues.push({ page: page, kind: it.kind, msg: it.msg });
+          });
+          html += "</ul>";
+        }
+        div.innerHTML = html;
+        root.appendChild(div);
+        if (r.issues.length) summary.bad++; else summary.ok++;
+        summary.totalIssues += r.issues.length;
+      }
+      document.getElementById("bar").style.width = "100%";
+      log("Done. " + summary.ok + " clean, " + summary.bad + " with issues (" + summary.totalIssues + " total).");
+
+      // Push summary into console log
+      push("info", "/_audit.html", "Audit complete", summary);
+
+      // Also dump JSON
+      var blob = new Blob([JSON.stringify({ summary: summary, issues: allIssues, pages: PAGES.length }, null, 2)], { type: "application/json" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "vendo-audit.json";
+      a.textContent = "Download audit JSON";
+      a.className = "pill";
+      a.style.marginLeft = "12px";
+      document.getElementById("status").appendChild(a);
+    });
+
+    function escapeHtml(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Customer Profile · Vendo</title>
   <script src="../../src/js/theme.js"></script>
+  <script src="../../src/js/vendoLogger.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +15,8 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="store-nav">
     <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
-      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">`r`n      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
+      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px" onerror="this.style.display='none'">
+      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto" onerror="this.style.display='none';this.insertAdjacentText('afterend','Vendo')">
     </a>
     <div id="store-nav-actions" class="flex gap-1" style="margin-left:auto"></div>
   </header>
@@ -22,15 +24,15 @@
   <main id="main" class="container page-pad" style="max-width:720px">
     <!-- User Avatar & Header -->
     <div class="card mb-6" style="padding:24px;display:flex;align-items:center;gap:20px">
-      <div class="avatar" style="width:68px;height:68px;font-size:24px;background:var(--color-brand-soft);color:var(--color-brand)">
-        AR
+      <div class="avatar" id="prof-avatar" style="width:68px;height:68px;font-size:24px;background:var(--color-brand-soft);color:var(--color-brand)">
+        ?
       </div>
       <div style="flex:1">
-        <h1 class="h2" style="margin-bottom:2px">Amina Rahman</h1>
-        <div class="caption secondary">Verified Buyer · amina.r@example.com · +880 1712 345678</div>
+        <h1 class="h2" id="prof-display-name" style="margin-bottom:2px">Welcome</h1>
+        <div class="caption secondary" id="prof-display-meta">Loading your account…</div>
         <div class="flex gap-2 mt-2">
           <span class="badge badge-success"><i data-lucide="shield-check" style="width:12px;height:12px"></i> Buyer Protected</span>
-          <span class="badge">4 Orders Placed</span>
+          <span class="badge" id="prof-order-count">New customer</span>
         </div>
       </div>
     </div>
@@ -49,16 +51,16 @@
       <div class="form-row" style="grid-template-columns:1fr 1fr">
         <div>
           <label class="label" for="prof-name">Full Name</label>
-          <input class="field" id="prof-name" value="Amina Rahman">
+          <input class="field" id="prof-name" value="" placeholder="Your name">
         </div>
         <div>
           <label class="label" for="prof-email">Email Address</label>
-          <input class="field" id="prof-email" value="amina.r@example.com">
+          <input class="field" id="prof-email" value="" placeholder="name@email.com">
         </div>
       </div>
       <div>
         <label class="label" for="prof-phone">Phone Number</label>
-        <input class="field" id="prof-phone" value="+880 1712 345678">
+        <input class="field" id="prof-phone" value="" placeholder="+880 1XXX XXXXXX">
       </div>
       <div class="flex gap-3 mt-2">
         <button class="btn btn-cta" type="button" id="btn-save-profile">Save Changes</button>
@@ -77,10 +79,8 @@
           <strong>Default Home Address</strong>
           <span class="badge badge-success">Default</span>
         </div>
-        <div class="secondary" style="font-size:14px;line-height:20px">
-          House 42, Road 11, Banani<br>
-          Dhaka 1213, Bangladesh<br>
-          Phone: +880 1712 345678
+        <div class="secondary" id="prof-default-address" style="font-size:14px;line-height:20px">
+          <span class="secondary">No default address saved yet. Add one in the form above.</span>
         </div>
       </div>
     </section>
@@ -143,6 +143,7 @@
   <script src="../../src/js/data.js"></script>
   <script src="../../src/js/layout.js"></script>
   <script src="../../src/js/chat.js"></script>
+  <script src="../../src/js/auth.js"></script>
   <script>
     VendoLayout.mountCustomer();
     VendoChat.mount();
@@ -160,8 +161,42 @@
     });
 
     document.getElementById("btn-save-profile").addEventListener("click", function () {
+      var patch = {
+        name: document.getElementById("prof-name").value.trim(),
+        email: document.getElementById("prof-email").value.trim(),
+        phone: document.getElementById("prof-phone").value.trim()
+      };
+      VendoAuth.updateProfile(patch);
+      paintProfile();
       VendoUI.toast({ title: "Profile Updated", desc: "Your customer details have been saved.", type: "success" });
     });
+
+    // Populate fields from the currently logged-in user.
+    // VendoAuth persists user data on login/register, so a freshly
+    // created account sees its own info instead of the demo placeholder.
+    function paintProfile() {
+      var u = VendoAuth.getUser();
+      var avatar = document.getElementById("prof-avatar");
+      var nameEl = document.getElementById("prof-display-name");
+      var metaEl = document.getElementById("prof-display-meta");
+      var orderEl = document.getElementById("prof-order-count");
+      var nameField = document.getElementById("prof-name");
+      var emailField = document.getElementById("prof-email");
+      var phoneField = document.getElementById("prof-phone");
+
+      var displayName = u.name || (u.email ? u.email.split("@")[0] : "Welcome");
+      avatar.textContent = VendoAuth.initials(displayName);
+      nameEl.textContent = displayName;
+      metaEl.textContent = [u.email, u.phone, u.role].filter(Boolean).join(" - ");
+      orderEl.textContent = (u.orderCount && u.orderCount > 0)
+        ? (u.orderCount + " Orders Placed")
+        : "New customer";
+
+      if (u.name && !nameField.value) nameField.value = u.name;
+      if (u.email && !emailField.value) emailField.value = u.email;
+      if (u.phone && !phoneField.value) phoneField.value = u.phone;
+    }
+    paintProfile();
 
     document.getElementById("prof-theme-toggle").addEventListener("click", function () {
       VendoTheme.toggle();

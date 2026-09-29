@@ -44,6 +44,16 @@
     .live-chat-msg.is-host strong {
       color: #5eead4;
     }
+    
+    /* Animation for simulated video effect */
+    @keyframes panZoom {
+      0% { transform: scale(1.0) translate(0, 0); }
+      50% { transform: scale(1.15) translate(-2%, 2%); }
+      100% { transform: scale(1.0) translate(0, 0); }
+    }
+    .reel-video {
+      animation: panZoom 15s ease-in-out infinite alternate;
+    }
   </style>
 </head>
 <body style="background:#0a0908;overflow:hidden">

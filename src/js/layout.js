@@ -52,14 +52,51 @@ window.VendoLayout = (function () {
 
     var tools = document.getElementById("topbar-tools");
     if (tools) {
+      tools.style.marginLeft = "auto";
+      tools.style.display = "flex";
+      tools.style.alignItems = "center";
+      tools.style.gap = "var(--space-2)";
       var isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      var initials = (role === "admin" ? "AD" : "VN");
+      var displayName = "Admin Demo";
+      try {
+        if (window.VendoAuth && VendoAuth.getUser) {
+          var u = VendoAuth.getUser();
+          if (u && (u.full_name || u.name || u.email)) {
+            displayName = u.full_name || u.name || u.email.split("@")[0];
+            if (u.full_name || u.name) {
+              var parts = String(u.full_name || u.name).trim().split(/\s+/);
+              initials = (parts[0] ? parts[0][0] : "") + (parts[1] ? parts[1][0] : "");
+              initials = initials.toUpperCase() || initials;
+            }
+          }
+        }
+      } catch (e) {}
       tools.innerHTML =
         '<button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle color theme" title="Toggle dark mode"><i data-lucide="' + (isDark ? "sun" : "moon") + '"></i></button>' +
         '<button class="icon-btn" style="position:relative" type="button" aria-label="Notifications" id="btn-bell" title="Notifications">' +
           '<i data-lucide="bell"></i>' +
           '<span class="unread-dot" style="position:absolute;top:10px;right:10px"></span>' +
         '</button>' +
-        '<a href="settings.html" class="avatar" style="text-decoration:none;color:inherit;font-size:13px" title="Settings">' + (role === "admin" ? "AD" : "VN") + '</a>';
+        '<div class="user-menu" id="user-menu">' +
+          '<button class="user-menu-trigger" id="user-menu-trigger" type="button" aria-haspopup="menu" aria-expanded="false" title="' + displayName + '">' +
+            '<span class="avatar" style="font-size:13px;width:40px;height:40px">' + initials + '</span>' +
+            '<span class="user-menu-caret"><i data-lucide="chevron-down"></i></span>' +
+          '</button>' +
+          '<div class="user-menu-pop" id="user-menu-pop" role="menu" hidden>' +
+            '<div class="user-menu-head">' +
+              '<div class="user-menu-name">' + displayName + '</div>' +
+              '<div class="user-menu-role">' + (role === "admin" ? "Administrator" : "Vendor") + '</div>' +
+            '</div>' +
+            '<a class="user-menu-item" role="menuitem" href="settings.html"><i data-lucide="user"></i> My Profile</a>' +
+            '<a class="user-menu-item" role="menuitem" href="settings.html#pane-account"><i data-lucide="settings"></i> Settings</a>' +
+            (role === "admin"
+              ? '<a class="user-menu-item" role="menuitem" href="vendors.html"><i data-lucide="store"></i> Vendors</a>'
+              : '<a class="user-menu-item" role="menuitem" href="products.html"><i data-lucide="package"></i> My Products</a>') +
+            '<div class="user-menu-sep"></div>' +
+            '<button class="user-menu-item user-menu-danger" id="user-menu-signout" role="menuitem" type="button"><i data-lucide="log-out"></i> Sign out</button>' +
+          '</div>' +
+        '</div>';
     }
 
     var toggle = document.getElementById("theme-toggle");
@@ -81,6 +118,53 @@ window.VendoLayout = (function () {
         }
       });
     }
+
+    // ---- User menu dropdown ----
+    var trigger = document.getElementById("user-menu-trigger");
+    var pop = document.getElementById("user-menu-pop");
+    function closeUserMenu() {
+      if (!pop || !trigger) return;
+      pop.hidden = true;
+      trigger.setAttribute("aria-expanded", "false");
+    }
+    function toggleUserMenu() {
+      if (!pop || !trigger) return;
+      var open = !pop.hidden;
+if (trigger) trigger.addEventListener("click", function (e) { e.stopPropagation(); toggleUserMenu(); });
+    if (pop) {
+      pop.addEventListener("click", function (e) {
+        var t = e.target.closest("a, button");
+        if (t && pop.contains(t)) closeUserMenu();
+      });
+    }
+      if (open) closeUserMenu();
+      else {
+        pop.hidden = false;
+        trigger.setAttribute("aria-expanded", "true");
+        if (window.lucide) window.lucide.createIcons();
+      }
+    }
+    if (trigger) trigger.addEventListener("click", function (e) { e.stopPropagation(); toggleUserMenu(); });
+    document.addEventListener("click", function (e) {
+      if (!pop || pop.hidden) return;
+      if (e.target === trigger || (trigger && trigger.contains(e.target))) return;
+      if (!pop.contains(e.target)) closeUserMenu();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeUserMenu();
+    });
+    var signout = document.getElementById("user-menu-signout");
+// Defensive cleanup: remove orphan modal scrim/modal boxes left from a prior page
+    document.querySelectorAll(".scrim").forEach(function (n) { n.remove(); });
+    document.querySelectorAll(".modal").forEach(function (n) { n.remove(); });
+
+    var burger = document.getElementById("nav-toggle");
+    if (signout) signout.addEventListener("click", function () {
+      try { if (window.VendoAuth && VendoAuth.signOut) VendoAuth.signOut(); } catch (e) {}
+      closeUserMenu();
+      if (window.VendoUI) window.VendoUI.toast({ title: "Signed out", desc: "You have been signed out safely.", type: "info" });
+      setTimeout(function () { location.href = role === "admin" ? "../login.html" : "../customer/login.html"; }, 600);
+    });
 
     var burger = document.getElementById("nav-toggle");
     if (burger && aside) {

@@ -46,24 +46,40 @@
   </div>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../../src/js/data.js"></script>
+<script src="../../src/js/store.js"></script>
   <script src="../../src/js/layout.js"></script>
   <script>
-    VendoLayout.mountDashboard("admin");
-    var map = { approved: "success", pending: "warning", suspended: "danger" };
+var map = { approved: "success", pending: "warning", suspended: "danger", "docs-requested": "warning", rejected: "danger" };
     var f = "all";
-    function render() {
-      var list = VendoData.vendors.filter(function (v) { return f === "all" || v.kyc === f; });
+    function mergeVendor(v) {
+      var patch = VendoStore.getVendor(v.id);
+      return patch ? Object.assign({}, v, patch) : v;
+    }
+function render() {
+      // Mount admin chrome (was missing — caused blackout)
+VendoLayout.mountDashboard("admin");
+// Defensive cleanup of orphan modal scrims
+try { document.querySelectorAll(".scrim").forEach(function (n) { n.remove(); }); document.querySelectorAll(".modal").forEach(function (n) { n.remove(); }); } catch (e) {}
+// Force a fresh read from localStorage so we don't render a stale vendor list
+try { if (window.VendoStore && VendoStore.forceReload) VendoStore.forceReload(); } catch (e) {}
+// (mount + cleanup hoisted to before render())
+var list = VendoStore.listVendors().filter(function (v) { return f === "all" || v.kyc === f; });
       document.getElementById("rows").innerHTML = list.map(function (v) {
-        return "<tr><td>" + v.name + "</td><td><span class='badge badge-" + map[v.kyc] + "'>" + v.kyc + "</span></td><td>" + v.joined + "</td><td><a class='btn btn-sm' href='vendor-detail.html'>Review</a></td></tr>";
+        var cls = map[v.kyc] || "warning";
+        var joined = v.joined || (v.kycSubmittedAt ? v.kycSubmittedAt.slice(0, 10) : "—");
+        return "<tr><td>" + v.name + "</td><td><span class='badge badge-" + cls + "'>" + (v.kyc || "pending") + "</span></td><td>" + joined + "</td><td><a class='btn btn-sm' href='vendor-detail.html?id=" + v.id + "'>Review</a></td></tr>";
       }).join("");
     }
-    document.getElementById("filters").addEventListener("click", function (e) {
+document.getElementById("filters").addEventListener("click", function (e) {
       if (!e.target.dataset.f) return;
       f = e.target.dataset.f;
       document.querySelectorAll("#filters .pill").forEach(function (p) { p.classList.toggle("is-active", p.dataset.f === f); });
       render();
     });
     render();
+
+    // Re-render when admin/vendor-detail.html mutates the store
+    VendoStore.subscribe(function () { render(); });
   </script>
 </body>
 

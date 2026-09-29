@@ -132,6 +132,7 @@
             '<td style="text-align:right">' +
               '<div class="flex gap-1" style="justify-content:flex-end">' +
                 '<a class="icon-btn" href="../customer/product.html?id=' + p.id + '" target="_blank" title="View PDP" style="width:32px;height:32px"><i data-lucide="external-link" style="width:14px;height:14px"></i></a>' +
+                '<button class="icon-btn btn-edit-prod" data-id="' + p.id + '" title="Edit product" style="width:32px;height:32px;color:var(--color-brand)"><i data-lucide="edit-3" style="width:14px;height:14px"></i></button>' +
                 '<button class="icon-btn btn-delete-prod" data-id="' + p.id + '" title="Delete product" style="width:32px;height:32px;color:var(--color-danger)"><i data-lucide="trash-2" style="width:14px;height:14px"></i></button>' +
               '</div>' +
             '</td>' +
@@ -159,7 +160,7 @@
       renderTable();
     });
 
-    // Quick Stock addition & delete delegation
+    // Quick Stock, Edit, & Delete delegation
     document.getElementById("products-tbody").addEventListener("click", function (e) {
       var plusBtn = e.target.closest(".btn-stock-plus");
       if (plusBtn) {
@@ -168,8 +169,41 @@
         if (p) {
           p.stock = (p.stock || 0) + 5;
           p.inStock = true;
+          if (window.VendoData.save) window.VendoData.save();
           VendoUI.toast({ title: "Stock Updated", desc: p.name + " inventory increased to " + p.stock + " units.", type: "success" });
           renderTable();
+        }
+        return;
+      }
+
+      var editBtn = e.target.closest(".btn-edit-prod");
+      if (editBtn) {
+        var id = editBtn.dataset.id;
+        var p = window.VendoData.products.find(function (x) { return x.id === id; });
+        if (p) {
+          VendoUI.modal({
+            title: "Edit Product · " + p.name,
+            htmlBody:
+              '<div class="stack gap-3">' +
+                '<div><label class="label">Product Title *</label><input class="field" id="edit-prod-name" value="' + p.name + '" required></div>' +
+                '<div class="form-row" style="grid-template-columns:1fr 1fr">' +
+                  '<div><label class="label">Category *</label><input class="field" id="edit-prod-cat" value="' + p.cat + '" required></div>' +
+                  '<div><label class="label">Price ($ USD) *</label><input class="field mono" type="number" id="edit-prod-price" value="' + p.price + '" step="0.5" required></div>' +
+                '</div>' +
+                '<div><label class="label">Stock Units *</label><input class="field mono" type="number" id="edit-prod-stock" value="' + p.stock + '" required></div>' +
+              '</div>',
+            ok: "Save Changes",
+            onOk: function (modalBox) {
+              p.name = modalBox.querySelector("#edit-prod-name").value.trim() || p.name;
+              p.cat = modalBox.querySelector("#edit-prod-cat").value.trim() || p.cat;
+              p.price = parseFloat(modalBox.querySelector("#edit-prod-price").value) || p.price;
+              p.stock = parseInt(modalBox.querySelector("#edit-prod-stock").value, 10) || 0;
+              p.inStock = p.stock > 0;
+              if (window.VendoData.save) window.VendoData.save();
+              VendoUI.toast({ title: "Product Updated", desc: p.name + " has been updated.", type: "success" });
+              renderTable();
+            }
+          });
         }
         return;
       }
@@ -185,6 +219,7 @@
           ok: "Delete SKU",
           onOk: function () {
             window.VendoData.products = window.VendoData.products.filter(function (x) { return x.id !== id; });
+            if (window.VendoData.save) window.VendoData.save();
             VendoUI.toast({ title: "Product Deleted", type: "info" });
             renderTable();
           }
@@ -205,7 +240,11 @@
             '</div>' +
             '<div class="form-row" style="grid-template-columns:1fr 1fr">' +
               '<div><label class="label">Initial Stock Units *</label><input class="field mono" type="number" id="new-prod-stock" value="20" required></div>' +
-              '<div><label class="label">Image URL</label><input class="field" id="new-prod-img" value="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80&auto=format"></div>' +
+              '<div><label class="label">Product Image</label>' +
+                '<input type="file" id="new-prod-file" accept="image/*" style="margin-bottom:8px;font-size:12px;width:100%">' +
+                '<div style="text-align:center;font-size:12px;margin-bottom:8px">OR</div>' +
+                '<input class="field" id="new-prod-img" placeholder="Paste Image URL" value="https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80&auto=format">' +
+              '</div>' +
             '</div>' +
             '<div><label class="label">Short Description</label><textarea class="field" id="new-prod-desc" rows="2" placeholder="Handcrafted with local clay, food-grade glaze…"></textarea></div>' +
           '</div>',
@@ -215,39 +254,81 @@
           var cat = modalBox.querySelector("#new-prod-cat").value;
           var price = parseFloat(modalBox.querySelector("#new-prod-price").value) || 35.00;
           var stock = parseInt(modalBox.querySelector("#new-prod-stock").value, 10) || 20;
-          var img = modalBox.querySelector("#new-prod-img").value.trim() || "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80&auto=format";
           var desc = modalBox.querySelector("#new-prod-desc").value.trim() || "Artisan handcrafted piece.";
-
-          if (!name) {
-            VendoUI.toast({ title: "Title required", type: "warning" });
-            return;
-          }
-
-          var newId = "p" + (window.VendoData.products.length + 1);
-          var newProd = {
-            id: newId,
-            name: name,
-            vendor: "Atelier North",
-            vendorId: "v1",
-            price: price,
-            rating: 5.0,
-            reviewsCount: 1,
-            cat: cat,
-            stock: stock,
-            inStock: true,
-            img: img,
-            gallery: [img],
-            description: desc,
-            specs: { Origin: "Artisan Studio", Care: "Gentle handle" }
+          
+          var fileInput = modalBox.querySelector("#new-prod-file");
+          var urlInput = modalBox.querySelector("#new-prod-img").value.trim() || "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=800&q=80&auto=format";
+          
+          var processImage = function(finalImgUrl) {
+            if (!name) {
+              VendoUI.toast({ title: "Title required", type: "warning" });
+              return;
+            }
+            var newId = "p" + (window.VendoData.products.length + 1);
+            var newProd = {
+              id: newId,
+              name: name,
+              vendor: "Atelier North",
+              vendorId: "v1",
+              price: price,
+              rating: 5.0,
+              reviewsCount: 1,
+              cat: cat,
+              stock: stock,
+              inStock: true,
+              img: finalImgUrl,
+              gallery: [finalImgUrl],
+              description: desc,
+              specs: { Origin: "Artisan Studio", Care: "Gentle handle" }
+            };
+            window.VendoData.products.unshift(newProd);
+            if (window.VendoData.save) window.VendoData.save();
+            VendoUI.toast({
+              title: "Product Published!",
+              desc: name + " is now live and taggable in reels and broadcasts.",
+              type: "success"
+            });
+            renderTable();
           };
 
-          window.VendoData.products.unshift(newProd);
-          VendoUI.toast({
-            title: "Product Published!",
-            desc: name + " is now live and taggable in reels and broadcasts.",
-            type: "success"
-          });
-          renderTable();
+          if (fileInput && fileInput.files && fileInput.files[0]) {
+            var file = fileInput.files[0];
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              var imgObj = new Image();
+              imgObj.onload = function() {
+                var canvas = document.createElement("canvas");
+                var ctx = canvas.getContext("2d");
+                var MAX_WIDTH = 600;
+                var MAX_HEIGHT = 600;
+                var width = imgObj.width;
+                var height = imgObj.height;
+
+                if (width > height) {
+                  if (width > MAX_WIDTH) {
+                    height *= MAX_WIDTH / width;
+                    width = MAX_WIDTH;
+                  }
+                } else {
+                  if (height > MAX_HEIGHT) {
+                    width *= MAX_HEIGHT / height;
+                    height = MAX_HEIGHT;
+                  }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(imgObj, 0, 0, width, height);
+                var compressedDataUrl = canvas.toDataURL("image/jpeg", 0.7);
+                processImage(compressedDataUrl);
+              };
+              imgObj.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          } else {
+            processImage(urlInput);
+          }
+
+
         }
       });
     });

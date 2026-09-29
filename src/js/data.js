@@ -655,8 +655,71 @@ window.VendoDefaultData = {
 
 // Initialize State in window.VendoData
 window.VendoData = (function () {
+  var KEY = "vendo_global_store";
   var data = window.VendoDefaultData;
+  try {
+    var stored = localStorage.getItem(KEY);
+    if (stored) {
+      data = JSON.parse(stored);
+    }
+  } catch(e) {}
+  
+  data.save = function() {
+    var clone = Object.assign({}, this);
+    delete clone.save;
+    try { localStorage.setItem(KEY, JSON.stringify(clone)); } catch(e) {}
+  };
   return data;
+})();
+// Per-user notifications store. Static demo notifications are shown only
+// for new anonymous visitors (to demonstrate the UI shape); as soon as
+// the user signs up / signs in we drop the demo feed so they see an
+// empty inbox instead of someone else's activity.
+window.VendoNotifications = (function () {
+  var KEY = "vendo_notifications_v2";
+
+  function ownerKey() {
+    try {
+      var auth = window.VendoAuth && VendoAuth.getUser && VendoAuth.getUser();
+      if (auth && (auth.email || auth.phone)) return auth.email || auth.phone;
+    } catch (e) {}
+    return null;
+  }
+
+  function scopedKey() {
+    var o = ownerKey();
+    return o ? (KEY + ":" + o) : KEY + ":__demo__";
+  }
+
+  function all() {
+    var o = ownerKey();
+    if (!o) {
+      // Anonymous visitor: show static demo notifications so the page is not empty.
+      return (window.VendoData && window.VendoData.notifications) || [];
+    }
+    try {
+      var raw = localStorage.getItem(scopedKey());
+      if (raw) {
+        var saved = JSON.parse(raw);
+        if (Array.isArray(saved)) return saved;
+      }
+    } catch (e) {}
+    return [];
+  }
+
+  function push(notif) {
+    var list = all();
+    list.unshift(Object.assign({ time: "Just now", group: "Today" }, notif || {}));
+    try { localStorage.setItem(scopedKey(), JSON.stringify(list.slice(0, 50))); } catch (e) {}
+  }
+
+  function markRead(id) {
+    var list = all();
+    list.forEach(function (n) { if (n.id === id) n.read = true; });
+    try { localStorage.setItem(scopedKey(), JSON.stringify(list)); } catch (e) {}
+  }
+
+  return { all: all, push: push, markRead: markRead };
 })();
 
 // Reactive Persistent Stores: Cart, Wishlist, Orders, Products, KYC
@@ -756,7 +819,7 @@ window.VendoCart = (function () {
   }
 
   function tax() {
-    var sub = subtotal() - discount();
+    var sub = Math.max(0, subtotal() - discount());
     return Math.round(sub * 0.075 * 100) / 100; // 7.5% Tax
   }
 
@@ -844,12 +907,32 @@ window.VendoWish = (function () {
 window.VendoOrders = (function () {
   var KEY = "vendo_orders_v2";
 
+function ownerKey() {
+    try {
+      var auth = window.VendoAuth && VendoAuth.getUser && VendoAuth.getUser();
+      if (auth && (auth.email || auth.phone || auth.name)) {
+        return auth.email || auth.phone || ("name:" + auth.name);
+      }
+      var anon = localStorage.getItem("vendo_anon_id");
+      if (anon) return anon;
+      anon = "anon-" + Math.random().toString(36).slice(2, 10);
+      localStorage.setItem("vendo_anon_id", anon);
+      return anon;
+    } catch (e) {
+      return "anon-static";
+    }
+  }
+
+  function scopedKey() {
+    return KEY + ":" + ownerKey();
+  }
+
   function all() {
     try {
-      var saved = JSON.parse(localStorage.getItem(KEY));
+      var saved = JSON.parse(localStorage.getItem(scopedKey()) || "[]");
       if (saved && Array.isArray(saved) && saved.length > 0) return saved;
     } catch (e) {}
-    return window.VendoData.orders;
+    return [];
   }
 
   function get(id) {
@@ -875,7 +958,7 @@ window.VendoOrders = (function () {
     }, orderPayload);
 
     list.unshift(newOrder);
-    localStorage.setItem(KEY, JSON.stringify(list));
+    try { localStorage.setItem(scopedKey(), JSON.stringify(list)); } catch (e) {}
     return newOrder;
   }
 
@@ -884,7 +967,7 @@ window.VendoOrders = (function () {
     var found = list.find(function (o) { return o.id === id; });
     if (found) {
       found.status = newStatus;
-      localStorage.setItem(KEY, JSON.stringify(list));
+      try { localStorage.setItem(scopedKey(), JSON.stringify(list)); } catch (e) {}
     }
   }
 

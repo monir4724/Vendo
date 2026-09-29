@@ -66,6 +66,7 @@
     </form>
   </main>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../../src/js/store.js"></script>
   <script src="../../src/js/ui.js"></script>
   <script>
     var step = 0;
@@ -87,11 +88,45 @@
       localStorage.setItem("vendo-kyc-draft", JSON.stringify({ step: step, bn: document.getElementById("bn").value }));
       VendoUI.toast({ title: "Draft saved", type: "info" });
     });
+// Resolve vendor id: prefer logged-in user id/email; stable hash id, else "v_new"
+    function deriveVendorId(user) {
+      if (!user) return "v_new";
+      if (user.id && /[a-z0-9]/i.test(user.id)) return "v_" + String(user.id).replace(/[^a-z0-9]/gi, "").slice(-12);
+      var seed = (user.email || user.phone || user.name || "anon").toLowerCase().trim();
+      if (!seed) return "v_new";
+      var h = 5381;
+      for (var i = 0; i < seed.length; i++) h = ((h << 5) + h) + seed.charCodeAt(i);
+      return "v_" + ("00000000" + (h >>> 0).toString(16)).slice(-8);
+    }
+    var _vUser = (window.VendoAuth && VendoAuth.getUser && VendoAuth.getUser()) || null;
+    var _vId = deriveVendorId(_vUser);
+    function submitVendorKyc() {
+      var bn = (document.getElementById("bn") && document.getElementById("bn").value) || "";
+      // brand-new vendor record so admin/vendor list can see it
+      VendoStore.registerVendor({
+        id: _vId,
+        name: bn || (_vUser && (_vUser.name || _vUser.email)) || "New Vendor",
+        email: _vUser && _vUser.email,
+        phone: _vUser && _vUser.phone,
+        category: "Pending setup",
+        location: "Bangladesh",
+        joined: new Date().toISOString().slice(0, 10),
+        kyc: "pending",
+        kycSubmittedAt: new Date().toISOString(),
+        businessName: bn
+      });
+      // also drop the kyc patch for safety
+      VendoStore.updateVendor(_vId, {
+        kyc: "pending",
+        kycSubmittedAt: new Date().toISOString(),
+        businessName: bn
+      });
+    }
     document.getElementById("form").addEventListener("submit", function (e) {
       e.preventDefault();
       if (step < 3) {
         step += 1;
-        if (step === 3) localStorage.setItem("vendo-kyc", "pending");
+        if (step === 3) { localStorage.setItem("vendo-kyc", "pending"); submitVendorKyc(); }
         paint();
       }
     });

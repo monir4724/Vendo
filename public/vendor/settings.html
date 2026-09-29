@@ -136,7 +136,7 @@
               </div>
               <div>
                 <label class="label">KYC Verification Status</label>
-                <div class="mt-2"><span class="badge badge-success">✓ Verified by Vendo Compliance</span></div>
+                <div class="mt-2" id="vendor-kyc-status"><span class="badge badge-warning">Loading status…</span></div>
               </div>
             </div>
 
@@ -164,6 +164,7 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../../src/js/ui.js"></script>
   <script src="../../src/js/layout.js"></script>
+<script src="../../src/js/store.js"></script>
   <script>
     VendoLayout.mountDashboard("vendor");
 
@@ -196,8 +197,27 @@
       var name = document.getElementById("store-name").value;
       VendoUI.toast("Store Settings Saved", "Public storefront for '" + name + "' updated successfully.", "success");
     });
+// KYC status badge driven by VendoStore (mirrors admin/vendor-detail.html decisions)
+    (function () {
+      function paintKyc() {
+        var el = document.getElementById("vendor-kyc-status");
+        if (!el || !window.VendoStore) return;
+        var u = (window.VendoAuth && VendoAuth.getUser && VendoAuth.getUser()) || null;
+        var vid = (u && u.id) || "v_new";
+        var s = VendoStore.getState();
+        var patch = (s && s.vendors && s.vendors[vid]) || null;
+        var kyc = (patch && patch.kyc) || (window.localStorage.getItem("vendo-kyc") || "pending");
+        var cls, text;
+        if (kyc === "approved") { cls = "badge badge-success"; text = "Verified by Vendo Compliance"; }
+        else if (kyc === "suspended" || kyc === "rejected") { cls = "badge badge-danger"; text = "KYC Suspended"; }
+        else if (kyc === "docs-requested") { cls = "badge badge-warning"; text = "Documents Re-Requested"; }
+        else { cls = "badge badge-warning"; text = "Pending Review (24–48h)"; }
+        el.innerHTML = "<span class=\"" + cls + "\">" + text + "</span>";
+      }
+      paintKyc();
+      if (window.VendoStore && VendoStore.subscribe) VendoStore.subscribe(paintKyc);
+    })();
 
     lucide.createIcons();
-  </script>
 </body>
 </html>

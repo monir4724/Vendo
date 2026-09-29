@@ -14,7 +14,8 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="store-nav">
     <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
-      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">`r`n      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
+      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">
+      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
     </a>
     <form class="search" id="header-search-form" action="search.html" style="max-width:600px">
       <i data-lucide="search"></i>
@@ -74,6 +75,7 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../../src/js/ui.js"></script>
   <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/store.js"></script>
   <script src="../../src/js/layout.js"></script>
   <script src="../../src/js/chat.js"></script>
   <script>
@@ -114,7 +116,8 @@
                (p.tags && p.tags.some(function (t) { return t.toLowerCase().indexOf(q) !== -1; }));
       });
 
-      var vendors = (window.VendoData.vendors || []).filter(function (v) {
+      var allVendors = (window.VendoStore && VendoStore.listVendors) ? VendoStore.listVendors() : (window.VendoData.vendors || []);
+      var vendors = allVendors.filter(function (v) {
         if (!q) return true;
         return v.name.toLowerCase().indexOf(q) !== -1 ||
                (v.category && v.category.toLowerCase().indexOf(q) !== -1) ||
@@ -146,7 +149,7 @@
               '<div style="flex:1">' +
                 '<strong style="font-size:15px;display:block">' + v.name + '</strong>' +
                 '<span class="caption secondary">' + (v.category || "Artisan Studio") + '</span>' +
-                '<div class="caption mt-1" style="color:var(--color-brand)">★ ' + (v.rating || "4.8") + ' · ' + (v.followersCount || "10k") + ' followers</div>' +
+                '<div class="caption mt-1" style="color:var(--color-brand)">' + (v.rating || "4.8") + ' · ' + (v.followersCount || "10k") + ' followers</div>' +
               '</div>' +
             '</a>'
           );

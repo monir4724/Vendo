@@ -7,6 +7,7 @@
   <title>Sign In & Register · Vendo</title>
   <link rel="icon" type="image/jpeg" href="../assets/icon.jpg">
   <script src="../../src/js/theme.js"></script>
+  <script src="../../src/js/vendoLogger.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -276,11 +277,7 @@
             </button>
           </div>
 
-          <!-- Notice: No Admin Option -->
-          <div class="caption" style="color:var(--color-text-muted);font-size:11px;margin-bottom:14px;background:var(--color-bg-subtle);padding:6px 10px;border-radius:4px">
-            <strong>Note:</strong> Admin accounts are pre-provisioned securely and do not require registration.
-          </div>
-
+          
           <form id="form-register" class="stack gap-3">
             <input type="hidden" id="register-role" value="customer">
 
@@ -323,7 +320,10 @@
   </main>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../../src/js/supabaseClient.js"></script>
   <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/auth.js"></script>
   <script>
     if (window.lucide) lucide.createIcons();
 
@@ -392,38 +392,79 @@
       btn.innerHTML = '<span class="spin"></span> Authenticating...';
 
       setTimeout(() => {
-        // 1. ADMIN LOGIN: Direct verification and redirect to Admin Dashboard
-        if (identifier === "admin@vendo.app" || identifier === "security.admin@vendo.app" || identifier.includes("admin")) {
-          if (password === "Admin@Vendo2026!" || password.length >= 6) {
-            sessionStorage.setItem("vendo_role", "admin");
-            sessionStorage.setItem("vendo_user", identifier);
-            if (window.VendoUI) VendoUI.toast({ title: "Admin Authenticated", desc: "Redirecting to Admin Control...", type: "success" });
-            window.location.href = "../admin/dashboard.html";
-            return;
-          } else {
-            errorBox.textContent = "Invalid Admin credentials. Please verify your password.";
-            errorBox.style.display = "block";
-            btn.disabled = false;
-            btn.innerHTML = "<span>Sign In</span>";
-            return;
-          }
+        function persistAndRedirect(role, id, name, email) {
+          sessionStorage.setItem("vendo_role", role);
+          sessionStorage.setItem("vendo_user", id);
+          if (window.VendoAuth) VendoAuth.setUser({ role: role, name: name || "", email: email || id, phone: "" });
+          if (role === "admin") window.location.href = "../admin/dashboard.html";
+          else if (role === "vendor") window.location.href = "../vendor/dashboard.html";
+          else window.location.href = "home.html";
         }
+        function showError(msg) {
+          errorBox.textContent = msg;
+          errorBox.style.display = "block";
+          btn.disabled = false;
+          btn.innerHTML = "<span>Sign In</span>";
+        }
+        function isValidEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+        function isValidPhone(s) { return /^\+?[0-9]{8,15}$/.test(s.replace(/[\s-]/g, "")); }
 
-        // 2. VENDOR LOGIN: Redirect to Vendor Studio
-        if (identifier === "vendor@vendo.app" || identifier.includes("vendor") || identifier.includes("artisan") || identifier.includes("studio")) {
-          sessionStorage.setItem("vendo_role", "vendor");
-          sessionStorage.setItem("vendo_user", identifier);
-          if (window.VendoUI) VendoUI.toast({ title: "Vendor Studio", desc: "Welcome back to your studio!", type: "success" });
-          window.location.href = "../vendor/dashboard.html";
+        // --- Strict client-side validation (server still enforces) ---
+        if (!identifier) { showError("Please enter your email or phone number."); return; }
+        if (!password || password.length < 6) { showError("Password must be at least 6 characters."); return; }
+
+        var isEmail = isValidEmail(identifier);
+        var isPhone = !isEmail && isValidPhone(identifier);
+        if (!isEmail && !isPhone) {
+          showError("Please enter a valid email address or phone number.");
           return;
         }
 
-        // 3. CUSTOMER LOGIN (Default): Redirect to Customer Storefront
-        sessionStorage.setItem("vendo_role", "customer");
-        sessionStorage.setItem("vendo_user", identifier);
-        if (window.VendoUI) VendoUI.toast({ title: "Welcome to Vendo", desc: "Happy live shopping!", type: "success" });
-        window.location.href = "home.html";
-      }, 500);
+        // --- Admin login (allowlist only) ---
+        var ADMIN_EMAILS = ["admin@vendo.app", "security.admin@vendo.app", "admin@gmail.com", "monir@gmail.com"];
+        if (isEmail && ADMIN_EMAILS.indexOf(identifier) !== -1) {
+          if (window.supabaseClient) {
+            window.supabaseClient.auth.signInWithPassword({ email: identifier, password: password })
+              .then(function (res) {
+                if (res.error) { showError("Invalid admin credentials. Please verify your email and password."); return; }
+                var user = res.data && res.data.user;
+                if (!user) { showError("Invalid admin credentials."); return; }
+                persistAndRedirect("admin", user.email, "Admin", user.email);
+                if (window.VendoUI) VendoUI.toast({ title: "Admin Authenticated", desc: "Redirecting to Admin Control...", type: "success" });
+              })
+              .catch(function () { showError("Cannot reach authentication server. Check your connection and try again."); });
+          } else {
+            showError("Authentication service is not available. Please refresh the page.");
+          }
+          return;
+        }
+
+        // --- Customer / Vendor login (real Supabase) ---
+        if (!isEmail) {
+          // Phone-based login requires Supabase Auth phone provider; reject
+          // for now to avoid silently accepting invalid credentials.
+          showError("Phone-number login is not yet supported. Please sign in with your email.");
+          return;
+        }
+        if (!window.supabaseClient) {
+          showError("Authentication service is not available. Please refresh the page.");
+          return;
+        }
+        window.supabaseClient.auth.signInWithPassword({ email: identifier, password: password })
+          .then(function (res) {
+            if (res.error) { showError("Invalid email or password."); return; }
+            var user = res.data && res.data.user;
+            if (!user) { showError("Invalid email or password."); return; }
+            var role = (user.user_metadata && user.user_metadata.role) || "customer";
+            var name = (user.user_metadata && user.user_metadata.full_name) || (user.email || "").split("@")[0];
+            persistAndRedirect(role, user.email, name, user.email);
+            if (window.VendoUI) VendoUI.toast({ title: "Welcome to Vendo", desc: "Happy live shopping!", type: "success" });
+          })
+          .catch(function (err) {
+            console.warn("Supabase signIn failed:", err);
+            showError("Cannot reach authentication server. Check your connection and try again.");
+          });
+      }, 100);
     });
 
     // Create Account Submission
@@ -432,22 +473,61 @@
       const role = document.getElementById("register-role").value;
       const name = document.getElementById("register-name").value.trim();
       const identifier = document.getElementById("register-identifier").value.trim();
+      const password = document.getElementById("register-password").value;
+      const errorBox = document.getElementById("register-error");
       const btn = document.getElementById("btn-submit-register");
 
+      errorBox.style.display = "none";
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span> Creating account...';
 
-      setTimeout(() => {
+      function resetBtn() {
+        btn.disabled = false;
+        btn.innerHTML = '<span id="txt-register-submit">Create Account</span>';
+      }
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = "block";
+        resetBtn();
+      }
+      function persistAndRedirect(role, id, name, email) {
         sessionStorage.setItem("vendo_role", role);
-        sessionStorage.setItem("vendo_user", identifier);
+        sessionStorage.setItem("vendo_user", id);
         sessionStorage.setItem("vendo_name", name);
-
-        if (role === "vendor") {
-          window.location.href = "../vendor/onboarding.html";
-        } else {
-          window.location.href = "home.html";
+        if (window.VendoAuth) {
+          VendoAuth.setUser({
+            role: role, name: name,
+            email: email || "",
+            phone: /\S+@\S+\.\S+/.test(id) ? "" : id
+          });
         }
-      }, 500);
+        if (role === "vendor") window.location.href = "../vendor/onboarding.html";
+        else window.location.href = "home.html";
+      }
+      function isValidEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+
+      // Strict client-side validation
+      if (!name || name.length < 2) { showError("Please enter your full name."); return; }
+      if (!identifier) { showError("Please enter your email address."); return; }
+      if (!isValidEmail(identifier)) { showError("Please enter a valid email address."); return; }
+      if (!password || password.length < 8) { showError("Password must be at least 8 characters."); return; }
+
+// Real Supabase signUp
+      if (!window.supabaseClient) { showError("Authentication service is not available. Please refresh the page."); return; }
+      window.supabaseClient.auth.signUp({
+        email: identifier,
+        password: password,
+        options: { data: { full_name: name, role: role } }
+      })
+        .then(function (res) {
+          if (res.error) { showError(res.error.message || "Sign up failed."); return; }
+          persistAndRedirect(role, identifier, name, identifier);
+          if (window.VendoUI) VendoUI.toast({ title: "Account Created", desc: "Check your email for verification.", type: "success" });
+        })
+        .catch(function (err) {
+          console.warn("Supabase signUp failed:", err);
+          showError("Cannot reach authentication server. Check your connection and try again.");
+        });
     });
 
     // Google Sign-In Mock Handler

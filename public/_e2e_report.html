@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E2E Report · Vendo</title>
+  <script src="../src/js/theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../src/css/styles.css">
+  <style>
+    body { padding: 24px; max-width: 1280px; margin: 0 auto; }
+    h1 { font-family: var(--font-heading); }
+    .role { margin-top: 32px; border-top: 1px solid var(--color-border-default); padding-top: 16px; }
+    .page-card { padding: 12px 16px; border: 1px solid var(--color-border-default); border-radius: 8px; margin-bottom: 8px; }
+    .page-card.failed { border-color: var(--color-danger); background: var(--color-danger-soft); }
+    .page-card.passed { border-color: var(--color-success); }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; margin-right: 4px; background: var(--color-bg-subtle); }
+    .pill.ok { background: var(--color-success-soft); color: var(--color-success); }
+    .pill.fail { background: var(--color-danger-soft); color: var(--color-danger); }
+    .err { font-family: var(--font-mono); font-size: 11px; color: var(--color-danger); white-space: pre-wrap; word-break: break-word; max-height: 120px; overflow: auto; background: var(--color-bg-subtle); padding: 6px; border-radius: 4px; margin-top: 4px; }
+    details summary { cursor: pointer; font-size: 12px; color: var(--color-text-muted); }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip</a>
+  <div class="app">
+    <div class="main" style="width: 100%;">
+      <header class="topbar">
+        <h1 class="h2" style="margin: 0;">Vendo E2E Test Report</h1>
+      </header>
+      <div class="content" id="main">
+        <div id="root">Loading…</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    fetch("_e2e_report.json", { cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(render)
+      .catch(function (e) {
+        document.getElementById("root").textContent = "Failed to load report: " + e;
+      });
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function render(rep) {
+      var s = rep.summary || {};
+      var root = document.getElementById("root");
+      root.innerHTML =
+        '<div class="card">' +
+          '<div class="flex-between">' +
+            '<div><strong>Frontend:</strong> ' + escapeHtml(rep.frontend) + '<br>' +
+            '<strong>Functions:</strong> ' + escapeHtml(rep.functions) + '</div>' +
+            '<div class="caption">' +
+              'started: ' + escapeHtml(rep.started_at) + '<br>' +
+              'finished: ' + escapeHtml(rep.finished_at) +
+            '</div>' +
+          '</div>' +
+          '<div style="margin-top:12px">' +
+            '<span class="pill">Pages tested: <strong>' + (s.pages_tested || 0) + '</strong></span>' +
+            '<span class="pill ' + (s.pages_failed ? "fail" : "ok") + '">Failed: <strong>' + (s.pages_failed || 0) + '</strong></span>' +
+            '<span class="pill ' + (s.console_errors ? "fail" : "ok") + '">Console errors: <strong>' + (s.console_errors || 0) + '</strong></span>' +
+            '<span class="pill ' + (s.network_failures ? "fail" : "ok") + '">Network failures: <strong>' + (s.network_failures || 0) + '</strong></span>' +
+            '<span class="pill ' + (s.page_errors ? "fail" : "ok") + '">Page errors: <strong>' + (s.page_errors || 0) + '</strong></span>' +
+          '</div>' +
+          (rep.seed ? ('<details style="margin-top:12px"><summary>Seed result</summary><pre class="caption" style="white-space:pre-wrap">' + escapeHtml(JSON.stringify(rep.seed, null, 2)) + '</pre></details>') : '') +
+        '</div>';
+
+      // Group by role
+      var groups = {};
+      (rep.pages || []).forEach(function (p) {
+        var k = p.role || "unknown";
+        groups[k] = groups[k] || [];
+        groups[k].push(p);
+      });
+
+      Object.keys(groups).forEach(function (role) {
+        var div = document.createElement("div");
+        div.className = "role";
+        var html = '<h2 class="h3">' + escapeHtml(role) + ' (' + groups[role].length + ' pages)</h2>';
+        groups[role].forEach(function (p) {
+          var cls = p.loaded === false ? "failed" : (p.loaded ? "passed" : "");
+          html += '<div class="page-card ' + cls + '">' +
+            '<div class="flex-between">' +
+              '<strong>' + escapeHtml(p.page) + '</strong>' +
+              '<span class="pill ' + (p.loaded ? "ok" : "fail") + '">' + (p.loaded ? "loaded" : "FAIL") + '</span>' +
+            '</div>' +
+            (p.title ? '<div class="caption">title: ' + escapeHtml(p.title) + '</div>' : '') +
+            (p.status ? '<div class="caption">HTTP ' + p.status + '</div>' : '') +
+            '<div class="caption">' +
+              'links: ' + (p.links_present || 0) + ' · ' +
+              'buttons: ' + (p.buttons_present || 0) + ' · ' +
+              'lucide: ' + (p.lucide_icons || 0) +
+            '</div>' +
+            ((p.tabs_clicked || []).length ? '<div class="caption">tabs clicked: ' + escapeHtml(p.tabs_clicked.join(", ")) + '</div>' : '') +
+            ((p.buttons_clicked || []).length ? '<div class="caption">buttons: ' + escapeHtml(p.buttons_clicked.join(", ")) + '</div>' : '') +
+            ((p.assertions || []).map(function (a) {
+              return '<span class="pill ' + (a.ok ? "ok" : "fail") + '">' + escapeHtml(a.name) + (a.ok ? "" : ": " + escapeHtml(a.err || "fail")) + '</span>';
+            }).join("")) +
+            ((p.console_errors || []).length ? '<details><summary>' + p.console_errors.length + ' console error(s)</summary>' + p.console_errors.map(function (e) { return '<div class="err">' + escapeHtml(e.text) + '</div>'; }).join("") + '</details>' : '') +
+            ((p.page_errors || []).length ? '<details><summary>' + p.page_errors.length + ' page error(s)</summary>' + p.page_errors.map(function (e) { return '<div class="err">' + escapeHtml(e) + '</div>'; }).join("") + '</details>' : '') +
+          '</div>';
+        });
+        div.innerHTML = html;
+        root.appendChild(div);
+      });
+    }
+  </script>
+</body>
+</html>

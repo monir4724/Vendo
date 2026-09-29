@@ -12,6 +12,16 @@
   <style>
     .comment-item { display: flex; gap: 10px; margin-bottom: 12px; }
     .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-bg-subtle); display: grid; place-items: center; font-size: 11px; font-weight: 600; flex-shrink: 0; color: #fff; }
+    
+    /* Animation for simulated video effect */
+    @keyframes panZoom {
+      0% { transform: scale(1.0) translate(0, 0); }
+      50% { transform: scale(1.15) translate(-2%, 2%); }
+      100% { transform: scale(1.0) translate(0, 0); }
+    }
+    .reel-video {
+      animation: panZoom 15s ease-in-out infinite alternate;
+    }
   </style>
 </head>
 <body style="background:#0a0908;overflow:hidden">
@@ -102,7 +112,7 @@
         <div style="flex:1">
           <div id="sheet-name" style="font-weight:600;font-size:15px"></div>
           <div class="price" id="sheet-price" style="font-size:18px"></div>
-          <span class="caption" style="color:#34d399">✓ In stock · Ships in 24h</span>
+          <span class="caption" style="color:#34d399">In stock · Ships in 24h</span>
         </div>
       </div>
 

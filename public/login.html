@@ -7,6 +7,7 @@
   <title>Sign In & Register · Vendo</title>
   <link rel="icon" type="image/jpeg" href="assets/icon.jpg">
   <script src="../src/js/theme.js"></script>
+  <script src="../src/js/vendoLogger.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -46,7 +47,7 @@
     .auth-visual-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
@@ -174,11 +175,14 @@
   <main class="auth-split">
     <!-- LEFT SIDE: Live Shopping Hero Image -->
     <section class="auth-visual" aria-label="Vendo Live Commerce showcase">
-      <img src="assets/login-hero.jpg" alt="Vendo Live Stream Commerce showcase with artisan creators and live shoppers">
+      <img src="assets/login-hero.jpg"
+        alt="Vendo Live Stream Commerce showcase with artisan creators and live shoppers">
       <div class="auth-visual-overlay">
         <div class="flex gap-2" style="align-items:center;margin-bottom:8px">
-          <img src="assets/icon.jpg" alt="Vendo" style="width:32px;height:32px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.4)">
-          <span class="badge badge-live" style="background:#ef4444;color:#fff;font-weight:700;padding:2px 8px;border-radius:12px;font-size:11px">
+          <img src="assets/icon.jpg" alt="Vendo"
+            style="width:32px;height:32px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.4)">
+          <span class="badge badge-live"
+            style="background:#ef4444;color:#fff;font-weight:700;padding:2px 8px;border-radius:12px;font-size:11px">
             LIVE NOW
           </span>
           <span class="caption" style="color:rgba(255,255,255,0.9)">Interactive Artisan Drops</span>
@@ -187,7 +191,8 @@
           Shop artisan crafts live.
         </h2>
         <p style="font-size:13px;line-height:20px;margin:0;color:rgba(255,255,255,0.85);max-width:440px">
-          Watch real-time live demonstrations, interact with creators, and purchase verified handcrafted pieces with instant checkout.
+          Watch real-time live demonstrations, interact with creators, and purchase verified handcrafted pieces with
+          instant checkout.
         </p>
       </div>
     </section>
@@ -198,9 +203,11 @@
         <!-- Brand Header -->
         <div class="auth-header">
           <a href="index.html" class="flex gap-2" style="align-items:center;margin-bottom:16px;text-decoration:none">
-            <img src="assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:38px;height:38px;border-radius:10px">
+            <img src="assets/icon.jpg" class="brand-icon-img" alt="Vendo"
+              style="width:38px;height:38px;border-radius:10px">
             <div>
-              <img src="assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:30px;width:auto;display:block">
+              <img src="assets/logo.png" class="brand-logo-img" alt="Vendo"
+                style="height:30px;width:auto;display:block">
               <div class="caption">Live Social Commerce</div>
             </div>
           </a>
@@ -216,23 +223,29 @@
           <form id="form-signin" class="stack gap-3">
             <div>
               <label class="label" for="signin-identifier">Gmail / Phone Number</label>
-              <input class="field" id="signin-identifier" type="text" placeholder="name@gmail.com or 017xxxxxxxx" required autocomplete="username">
+              <input class="field" id="signin-identifier" type="text" placeholder="name@gmail.com or 017xxxxxxxx"
+                required autocomplete="username">
             </div>
 
             <div>
               <div class="flex-between">
                 <label class="label" for="signin-password">Password</label>
-                <a href="javascript:void(0)" id="link-forgot" class="caption" style="color:var(--color-brand)">Forgot password?</a>
+                <a href="javascript:void(0)" id="link-forgot" class="caption" style="color:var(--color-brand)">Forgot
+                  password?</a>
               </div>
               <div style="position:relative">
-                <input class="field" id="signin-password" type="password" placeholder="••••••••" required autocomplete="current-password" style="padding-right:40px">
-                <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('signin-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-muted);padding:4px">
+                <input class="field" id="signin-password" type="password" placeholder="••••••••" required
+                  autocomplete="current-password" style="padding-right:40px">
+                <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('signin-password', this)"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-muted);padding:4px">
                   <i data-lucide="eye" style="width:16px;height:16px"></i>
                 </button>
               </div>
             </div>
 
-            <div id="signin-error" class="caption" style="color:var(--color-danger);display:none;padding:6px 10px;background:rgba(239,68,68,0.1);border-radius:4px"></div>
+            <div id="signin-error" class="caption"
+              style="color:var(--color-danger);display:none;padding:6px 10px;background:rgba(239,68,68,0.1);border-radius:4px">
+            </div>
 
             <button class="btn btn-cta btn-block" type="submit" id="btn-submit-signin">
               <span>Sign In</span>
@@ -243,17 +256,22 @@
 
           <button class="google-btn" type="button" id="btn-google-signin">
             <svg width="18" height="18" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              <path fill="#4285F4"
+                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" />
+              <path fill="#34A853"
+                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z" />
+              <path fill="#FBBC05"
+                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.97 0 12s.45 3.82 1.25 5.42l4.03-3.15z" />
+              <path fill="#EA4335"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
             </svg>
             <span>Sign in with Google</span>
           </button>
 
           <div style="text-align:center;margin-top:24px">
             <span class="caption">Don't have an account?</span>
-            <button type="button" id="btn-show-register" style="background:none;border:none;color:var(--color-brand);font-weight:600;cursor:pointer;font-size:13px;margin-left:4px;padding:0">
+            <button type="button" id="btn-show-register"
+              style="background:none;border:none;color:var(--color-brand);font-weight:600;cursor:pointer;font-size:13px;margin-left:4px;padding:0">
               Create Account / Register
             </button>
           </div>
@@ -276,10 +294,6 @@
             </button>
           </div>
 
-          <!-- Notice: No Admin Option -->
-          <div class="caption" style="color:var(--color-text-muted);font-size:11px;margin-bottom:14px;background:var(--color-bg-subtle);padding:6px 10px;border-radius:4px">
-            <strong>Note:</strong> Admin accounts are pre-provisioned securely and do not require registration.
-          </div>
 
           <form id="form-register" class="stack gap-3">
             <input type="hidden" id="register-role" value="customer">
@@ -291,20 +305,26 @@
 
             <div>
               <label class="label" for="register-identifier">Gmail / Phone Number</label>
-              <input class="field" id="register-identifier" type="text" placeholder="name@gmail.com or 017xxxxxxxx" required>
+              <input class="field" id="register-identifier" type="text" placeholder="name@gmail.com or 017xxxxxxxx"
+                required>
             </div>
 
             <div>
               <label class="label" for="register-password">Password</label>
               <div style="position:relative">
-                <input class="field" id="register-password" type="password" placeholder="At least 8 characters" required style="padding-right:40px">
-                <button type="button" class="btn-toggle-pw" onclick="togglePasswordVisibility('register-password', this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-muted);padding:4px">
+                <input class="field" id="register-password" type="password" placeholder="At least 8 characters" required
+                  style="padding-right:40px">
+                <button type="button" class="btn-toggle-pw"
+                  onclick="togglePasswordVisibility('register-password', this)"
+                  style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-muted);padding:4px">
                   <i data-lucide="eye" style="width:16px;height:16px"></i>
                 </button>
               </div>
             </div>
 
-            <div id="register-error" class="caption" style="color:var(--color-danger);display:none;padding:6px 10px;background:rgba(239,68,68,0.1);border-radius:4px"></div>
+            <div id="register-error" class="caption"
+              style="color:var(--color-danger);display:none;padding:6px 10px;background:rgba(239,68,68,0.1);border-radius:4px">
+            </div>
 
             <button class="btn btn-cta btn-block" type="submit" id="btn-submit-register">
               <span id="txt-register-submit">Create Customer Account</span>
@@ -313,7 +333,8 @@
 
           <div style="text-align:center;margin-top:20px">
             <span class="caption">Already have an account?</span>
-            <button type="button" id="btn-show-signin" style="background:none;border:none;color:var(--color-brand);font-weight:600;cursor:pointer;font-size:13px;margin-left:4px;padding:0">
+            <button type="button" id="btn-show-signin"
+              style="background:none;border:none;color:var(--color-brand);font-weight:600;cursor:pointer;font-size:13px;margin-left:4px;padding:0">
               Sign In
             </button>
           </div>
@@ -323,7 +344,10 @@
   </main>
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../src/js/supabaseClient.js"></script>
   <script src="../src/js/ui.js"></script>
+  <script src="../src/js/auth.js"></script>
   <script>
     if (window.lucide) lucide.createIcons();
 
@@ -390,39 +414,76 @@
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span> Authenticating...';
 
-      setTimeout(() => {
-        // 1. ADMIN LOGIN: Direct verification and redirect to Admin Dashboard
-        if (identifier === "admin@vendo.app" || identifier === "security.admin@vendo.app" || identifier.includes("admin")) {
-          if (password === "Admin@Vendo2026!" || password.length >= 6) {
-            sessionStorage.setItem("vendo_role", "admin");
-            sessionStorage.setItem("vendo_user", identifier);
+      function resetBtn() {
+        btn.disabled = false;
+        btn.innerHTML = "<span>Sign In</span>";
+      }
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = "block";
+        resetBtn();
+      }
+      function persistAndRedirect(role, id, name, email) {
+        sessionStorage.setItem("vendo_role", role);
+        sessionStorage.setItem("vendo_user", id);
+        if (window.VendoAuth) {
+          VendoAuth.setUser({ role: role, name: name || "", email: email || id, phone: "" });
+        }
+        if (role === "admin") window.location.href = "admin/dashboard.html";
+        else if (role === "vendor") window.location.href = "vendor/dashboard.html";
+        else window.location.href = "customer/home.html";
+      }
+      function isValidEmail(s) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s); }
+      function isValidPhone(s) { return /^\+?[0-9]{8,15}$/.test(s.replace(/[\s-]/g, "")); }
+
+      // Strict client-side validation
+      if (!identifier) { showError("Please enter your email or phone number."); return; }
+      if (!password || password.length < 6) { showError("Password must be at least 6 characters."); return; }
+
+      var isEmail = isValidEmail(identifier);
+      var isPhone = !isEmail && isValidPhone(identifier);
+      if (!isEmail && !isPhone) {
+        showError("Please enter a valid email address or phone number.");
+        return;
+      }
+
+      // Admin (allowlist only)
+      var ADMIN_EMAILS = ["admin@vendo.app", "security.admin@vendo.app", "admin@gmail.com", "monir@gmail.com"];
+      if (isEmail && ADMIN_EMAILS.indexOf(identifier) !== -1) {
+        if (!window.supabaseClient) { showError("Authentication service is not available. Please refresh the page."); return; }
+        window.supabaseClient.auth.signInWithPassword({ email: identifier, password: password })
+          .then(function (res) {
+            if (res.error) { showError("Invalid admin credentials. Please verify your email and password."); return; }
+            var user = res.data && res.data.user;
+            if (!user) { showError("Invalid admin credentials."); return; }
+            persistAndRedirect("admin", user.email, "Admin", user.email);
             if (window.VendoUI) VendoUI.toast({ title: "Admin Authenticated", desc: "Redirecting to Admin Control...", type: "success" });
-            window.location.href = "admin/dashboard.html";
-            return;
-          } else {
-            errorBox.textContent = "Invalid Admin credentials. Please verify your password.";
-            errorBox.style.display = "block";
-            btn.disabled = false;
-            btn.innerHTML = "<span>Sign In</span>";
-            return;
-          }
-        }
+          })
+          .catch(function () { showError("Cannot reach authentication server. Check your connection and try again."); });
+        return;
+      }
 
-        // 2. VENDOR LOGIN: Redirect to Vendor Studio
-        if (identifier === "vendor@vendo.app" || identifier.includes("vendor") || identifier.includes("artisan") || identifier.includes("studio")) {
-          sessionStorage.setItem("vendo_role", "vendor");
-          sessionStorage.setItem("vendo_user", identifier);
-          if (window.VendoUI) VendoUI.toast({ title: "Vendor Studio", desc: "Welcome back to your studio!", type: "success" });
-          window.location.href = "vendor/dashboard.html";
-          return;
-        }
+      // Customer / Vendor
+      if (!isEmail) {
+        showError("Phone-number login is not yet supported. Please sign in with your email.");
+        return;
+      }
+      if (!window.supabaseClient) { showError("Authentication service is not available. Please refresh the page."); return; }
 
-        // 3. CUSTOMER LOGIN (Default): Redirect to Customer Storefront
-        sessionStorage.setItem("vendo_role", "customer");
-        sessionStorage.setItem("vendo_user", identifier);
-        if (window.VendoUI) VendoUI.toast({ title: "Welcome to Vendo", desc: "Happy live shopping!", type: "success" });
-        window.location.href = "customer/home.html";
-      }, 500);
+      window.supabaseClient.auth.signInWithPassword({ email: identifier, password: password })
+        .then(function (res) {
+          if (res.error) { showError("Invalid email or password."); return; }
+          var user = res.data && res.data.user;
+          if (!user) { showError("Invalid email or password."); return; }
+          var role = (user.user_metadata && user.user_metadata.role) || "customer";
+          var name = (user.user_metadata && user.user_metadata.full_name) || (user.email || "").split("@")[0];
+          persistAndRedirect(role, user.email, name, user.email);
+          if (window.VendoUI) VendoUI.toast({ title: "Welcome to Vendo", desc: "Happy live shopping!", type: "success" });
+        })
+        .catch(function (err) {
+          console.warn("Supabase signIn failed:", err);
+          showError("Cannot reach authentication server. Check your connection and try again.");
+        });
     });
 
     // Create Account Submission
@@ -431,22 +492,57 @@
       const role = document.getElementById("register-role").value;
       const name = document.getElementById("register-name").value.trim();
       const identifier = document.getElementById("register-identifier").value.trim();
+      const password = document.getElementById("register-password").value;
+      const errorBox = document.getElementById("register-error");
       const btn = document.getElementById("btn-submit-register");
 
+      errorBox.style.display = "none";
       btn.disabled = true;
       btn.innerHTML = '<span class="spin"></span> Creating account...';
 
-      setTimeout(() => {
+      function resetBtn() {
+        btn.disabled = false;
+        btn.innerHTML = '<span id="txt-register-submit">Create Account</span>';
+      }
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.style.display = "block";
+        resetBtn();
+      }
+      function persistAndRedirect(role, id, name, email) {
         sessionStorage.setItem("vendo_role", role);
-        sessionStorage.setItem("vendo_user", identifier);
+        sessionStorage.setItem("vendo_user", id);
         sessionStorage.setItem("vendo_name", name);
-
-        if (role === "vendor") {
-          window.location.href = "vendor/onboarding.html";
-        } else {
-          window.location.href = "customer/home.html";
+        if (window.VendoAuth) {
+          VendoAuth.setUser({
+            role: role,
+            name: name,
+            email: email || "",
+            phone: /\S+@\S+\.\S+/.test(id) ? "" : id
+          });
         }
-      }, 500);
+        if (role === "vendor") window.location.href = "vendor/onboarding.html";
+        else window.location.href = "customer/home.html";
+      }
+
+      if (window.supabaseClient) {
+        window.supabaseClient.auth.signUp({
+          email: identifier,
+          password: password,
+          options: { data: { full_name: name, role: role } }
+        })
+          .then(function (res) {
+            if (res.error) { showError(res.error.message || "Sign up failed."); return; }
+            persistAndRedirect(role, identifier, name, identifier);
+            if (window.VendoUI) VendoUI.toast({ title: "Account Created", desc: "Check your email for verification.", type: "success" });
+          })
+          .catch(function (err) {
+            console.warn("Supabase signUp failed:", err);
+            showError("Cannot reach authentication server. Check your connection and try again.");
+          });
+      } else {
+        showError("Authentication service is not available. Please refresh the page.");
+      }
     });
 
     // Google Sign-In Mock Handler

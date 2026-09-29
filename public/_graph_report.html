@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Vendo — Cross-Role Dependency Graph</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link rel="stylesheet" href="../src/styles/styles.css" />
+<style>
+  .wrap{max-width:1200px;margin:24px auto;padding:0 16px}
+  .card{background:var(--vendo-bg-elev,#fff);border:1px solid var(--vendo-border,#e5e7eb);border-radius:12px;padding:16px;margin-bottom:12px}
+  .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;margin:2px;font-family:ui-monospace,monospace}
+  .err{background:#fee2e2;color:#991b1b}
+  .warn{background:#fef3c7;color:#92400e}
+  .ok{background:#dcfce7;color:#166534}
+  .info{background:#dbeafe;color:#1e40af}
+  .modrow{border-bottom:1px solid var(--vendo-border,#e5e7eb);padding:10px 0}
+  .modname{font-weight:600;font-family:ui-monospace,monospace}
+  .pages{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+  .pagepill{font-size:11px;padding:2px 8px;background:#f3f4f6;border-radius:6px;font-family:ui-monospace,monospace}
+  h2{margin-top:24px;margin-bottom:8px}
+  pre{background:#0b1020;color:#e6edf3;padding:12px;border-radius:8px;overflow:auto;font-size:12px}
+  .stat{display:flex;gap:16px;flex-wrap:wrap}
+  .stat .n{font-size:28px;font-weight:700}
+  .gap-row{padding:8px 12px;border-left:4px solid #888;background:#fafafa;margin-bottom:6px;border-radius:4px}
+  .gap-row.err{border-left-color:#dc2626}
+  .gap-row.warn{border-left-color:#d97706}
+  .gap-row.info{border-left-color:#2563eb}
+  .gap-rule{font-family:ui-monospace,monospace;font-weight:600;margin-right:8px}
+  .gap-page{font-family:ui-monospace,monospace;color:#4b5563;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Vendo — Cross-Role Dependency Graph</h1>
+  <p>Maps every cross-cutting function/module call across admin / vendor / customer pages and flags missing reciprocal edges.</p>
+
+  <div id="stats" class="card"></div>
+
+  <h2>Module usage</h2>
+  <div id="modules" class="card"></div>
+
+  <h2>Function → callers</h2>
+  <div id="functions" class="card"></div>
+
+  <h2>Gaps</h2>
+  <div id="gaps" class="card"></div>
+
+  <h2>Raw JSON</h2>
+  <pre id="raw">loading…</pre>
+</div>
+
+<script src="../src/js/vendoLogger.js"></script>
+<script>
+(async function () {
+  const res = await fetch("_graph_report.json", { cache: "no-cache" });
+  const data = await res.json();
+
+  // stats
+  const s = data.summary || {};
+  document.getElementById("stats").innerHTML = `
+    <div class="stat">
+      <div><div class="n">${s.pages_scanned ?? "?"}</div><div>pages scanned</div></div>
+      <div><div class="n">${s.modules_seen ?? "?"}</div><div>modules seen</div></div>
+      <div><div class="n">${s.gaps_found ?? 0}</div><div>gaps</div></div>
+      <div><div class="n">${(s.by_severity||{}).error ?? 0}</div><div>errors</div></div>
+      <div><div class="n">${(s.by_severity||{}).warning ?? 0}</div><div>warnings</div></div>
+    </div>
+    <div style="margin-top:8px">By rule: ${Object.entries(s.by_rule||{}).map(([k,v])=>`<span class="pill info">${k} = ${v}</span>`).join(" ")||"none"}</div>
+  `;
+
+  // modules
+  const expected = ["VendoUI","VendoAuth","VendoData","VendoLayout","VendoTheme","VendoCart","VendoWish","VendoOrders","VendoChat","VendoStore","VendoNotifications"];
+  const mods = data.module_summary || {};
+  document.getElementById("modules").innerHTML = expected.map(m => {
+    const used = mods[m] || [];
+    const cls = used.length ? "ok" : "err";
+    return `<div class="modrow">
+      <span class="pill ${cls}">${m}</span>
+      <span style="margin-left:8px;color:#6b7280">${used.length} page${used.length===1?"":"s"}</span>
+      <div class="pages">${used.map(p=>`<span class="pagepill">${p}</span>`).join("")}</div>
+    </div>`;
+  }).join("");
+
+  // functions
+  const fns = data.function_callers || {};
+  const fnKeys = Object.keys(fns).sort();
+  document.getElementById("functions").innerHTML = fnKeys.length === 0
+    ? "<em>No VendoX.method() calls detected.</em>"
+    : fnKeys.map(k => `<div class="modrow">
+        <span class="modname">${k}</span> <span style="color:#6b7280">(${fns[k].length})</span>
+        <div class="pages">${fns[k].map(p=>`<span class="pagepill">${p}</span>`).join("")}</div>
+      </div>`).join("");
+
+  // gaps
+  const gaps = data.gaps || [];
+  document.getElementById("gaps").innerHTML = gaps.length === 0
+    ? "<span class='pill ok'>No gaps detected ✓</span>"
+    : gaps.map(g => `<div class="gap-row ${g.severity}">
+        <span class="pill ${g.severity}">${g.severity.toUpperCase()}</span>
+        <span class="gap-rule">${g.rule}</span>
+        <span class="gap-page">${g.page}</span>
+        <div style="margin-top:4px">${g.msg}</div>
+      </div>`).join("");
+
+  document.getElementById("raw").textContent = JSON.stringify(data, null, 2);
+})();
+</script>
+</body>
+</html>

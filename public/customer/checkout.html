@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Checkout · Vendo</title>
   <script src="../../src/js/theme.js"></script>
+  <script src="../../src/js/vendoLogger.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,7 +15,8 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="store-nav">
     <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
-      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">`r`n      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
+      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">
+      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
     </a>
     <div style="margin-left:auto" class="caption secondary flex gap-2" style="align-items:center">
       <i data-lucide="lock" style="width:14px;height:14px;color:var(--color-brand)"></i>
@@ -52,28 +54,28 @@
           <div class="form-row" style="grid-template-columns:1fr 1fr">
             <div>
               <label class="label" for="ship-name">Full Name *</label>
-              <input class="field" id="ship-name" required value="Amina Rahman" placeholder="e.g. Amina Rahman">
+              <input class="field" id="ship-name" required value="" placeholder="e.g. Anika Tabassum">
             </div>
             <div>
               <label class="label" for="ship-email">Email Address *</label>
-              <input class="field" type="email" id="ship-email" required value="amina.r@example.com" placeholder="name@domain.com">
+              <input class="field" type="email" id="ship-email" required value="" placeholder="name@domain.com">
             </div>
           </div>
 
           <div class="form-row" style="grid-template-columns:1fr 1fr">
             <div>
               <label class="label" for="ship-phone">Phone Number *</label>
-              <input class="field" id="ship-phone" required value="+880 1712 345678" placeholder="+880 1XXX XXXXXX">
+              <input class="field" id="ship-phone" required value="" placeholder="+880 1XXX XXXXXX">
             </div>
             <div>
               <label class="label" for="ship-city">City / Region *</label>
-              <input class="field" id="ship-city" required value="Dhaka" placeholder="City">
+              <input class="field" id="ship-city" required value="" placeholder="City">
             </div>
           </div>
 
           <div class="mb-4">
             <label class="label" for="ship-address">Street Address & Apartment *</label>
-            <input class="field" id="ship-address" required value="House 42, Road 11, Banani" placeholder="House, road, landmark">
+            <input class="field" id="ship-address" required value="" placeholder="House, road, landmark">
           </div>
 
           <div class="mb-4">
@@ -163,7 +165,7 @@
               <strong>Shipping Destination</strong>
               <button class="btn btn-sm btn-ghost" type="button" id="btn-edit-ship" style="font-size:12px;color:var(--color-brand)">Edit</button>
             </div>
-            <div class="caption" id="review-ship-text">Amina Rahman · Banani, Dhaka · +880 1712 345678</div>
+            <div class="caption" id="review-ship-text">—</div>
           </div>
 
           <div class="card" style="background:var(--color-bg-subtle);padding:16px;margin-bottom:16px">
@@ -227,6 +229,7 @@
 
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../../src/js/ui.js"></script>
+  <script src="../../src/js/auth.js"></script>
   <script src="../../src/js/data.js"></script>
   <script src="../../src/js/layout.js"></script>
   <script>
@@ -371,3 +374,29 @@
   </script>
 </body>
 </html>
+
+    // Autofill shipping form with the current signed-in user.
+    // VendoAuth persists user data on login/register, so a new
+    // account's info flows in instead of the static demo values.
+    (function autofillCheckout() {
+      if (!window.VendoAuth) return;
+      var u = VendoAuth.getUser();
+      function setIfEmpty(id, value) {
+        var el = document.getElementById(id);
+        if (el && value && !el.value) el.value = value;
+      }
+      setIfEmpty("ship-name", u.name);
+      setIfEmpty("ship-email", u.email);
+      setIfEmpty("ship-phone", u.phone);
+      setIfEmpty("ship-city", u.city);
+      setIfEmpty("ship-address", u.address);
+      var reviewEl = document.getElementById("review-ship-text");
+      if (reviewEl) {
+        var name = (document.getElementById("ship-name") || {}).value;
+        var city = (document.getElementById("ship-city") || {}).value;
+        var phone = (document.getElementById("ship-phone") || {}).value;
+        var parts = [name, city, phone].filter(Boolean);
+        reviewEl.textContent = parts.length ? parts.join(" - ") : "—";
+      }
+    })();
+

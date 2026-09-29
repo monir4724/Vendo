@@ -14,7 +14,8 @@
   <a class="skip-link" href="#main">Skip to content</a>
   <header class="store-nav">
     <a href="home.html" class="flex gap-2" style="align-items:center;color:inherit">
-      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">`r`n      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
+      <img src="../assets/icon.jpg" class="brand-icon-img" alt="Vendo" style="width:30px;height:30px;border-radius:8px">
+      <img src="../assets/logo.png" class="brand-logo-img" alt="Vendo" style="height:24px;width:auto">
     </a>
     <form class="search" action="search.html">
       <i data-lucide="search"></i>
@@ -45,7 +46,7 @@
         <div class="flex gap-3" style="align-items:center">
           <div style="text-align:right" class="caption">
             <div><strong id="store-followers" style="font-size:16px;color:var(--color-text-primary)">14.2k</strong> followers</div>
-            <div class="secondary">★ <strong id="store-rating">4.9</strong> (1,420 orders)</div>
+            <div class="secondary"><strong id="store-rating">4.9</strong> (1,420 orders)</div>
           </div>
           <button class="btn btn-cta" type="button" id="btn-follow-store">
             <i data-lucide="user-plus"></i> Follow Store
@@ -92,6 +93,7 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="../../src/js/ui.js"></script>
   <script src="../../src/js/data.js"></script>
+  <script src="../../src/js/store.js"></script>
   <script src="../../src/js/layout.js"></script>
   <script src="../../src/js/chat.js"></script>
   <script>
@@ -100,7 +102,10 @@
 
     var params = new URLSearchParams(location.search);
     var vendorName = params.get("vendor") || "Atelier North";
-    var vendor = window.VendoData.vendors.find(function (v) { return v.name.toLowerCase() === vendorName.toLowerCase(); }) || window.VendoData.vendors[0];
+    var vendor = window.VendoStore && VendoStore.listVendors
+  ? VendoStore.listVendors().find(function (v) { return v.name.toLowerCase() === vendorName.toLowerCase(); })
+  : null;
+if (!vendor) vendor = window.VendoData.vendors.find(function (v) { return v.name.toLowerCase() === vendorName.toLowerCase(); }) || window.VendoData.vendors[0];
 
     document.title = vendor.name + " · Vendo Storefront";
     document.getElementById("store-name").textContent = vendor.name;
